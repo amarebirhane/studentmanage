@@ -190,3 +190,154 @@ This will start MongoDB in a Docker container.
 
 ISC
 
+
+<!-- 
+
+Core Features (Must-Have)
+
+Student Registration & Profile Management
+
+Name, age, gender, contact
+
+Parent/guardian info
+
+Documents upload (ID, photo)
+
+Class & Section Management
+
+Create classes/sections
+
+Assign students to classes
+
+Attendance Management
+
+Daily attendance
+
+Reports (monthly/weekly)
+
+Grades & Exam Management
+
+Record marks
+
+Report cards
+
+GPA/grade calculation
+
+User Roles & Authentication
+
+Admin
+
+Teachers
+
+Students
+
+Parents
+
+Dashboard
+
+Quick stats (total students, attendance, performance)
+
+⭐ Advanced Features
+
+Timetable Management
+
+Generate weekly schedules
+
+Assign teachers to periods
+
+Fee Management
+
+Due dates
+
+Payment status
+
+Receipts
+
+Behavior & Discipline Records
+
+Notes for good behavior or incidents
+
+Student Performance Analytics
+
+Graphs for marks
+
+Trends over time
+
+Assignments Module
+
+Teachers upload tasks
+
+Students submit work
+
+Notifications System
+
+SMS / Email alerts
+
+In-app notifications for deadlines
+
+🚀 Professional Features (Optional but Valuable)
+
+Online Exams
+
+Multiple-choice quizzes
+
+Automatic grading
+
+Document Generation
+
+Transcripts
+
+Transfer certificates
+
+ID cards
+
+Parent Portal
+
+Monitor attendance
+
+View marks
+
+Receive messages
+
+Library Management
+
+Books
+
+Issued/returned
+
+Due reminders
+
+Transport Management
+
+Bus routes
+
+Student bus assignment
+
+Driver info
+
+Hostel Management (if needed)
+
+Room allocation
+
+Fee tracking
+
+🤖 Modern Features (If using AI or advanced tech)
+
+AI-powered performance prediction
+
+Chatbot for student queries
+
+Face-recognition attendance
+
+Smart timetable generator
+
+🗂️ Integration Features
+
+Export data (Excel/PDF)
+
+Backup & restore
+
+Cloud storage support
+
+API for mobile app
+ -->

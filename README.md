@@ -346,4 +346,5 @@ API for mobile app
     npx prisma migrate dev --name init
    npm run db:seed
       npm run dev
+      DISM /Online /Cleanup-Image /RestoreHealth
   -->

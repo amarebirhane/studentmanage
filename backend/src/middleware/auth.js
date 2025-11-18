@@ -1,15 +1,18 @@
 const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+const prisma = require('../lib/prisma');
+
+const getTokenFromRequest = (req) => {
+  if (req.cookies?.token) {
+    return req.cookies.token;
+  }
+  if (req.headers.authorization?.startsWith('Bearer')) {
+    return req.headers.authorization.split(' ')[1];
+  }
+  return null;
+};
 
 const protect = async (req, res, next) => {
-  let token;
-
-  // Check for token in cookies first, then in Authorization header
-  if (req.cookies && req.cookies.token) {
-    token = req.cookies.token;
-  } else if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
-    token = req.headers.authorization.split(' ')[1];
-  }
+  const token = getTokenFromRequest(req);
 
   if (!token) {
     return res.status(401).json({ message: 'Not authorized, no token' });
@@ -17,33 +20,42 @@ const protect = async (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = await User.findById(decoded.id).select('-password');
-    
-    if (!req.user) {
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.id },
+      include: {
+        studentProfile: true,
+        teacherProfile: true,
+        parentProfiles: true,
+      },
+    });
+
+    if (!user) {
       return res.status(401).json({ message: 'User not found' });
     }
-    
+
+    req.user = user;
     next();
   } catch (error) {
+    console.error('Auth error:', error.message);
     res.status(401).json({ message: 'Not authorized, token failed' });
   }
 };
 
-const admin = (req, res, next) => {
-  if (req.user && req.user.role === 'admin') {
-    next();
-  } else {
-    res.status(403).json({ message: 'Not authorized as admin' });
+const requireRoles = (...roles) => (req, res, next) => {
+  if (!req.user) {
+    return res.status(401).json({ message: 'Not authorized' });
   }
+
+  if (!roles.includes(req.user.role)) {
+    return res.status(403).json({ message: 'Not authorized for this action' });
+  }
+
+  next();
 };
 
-const teacher = (req, res, next) => {
-  if (req.user && (req.user.role === 'admin' || req.user.role === 'teacher')) {
-    next();
-  } else {
-    res.status(403).json({ message: 'Not authorized as teacher or admin' });
-  }
-};
+const admin = requireRoles('ADMIN');
+const teacher = requireRoles('ADMIN', 'TEACHER');
+const parent = requireRoles('ADMIN', 'PARENT');
+const student = requireRoles('ADMIN', 'STUDENT');
 
-module.exports = { protect, admin, teacher };
-
+module.exports = { protect, admin, teacher, parent, student, requireRoles };

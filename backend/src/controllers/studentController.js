@@ -1,173 +1,345 @@
-const Student = require('../models/Student');
+const bcrypt = require('bcryptjs');
+const prisma = require('../lib/prisma');
 
-// @desc    Get all students with search, filter, and pagination
-// @route   GET /api/v1/students
-// @access  Private/Teacher
+const DEFAULT_STUDENT_PASSWORD = 'Student@123';
+
+const buildStudentWhereClause = ({ search, classId, sectionId }) => {
+  const where = {};
+  if (search) {
+    where.OR = [
+      { user: { firstName: { contains: search, mode: 'insensitive' } } },
+      { user: { lastName: { contains: search, mode: 'insensitive' } } },
+      { user: { email: { contains: search, mode: 'insensitive' } } },
+      { guardianName: { contains: search, mode: 'insensitive' } },
+      { guardianPhone: { contains: search, mode: 'insensitive' } },
+    ];
+  }
+  if (classId) {
+    where.classId = classId;
+  }
+  if (sectionId) {
+    where.sectionId = sectionId;
+  }
+  return where;
+};
+
 const getStudents = async (req, res) => {
   try {
-    const { search, page = 1, limit = 10, sortBy = 'createdAt', sortOrder = 'desc' } = req.query;
-    
-    const query = {};
-    
-    // Search functionality
-    if (search) {
-      query.$or = [
-        { name: { $regex: search, $options: 'i' } },
-        { email: { $regex: search, $options: 'i' } },
-        { enrollmentNo: { $regex: search, $options: 'i' } },
-        { phone: { $regex: search, $options: 'i' } },
-      ];
-    }
+    const { search, classId, sectionId, page = 1, limit = 10, sortBy = 'createdAt', sortOrder = 'desc' } = req.query;
 
-    const skip = (parseInt(page) - 1) * parseInt(limit);
-    const sort = { [sortBy]: sortOrder === 'asc' ? 1 : -1 };
+    const where = buildStudentWhereClause({ search, classId, sectionId });
 
-    const students = await Student.find(query)
-      .populate('createdBy', 'name email')
-      .sort(sort)
-      .skip(skip)
-      .limit(parseInt(limit));
-
-    const total = await Student.countDocuments(query);
+    const [students, total] = await Promise.all([
+      prisma.studentProfile.findMany({
+        where,
+        include: {
+          user: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              email: true,
+              role: true,
+              phone: true,
+            },
+          },
+          class: true,
+          section: true,
+          documents: true,
+        },
+        skip: (Number(page) - 1) * Number(limit),
+        take: Number(limit),
+        orderBy: { [sortBy]: sortOrder === 'asc' ? 'asc' : 'desc' },
+      }),
+      prisma.studentProfile.count({ where }),
+    ]);
 
     res.json({
       students,
       pagination: {
-        page: parseInt(page),
-        limit: parseInt(limit),
+        page: Number(page),
+        limit: Number(limit),
         total,
-        pages: Math.ceil(total / parseInt(limit)),
+        pages: Math.ceil(total / Number(limit)) || 1,
       },
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error('Get students error:', error);
+    res.status(500).json({ message: 'Failed to fetch students' });
   }
 };
 
-// @desc    Get single student
-// @route   GET /api/v1/students/:id
-// @access  Private/Teacher
 const getStudentById = async (req, res) => {
   try {
-    const student = await Student.findById(req.params.id).populate('createdBy', 'name email');
-    
-    if (student) {
-      res.json(student);
-    } else {
-      res.status(404).json({ message: 'Student not found' });
-    }
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-// @desc    Create new student
-// @route   POST /api/v1/students
-// @access  Private/Admin
-const createStudent = async (req, res) => {
-  try {
-    const { name, email, phone, enrollmentNo, dateOfAdmission, photo } = req.body;
-
-    const studentExists = await Student.findOne({ $or: [{ email }, { enrollmentNo }] });
-
-    if (studentExists) {
-      return res.status(400).json({ message: 'Student with this email or enrollment number already exists' });
-    }
-
-    const student = await Student.create({
-      name,
-      email,
-      phone,
-      enrollmentNo,
-      dateOfAdmission: new Date(dateOfAdmission),
-      photo: photo || null,
-      createdBy: req.user._id,
+    const student = await prisma.studentProfile.findUnique({
+      where: { id: req.params.id },
+      include: {
+        user: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+            role: true,
+            phone: true,
+          },
+        },
+        class: true,
+        section: true,
+        documents: true,
+        attendances: true,
+        grades: {
+          include: {
+            exam: true,
+          },
+        },
+      },
     });
 
-    res.status(201).json(student);
+    if (!student) {
+      return res.status(404).json({ message: 'Student not found' });
+    }
+
+    res.json(student);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error('Get student error:', error);
+    res.status(500).json({ message: 'Failed to fetch student' });
   }
 };
 
-// @desc    Update student
-// @route   PUT /api/v1/students/:id
-// @access  Private/Admin
+const createStudent = async (req, res) => {
+  try {
+    const {
+      firstName,
+      lastName,
+      email,
+      password,
+      phone,
+      age,
+      gender,
+      dateOfBirth,
+      contactAddress,
+      guardianName,
+      guardianPhone,
+      guardianEmail,
+      classId,
+      sectionId,
+      avatarUrl,
+      idDocumentUrl,
+    } = req.body;
+
+    if (!firstName || !lastName || !email) {
+      return res.status(400).json({ message: 'firstName, lastName and email are required' });
+    }
+
+    const existingUser = await prisma.user.findUnique({ where: { email: email.toLowerCase() } });
+    if (existingUser) {
+      return res.status(400).json({ message: 'A user with this email already exists' });
+    }
+
+    if (classId) {
+      const classExists = await prisma.class.findUnique({ where: { id: classId } });
+      if (!classExists) {
+        return res.status(400).json({ message: 'Class not found' });
+      }
+    }
+
+    if (sectionId) {
+      const sectionExists = await prisma.section.findUnique({ where: { id: sectionId } });
+      if (!sectionExists) {
+        return res.status(400).json({ message: 'Section not found' });
+      }
+    }
+
+    const hashedPassword = await bcrypt.hash(password || DEFAULT_STUDENT_PASSWORD, 10);
+
+    const result = await prisma.$transaction(async (tx) => {
+      const user = await tx.user.create({
+        data: {
+          firstName,
+          lastName,
+          email: email.toLowerCase(),
+          password: hashedPassword,
+          role: 'STUDENT',
+          phone,
+        },
+      });
+
+      const studentProfile = await tx.studentProfile.create({
+        data: {
+          userId: user.id,
+          age,
+          gender,
+          dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : null,
+          contactAddress,
+          guardianName,
+          guardianPhone,
+          guardianEmail,
+          classId,
+          sectionId,
+          avatarUrl,
+          idDocumentUrl,
+        },
+        include: {
+          class: true,
+          section: true,
+        },
+      });
+
+      return { user, studentProfile };
+    });
+
+    res.status(201).json(result);
+  } catch (error) {
+    console.error('Create student error:', error);
+    res.status(500).json({ message: 'Failed to create student' });
+  }
+};
+
 const updateStudent = async (req, res) => {
   try {
-    const { name, email, phone, enrollmentNo, dateOfAdmission, photo } = req.body;
+    const {
+      firstName,
+      lastName,
+      phone,
+      age,
+      gender,
+      dateOfBirth,
+      contactAddress,
+      guardianName,
+      guardianPhone,
+      guardianEmail,
+      classId,
+      sectionId,
+      avatarUrl,
+      idDocumentUrl,
+    } = req.body;
 
-    const student = await Student.findById(req.params.id);
-
-    if (student) {
-      // Check if email or enrollmentNo is being changed and if it conflicts
-      if (email && email !== student.email) {
-        const emailExists = await Student.findOne({ email, _id: { $ne: req.params.id } });
-        if (emailExists) {
-          return res.status(400).json({ message: 'Email already exists' });
-        }
-      }
-
-      if (enrollmentNo && enrollmentNo !== student.enrollmentNo) {
-        const idExists = await Student.findOne({ enrollmentNo, _id: { $ne: req.params.id } });
-        if (idExists) {
-          return res.status(400).json({ message: 'Enrollment number already exists' });
-        }
-      }
-
-      student.name = name || student.name;
-      student.email = email || student.email;
-      student.phone = phone || student.phone;
-      student.enrollmentNo = enrollmentNo || student.enrollmentNo;
-      if (dateOfAdmission) student.dateOfAdmission = new Date(dateOfAdmission);
-      if (photo !== undefined) student.photo = photo;
-
-      const updatedStudent = await student.save();
-      res.json(updatedStudent);
-    } else {
-      res.status(404).json({ message: 'Student not found' });
+    const student = await prisma.studentProfile.findUnique({ where: { id: req.params.id } });
+    if (!student) {
+      return res.status(404).json({ message: 'Student not found' });
     }
+
+    if (classId) {
+      const classExists = await prisma.class.findUnique({ where: { id: classId } });
+      if (!classExists) {
+        return res.status(400).json({ message: 'Class not found' });
+      }
+    }
+
+    if (sectionId) {
+      const sectionExists = await prisma.section.findUnique({ where: { id: sectionId } });
+      if (!sectionExists) {
+        return res.status(400).json({ message: 'Section not found' });
+      }
+    }
+
+    const updated = await prisma.$transaction(async (tx) => {
+      if (firstName || lastName || phone) {
+        await tx.user.update({
+          where: { id: student.userId },
+          data: {
+            firstName: firstName ?? undefined,
+            lastName: lastName ?? undefined,
+            phone: phone ?? undefined,
+          },
+        });
+      }
+
+      return tx.studentProfile.update({
+        where: { id: req.params.id },
+        data: {
+          age,
+          gender,
+          dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : undefined,
+          contactAddress,
+          guardianName,
+          guardianPhone,
+          guardianEmail,
+          classId,
+          sectionId,
+          avatarUrl,
+          idDocumentUrl,
+        },
+        include: {
+          user: true,
+          class: true,
+          section: true,
+        },
+      });
+    });
+
+    res.json(updated);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error('Update student error:', error);
+    res.status(500).json({ message: 'Failed to update student' });
   }
 };
 
-// @desc    Delete student
-// @route   DELETE /api/v1/students/:id
-// @access  Private/Admin
 const deleteStudent = async (req, res) => {
   try {
-    const student = await Student.findById(req.params.id);
-
-    if (student) {
-      await student.deleteOne();
-      res.json({ message: 'Student removed' });
-    } else {
-      res.status(404).json({ message: 'Student not found' });
+    const student = await prisma.studentProfile.findUnique({ where: { id: req.params.id } });
+    if (!student) {
+      return res.status(404).json({ message: 'Student not found' });
     }
+
+    await prisma.$transaction([
+      prisma.studentProfile.delete({ where: { id: req.params.id } }),
+      prisma.user.delete({ where: { id: student.userId } }),
+    ]);
+
+    res.json({ message: 'Student removed' });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error('Delete student error:', error);
+    res.status(500).json({ message: 'Failed to delete student' });
   }
 };
 
-// @desc    Get dashboard stats
-// @route   GET /api/v1/students/stats
-// @access  Private/Admin
-const getStats = async (req, res) => {
+const getStats = async (_req, res) => {
   try {
-    const totalStudents = await Student.countDocuments();
-    
-    const recentAdmissions = await Student.find()
-      .sort({ dateOfAdmission: -1 })
-      .limit(5)
-      .select('name enrollmentNo dateOfAdmission');
+    const [totalStudents, totalTeachers, recentAdmissions, latestAttendance] = await Promise.all([
+      prisma.studentProfile.count(),
+      prisma.user.count({ where: { role: 'TEACHER' } }),
+      prisma.studentProfile.findMany({
+        orderBy: { createdAt: 'desc' },
+        take: 5,
+        include: {
+          user: {
+            select: {
+              firstName: true,
+              lastName: true,
+            },
+          },
+          class: true,
+          section: true,
+        },
+      }),
+      prisma.attendanceRecord.findMany({
+        orderBy: { date: 'desc' },
+        take: 30,
+        select: {
+          status: true,
+        },
+      }),
+    ]);
+
+    const attendanceSummary = latestAttendance.reduce(
+      (acc, record) => {
+        acc[record.status] = (acc[record.status] || 0) + 1;
+        return acc;
+      },
+      {}
+    );
 
     res.json({
       totalStudents,
+      totalTeachers,
       recentAdmissions,
+      attendanceSummary,
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error('Get stats error:', error);
+    res.status(500).json({ message: 'Failed to load stats' });
   }
 };
 
@@ -179,4 +351,3 @@ module.exports = {
   deleteStudent,
   getStats,
 };
-

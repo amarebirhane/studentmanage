@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -27,80 +28,132 @@ enum AttendanceStatus {
   EXCUSED
 }
 
+enum FeeStatus {
+  PENDING
+  PAID
+  OVERDUE
+  PARTIAL
+}
+
+enum NotificationChannel {
+  EMAIL
+  SMS
+  IN_APP
+}
+
+enum AssignmentStatus {
+  DRAFT
+  PUBLISHED
+  CLOSED
+}
+
+enum HostelGender {
+  MALE
+  FEMALE
+  CO_ED
+}
+
 model User {
-  id              String           @id @default(uuid())
+  id              String             @id @default(uuid())
   firstName       String
   lastName        String
-  email           String           @unique
+  email           String             @unique
   password        String
-  role            UserRole         @default(STUDENT)
+  role            UserRole           @default(STUDENT)
   phone           String?
   avatarUrl       String?
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
   studentProfile  StudentProfile?
   teacherProfile  TeacherProfile?
   parentProfiles  ParentProfile[]
   attendanceTaken AttendanceRecord[] @relation("AttendanceTaken")
-  examsCreated    Exam[]            @relation("ExamCreator")
+  examsCreated    Exam[]             @relation("ExamCreator")
+  assignments     Assignment[]
+  notifications   Notification[]
+  onlineExams     OnlineExam[]       @relation("OnlineExamCreator")
 }
 
 model StudentProfile {
-  id              String           @id @default(uuid())
-  user            User             @relation(fields: [userId], references: [id])
-  userId          String           @unique
-  age             Int?
-  gender          Gender?
-  dateOfBirth     DateTime?
-  contactAddress  String?
-  guardianName    String?
-  guardianPhone   String?
-  guardianEmail   String?
-  class           Class?           @relation(fields: [classId], references: [id])
-  classId         String?
-  section         Section?         @relation(fields: [sectionId], references: [id])
-  sectionId       String?
-  avatarUrl       String?
-  idDocumentUrl   String?
-  documents       Document[]
-  attendances     AttendanceRecord[]
-  grades          GradeRecord[]
-  parentProfiles  ParentProfile[]
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
+  id                    String                 @id @default(uuid())
+  user                  User                   @relation(fields: [userId], references: [id])
+  userId                String                 @unique
+  age                   Int?
+  gender                Gender?
+  dateOfBirth           DateTime?
+  contactAddress        String?
+  guardianName          String?
+  guardianPhone         String?
+  guardianEmail         String?
+  class                 Class?                 @relation(fields: [classId], references: [id])
+  classId               String?
+  section               Section?               @relation(fields: [sectionId], references: [id])
+  sectionId             String?
+  avatarUrl             String?
+  idDocumentUrl         String?
+  documents             Document[]
+  attendances           AttendanceRecord[]
+  grades                GradeRecord[]
+  parentProfiles        ParentProfile[]
+  feeInvoices           FeeInvoice[]
+  behaviorRecords       BehaviorRecord[]
+  assignmentSubmissions AssignmentSubmission[]
+  libraryTransactions   LibraryTransaction[]
+  transportAssignment   TransportAssignment?
+  hostelAssignment      HostelAssignment?
+  analytics             PerformanceInsight[]
+  generatedDocuments    GeneratedDocument[]
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+  examResponses         ExamResponse[]
+  transcriptRequests    TranscriptRequest[]
 }
 
 model TeacherProfile {
-  id          String   @id @default(uuid())
-  user        User     @relation(fields: [userId], references: [id])
-  userId      String   @unique
+  id          String           @id @default(uuid())
+  user        User             @relation(fields: [userId], references: [id])
+  userId      String           @unique
   bio         String?
   subjects    String?
   sections    Section[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  timetable   TimetableEntry[] @relation("TeacherTimetable")
+  assignments Assignment[]
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
 }
 
 model ParentProfile {
-  id           String          @id @default(uuid())
-  user         User            @relation(fields: [userId], references: [id])
+  id           String         @id @default(uuid())
+  user         User           @relation(fields: [userId], references: [id])
   userId       String
-  student      StudentProfile  @relation(fields: [studentId], references: [id])
+  student      StudentProfile @relation(fields: [studentId], references: [id])
   studentId    String
   relationship String?
-  createdAt    DateTime        @default(now())
+  createdAt    DateTime       @default(now())
+}
+
+model Document {
+  id         String         @id @default(uuid())
+  student    StudentProfile @relation(fields: [studentId], references: [id])
+  studentId  String
+  type       String
+  fileUrl    String
+  uploadedAt DateTime       @default(now())
 }
 
 model Class {
-  id          String            @id @default(uuid())
+  id          String           @id @default(uuid())
   name        String
   grade       String
   description String?
   sections    Section[]
   students    StudentProfile[]
+  timetable   TimetableEntry[]
   exams       Exam[]
-  createdAt   DateTime          @default(now())
-  updatedAt   DateTime          @updatedAt
+  assignments Assignment[]
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  onlineExams OnlineExam[]
 }
 
 model Section {
@@ -111,61 +164,283 @@ model Section {
   teacher     TeacherProfile?  @relation(fields: [teacherId], references: [id])
   teacherId   String?
   students    StudentProfile[]
+  timetable   TimetableEntry[]
   exams       Exam[]
+  assignments Assignment[]
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
+  onlineExams OnlineExam[]
+}
+
+model TimetableEntry {
+  id           String          @id @default(uuid())
+  dayOfWeek    Int
+  periodNumber Int
+  subject      String
+  class        Class?          @relation(fields: [classId], references: [id])
+  classId      String?
+  section      Section?        @relation(fields: [sectionId], references: [id])
+  sectionId    String?
+  teacher      TeacherProfile? @relation("TeacherTimetable", fields: [teacherId], references: [id])
+  teacherId    String?
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  @@unique([dayOfWeek, periodNumber, classId, sectionId], map: "timetable_unique_slot")
 }
 
 model AttendanceRecord {
-  id             String          @id @default(uuid())
-  student        StudentProfile  @relation(fields: [studentId], references: [id])
-  studentId      String
-  date           DateTime
-  status         AttendanceStatus
-  remarks        String?
-  recordedBy     User            @relation("AttendanceTaken", fields: [recordedById], references: [id])
-  recordedById   String
-  createdAt      DateTime        @default(now())
+  id           String           @id @default(uuid())
+  student      StudentProfile   @relation(fields: [studentId], references: [id])
+  studentId    String
+  date         DateTime
+  status       AttendanceStatus
+  remarks      String?
+  recordedBy   User             @relation("AttendanceTaken", fields: [recordedById], references: [id])
+  recordedById String
+  createdAt    DateTime         @default(now())
 
-  @@unique([studentId, date])
+  @@unique([studentId, date], map: "attendance_unique_student_date")
 }
 
 model Exam {
-  id             String     @id @default(uuid())
-  name           String
-  term           String?
-  examDate       DateTime
-  class          Class?     @relation(fields: [classId], references: [id])
-  classId        String?
-  section        Section?   @relation(fields: [sectionId], references: [id])
-  sectionId      String?
-  maxMarks       Int        @default(100)
-  createdBy      User       @relation("ExamCreator", fields: [createdById], references: [id])
-  createdById    String
-  grades         GradeRecord[]
-  createdAt      DateTime   @default(now())
+  id          String        @id @default(uuid())
+  name        String
+  term        String?
+  examDate    DateTime
+  class       Class?        @relation(fields: [classId], references: [id])
+  classId     String?
+  section     Section?      @relation(fields: [sectionId], references: [id])
+  sectionId   String?
+  maxMarks    Int           @default(100)
+  createdBy   User          @relation("ExamCreator", fields: [createdById], references: [id])
+  createdById String
+  grades      GradeRecord[]
+  createdAt   DateTime      @default(now())
 }
 
 model GradeRecord {
-  id             String          @id @default(uuid())
-  student        StudentProfile  @relation(fields: [studentId], references: [id])
-  studentId      String
-  exam           Exam            @relation(fields: [examId], references: [id])
-  examId         String
-  subject        String
-  scoredMarks    Int
-  totalMarks     Int
-  grade          String?
-  gpa            Float?
-  remarks        String?
-  createdAt      DateTime        @default(now())
+  id          String         @id @default(uuid())
+  student     StudentProfile @relation(fields: [studentId], references: [id])
+  studentId   String
+  exam        Exam           @relation(fields: [examId], references: [id])
+  examId      String
+  subject     String
+  scoredMarks Int
+  totalMarks  Int
+  grade       String?
+  gpa         Float?
+  remarks     String?
+  createdAt   DateTime       @default(now())
+
+  @@unique([studentId, examId, subject], map: "grade_unique_student_exam_subject")
 }
 
-model Document {
-  id           String          @id @default(uuid())
-  student      StudentProfile  @relation(fields: [studentId], references: [id])
+model BehaviorRecord {
+  id           String         @id @default(uuid())
+  student      StudentProfile @relation(fields: [studentId], references: [id])
   studentId    String
   type         String
-  fileUrl      String
-  uploadedAt   DateTime        @default(now())
+  note         String
+  recordedById String?
+  recordedAt   DateTime       @default(now())
+}
+
+model FeeInvoice {
+  id          String         @id @default(uuid())
+  student     StudentProfile @relation(fields: [studentId], references: [id])
+  studentId   String
+  amount      Float
+  dueDate     DateTime
+  status      FeeStatus      @default(PENDING)
+  description String?
+  payments    FeePayment[]
+  createdAt   DateTime       @default(now())
+}
+
+model FeePayment {
+  id          String     @id @default(uuid())
+  invoice     FeeInvoice @relation(fields: [invoiceId], references: [id])
+  invoiceId   String
+  amount      Float
+  paymentDate DateTime   @default(now())
+  method      String?
+  reference   String?
+}
+
+model Assignment {
+  id           String                 @id @default(uuid())
+  title        String
+  description  String?
+  dueDate      DateTime?
+  class        Class?                 @relation(fields: [classId], references: [id])
+  classId      String?
+  section      Section?               @relation(fields: [sectionId], references: [id])
+  sectionId    String?
+  teacher      TeacherProfile?        @relation(fields: [teacherId], references: [id])
+  teacherId    String?
+  status       AssignmentStatus       @default(DRAFT)
+  resourcesUrl String?
+  submissions  AssignmentSubmission[]
+  createdAt    DateTime               @default(now())
+  updatedAt    DateTime               @updatedAt
+  user         User?                  @relation(fields: [userId], references: [id])
+  userId       String?
+}
+
+model AssignmentSubmission {
+  id           String         @id @default(uuid())
+  assignment   Assignment     @relation(fields: [assignmentId], references: [id])
+  assignmentId String
+  student      StudentProfile @relation(fields: [studentId], references: [id])
+  studentId    String
+  submittedAt  DateTime       @default(now())
+  fileUrl      String?
+  grade        String?
+  feedback     String?
+
+  @@unique([assignmentId, studentId], map: "assignment_submission_unique")
+}
+
+model Notification {
+  id       String              @id @default(uuid())
+  user     User                @relation(fields: [userId], references: [id])
+  userId   String
+  title    String
+  message  String
+  channel  NotificationChannel
+  metadata Json?
+  sentAt   DateTime            @default(now())
+  readAt   DateTime?
+}
+
+model OnlineExam {
+  id              String         @id @default(uuid())
+  title           String
+  description     String?
+  scheduledAt     DateTime
+  durationMinutes Int?
+  class           Class?         @relation(fields: [classId], references: [id])
+  classId         String?
+  section         Section?       @relation(fields: [sectionId], references: [id])
+  sectionId       String?
+  createdBy       User           @relation("OnlineExamCreator", fields: [createdById], references: [id])
+  createdById     String
+  questions       ExamQuestion[]
+  responses       ExamResponse[]
+  createdAt       DateTime       @default(now())
+}
+
+model ExamQuestion {
+  id            String         @id @default(uuid())
+  onlineExam    OnlineExam     @relation(fields: [onlineExamId], references: [id])
+  onlineExamId  String
+  question      String
+  options       Json?
+  correctAnswer String?
+  marks         Int            @default(1)
+  examResponses ExamResponse[]
+}
+
+model ExamResponse {
+  id           String         @id @default(uuid())
+  onlineExam   OnlineExam     @relation(fields: [onlineExamId], references: [id])
+  onlineExamId String
+  question     ExamQuestion   @relation(fields: [questionId], references: [id])
+  questionId   String
+  student      StudentProfile @relation(fields: [studentId], references: [id])
+  studentId    String
+  answer       String?
+  isCorrect    Boolean?
+  scoredMarks  Int?
+
+  @@unique([onlineExamId, questionId, studentId], map: "online_exam_response_unique")
+}
+
+model TranscriptRequest {
+  id          String         @id @default(uuid())
+  student     StudentProfile @relation(fields: [studentId], references: [id])
+  studentId   String
+  status      String         @default("PENDING")
+  requestedAt DateTime       @default(now())
+  processedAt DateTime?
+  documentUrl String?
+}
+
+model LibraryBook {
+  id              String               @id @default(uuid())
+  title           String
+  author          String
+  isbn            String               @unique
+  totalCopies     Int
+  availableCopies Int
+  transactions    LibraryTransaction[]
+  createdAt       DateTime             @default(now())
+}
+
+model LibraryTransaction {
+  id         String          @id @default(uuid())
+  book       LibraryBook     @relation(fields: [bookId], references: [id])
+  bookId     String
+  student    StudentProfile? @relation(fields: [studentId], references: [id])
+  studentId  String?
+  issueDate  DateTime        @default(now())
+  dueDate    DateTime?
+  returnDate DateTime?
+}
+
+model TransportRoute {
+  id          String                @id @default(uuid())
+  name        String
+  busNumber   String?
+  driverName  String?
+  driverPhone String?
+  stops       Json?
+  assignments TransportAssignment[]
+}
+
+model TransportAssignment {
+  id          String         @id @default(uuid())
+  route       TransportRoute @relation(fields: [routeId], references: [id])
+  routeId     String
+  student     StudentProfile @relation(fields: [studentId], references: [id])
+  studentId   String         @unique
+  pickupPoint String?
+}
+
+model HostelRoom {
+  id          String             @id @default(uuid())
+  name        String
+  capacity    Int
+  gender      HostelGender
+  assignments HostelAssignment[]
+}
+
+model HostelAssignment {
+  id        String         @id @default(uuid())
+  room      HostelRoom     @relation(fields: [roomId], references: [id])
+  roomId    String
+  student   StudentProfile @relation(fields: [studentId], references: [id])
+  studentId String         @unique
+  startDate DateTime       @default(now())
+  endDate   DateTime?
+}
+
+model PerformanceInsight {
+  id          String         @id @default(uuid())
+  student     StudentProfile @relation(fields: [studentId], references: [id])
+  studentId   String
+  metric      String
+  value       Float?
+  details     Json?
+  generatedAt DateTime       @default(now())
+}
+
+model GeneratedDocument {
+  id        String          @id @default(uuid())
+  student   StudentProfile? @relation(fields: [studentId], references: [id])
+  studentId String?
+  type      String
+  fileUrl   String
+  createdAt DateTime        @default(now())
 }

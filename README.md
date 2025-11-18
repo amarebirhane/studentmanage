@@ -341,3 +341,9 @@ Cloud storage support
 
 API for mobile app
  -->
+
+ <!-- 
+    npx prisma migrate dev --name init
+   npm run db:seed
+      npm run dev
+  -->

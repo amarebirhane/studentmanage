@@ -4,7 +4,7 @@ let prisma;
 
 if (!global.__prisma) {
   prisma = new PrismaClient({
-    log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error']
+    log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
   });
   global.__prisma = prisma;
 } else {

@@ -10,6 +10,7 @@ const buildStudentWhereClause = ({ search, classId, sectionId }) => {
       { user: { firstName: { contains: search, mode: 'insensitive' } } },
       { user: { lastName: { contains: search, mode: 'insensitive' } } },
       { user: { email: { contains: search, mode: 'insensitive' } } },
+      { enrollmentNo: { contains: search, mode: 'insensitive' } },
       { guardianName: { contains: search, mode: 'insensitive' } },
       { guardianPhone: { contains: search, mode: 'insensitive' } },
     ];
@@ -124,6 +125,7 @@ const createStudent = async (req, res) => {
       guardianEmail,
       classId,
       sectionId,
+      enrollmentNo,
       avatarUrl,
       idDocumentUrl,
     } = req.body;
@@ -175,6 +177,7 @@ const createStudent = async (req, res) => {
           guardianName,
           guardianPhone,
           guardianEmail,
+          enrollmentNo,
           classId,
           sectionId,
           avatarUrl,
@@ -211,6 +214,7 @@ const updateStudent = async (req, res) => {
       guardianEmail,
       classId,
       sectionId,
+      enrollmentNo,
       avatarUrl,
       idDocumentUrl,
     } = req.body;
@@ -256,6 +260,7 @@ const updateStudent = async (req, res) => {
           guardianName,
           guardianPhone,
           guardianEmail,
+          enrollmentNo,
           classId,
           sectionId,
           avatarUrl,

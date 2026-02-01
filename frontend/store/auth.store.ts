@@ -10,6 +10,7 @@ interface AuthState {
     error: string | null;
 
     login: (credentials: LoginCredentials) => Promise<void>;
+    register: (userData: any) => Promise<void>;
     logout: () => void;
     loadUser: () => Promise<void>;
 }
@@ -37,6 +38,20 @@ export const useAuthStore = create<AuthState>((set, get) => ({
                 isLoading: false
             });
             throw err; // Re-throw to allow component to handle specific UI feedback (like toasts)
+        }
+    },
+
+    register: async (userData) => {
+        set({ isLoading: true, error: null });
+        try {
+            await authService.register(userData);
+            set({ isLoading: false });
+        } catch (err: any) {
+            set({
+                error: err.response?.data?.message || 'Registration failed',
+                isLoading: false
+            });
+            throw err;
         }
     },
 

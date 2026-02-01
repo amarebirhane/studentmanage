@@ -11,5 +11,11 @@ export const useAuth = () => {
         }
     }, []); // Run once
 
-    return store;
+    return {
+        ...store,
+        isAdmin: store.user?.role === 'ADMIN',
+        isTeacher: store.user?.role === 'TEACHER',
+        isStudent: store.user?.role === 'STUDENT',
+        isParent: store.user?.role === 'PARENT',
+    };
 };

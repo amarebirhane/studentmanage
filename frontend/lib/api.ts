@@ -27,7 +27,6 @@ api.interceptors.response.use(
             // Clear any local storage
             if (typeof window !== 'undefined') {
                 localStorage.removeItem('user');
-                window.location.href = '/login';
             }
         }
         return Promise.reject(error);

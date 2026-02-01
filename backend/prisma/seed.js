@@ -4,7 +4,7 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('í¼± Seeding database...');
+  console.log('ï¿½ï¿½ï¿½ Seeding database...');
 
   const adminEmail = 'admin@school.com';
   const teacherEmail = 'teacher@school.com';
@@ -115,7 +115,9 @@ async function main() {
           phone: '+1-555-3333',
         },
       },
-      studentId: studentProfile.id,
+      student: {
+        connect: { id: studentProfile.id }
+      },
       relationship: 'Father',
     },
   });

@@ -1,6 +1,5 @@
-import { PrismaClient, GradeRecord, Prisma } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { GradeRecord, Prisma } from '@prisma/client';
+import { prisma } from '../../config';
 
 export const createResult = async (data: Prisma.GradeRecordCreateInput): Promise<GradeRecord> => {
     return prisma.gradeRecord.create({

@@ -1,6 +1,5 @@
-import { PrismaClient, Exam, Prisma } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { Exam, Prisma } from '@prisma/client';
+import { prisma } from '../../config';
 
 export const createExam = async (data: Prisma.ExamCreateInput): Promise<Exam> => {
     return prisma.exam.create({

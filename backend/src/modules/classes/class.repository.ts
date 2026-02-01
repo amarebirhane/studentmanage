@@ -1,6 +1,5 @@
-import { PrismaClient, Class, Prisma } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { Class, Prisma } from '@prisma/client';
+import { prisma } from '../../config';
 
 export const createClass = async (data: Prisma.ClassCreateInput): Promise<Class> => {
     return prisma.class.create({

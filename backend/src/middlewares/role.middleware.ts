@@ -1,9 +1,10 @@
-import { Request, Response, NextFunction } from 'express';
+import { Response, NextFunction } from 'express';
+import { AuthenticatedRequest } from '../types';
 import { UserRole } from '@prisma/client';
 import { ApiError } from '../utils/apiResponse';
 
 export const authorize = (...roles: UserRole[]) => {
-    return (req: Request, res: Response, next: NextFunction) => {
+    return (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
         if (!req.user) {
             return next(new ApiError(401, 'Not authorized to access this route'));
         }

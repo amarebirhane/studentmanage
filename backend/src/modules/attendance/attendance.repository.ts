@@ -1,6 +1,5 @@
-import { PrismaClient, AttendanceRecord, Prisma } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { AttendanceRecord, Prisma } from '@prisma/client';
+import { prisma } from '../../config';
 
 export const createAttendance = async (data: Prisma.AttendanceRecordCreateInput): Promise<AttendanceRecord> => {
     return prisma.attendanceRecord.create({

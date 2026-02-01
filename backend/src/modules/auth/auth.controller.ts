@@ -1,10 +1,11 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
+import { AuthenticatedRequest } from '../../types';
 import { AuthService } from './auth.service';
 import { ApiResponse } from '../../utils/apiResponse';
 import { config } from '../../config';
 
 export class AuthController {
-    static async register(req: Request, res: Response) {
+    static async register(req: AuthenticatedRequest, res: Response) {
         try {
             const user = await AuthService.register(req.body);
             return ApiResponse.success(res, user, 'User registered successfully', 201);
@@ -13,7 +14,7 @@ export class AuthController {
         }
     }
 
-    static async login(req: Request, res: Response) {
+    static async login(req: AuthenticatedRequest, res: Response) {
         try {
             const { user, token } = await AuthService.login(req.body);
 
@@ -31,7 +32,7 @@ export class AuthController {
         }
     }
 
-    static async logout(req: Request, res: Response) {
+    static async logout(req: AuthenticatedRequest, res: Response) {
         res.cookie('token', 'none', {
             expires: new Date(Date.now() + 10 * 1000),
             httpOnly: true,
@@ -39,9 +40,9 @@ export class AuthController {
         return ApiResponse.success(res, {}, 'Logged out successfully');
     }
 
-    static async getProfile(req: any, res: Response) {
+    static async getProfile(req: AuthenticatedRequest, res: Response) {
         try {
-            const user = await AuthService.getProfile(req.user.id);
+            const user = await AuthService.getProfile(req.user!.id);
             return ApiResponse.success(res, user, 'Profile retrieved');
         } catch (error: any) {
             return ApiResponse.error(res, error.message, 404);

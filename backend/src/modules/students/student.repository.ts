@@ -1,6 +1,5 @@
-import { PrismaClient, StudentProfile, Prisma } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { StudentProfile, Prisma } from '@prisma/client';
+import { prisma } from '../../config';
 
 export const createStudent = async (data: Prisma.StudentProfileCreateInput): Promise<StudentProfile> => {
     return prisma.studentProfile.create({

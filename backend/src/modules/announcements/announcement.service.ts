@@ -1,6 +1,5 @@
-import { PrismaClient, Prisma, Announcement } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { Prisma, Announcement } from '@prisma/client';
+import { prisma } from '../../config';
 
 export const createAnnouncement = async (data: Prisma.AnnouncementCreateInput): Promise<Announcement> => {
     return prisma.announcement.create({

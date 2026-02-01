@@ -1,6 +1,5 @@
-import { PrismaClient, FeeInvoice, Prisma } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { FeeInvoice, Prisma } from '@prisma/client';
+import { prisma } from '../../config';
 
 export const createFeeInvoice = async (data: Prisma.FeeInvoiceCreateInput): Promise<FeeInvoice> => {
     return prisma.feeInvoice.create({

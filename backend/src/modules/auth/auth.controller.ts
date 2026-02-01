@@ -1,0 +1,50 @@
+import { Request, Response } from 'express';
+import { AuthService } from './auth.service';
+import { ApiResponse } from '../../utils/apiResponse';
+import { config } from '../../config';
+
+export class AuthController {
+    static async register(req: Request, res: Response) {
+        try {
+            const user = await AuthService.register(req.body);
+            return ApiResponse.success(res, user, 'User registered successfully', 201);
+        } catch (error: any) {
+            return ApiResponse.error(res, error.message, 400);
+        }
+    }
+
+    static async login(req: Request, res: Response) {
+        try {
+            const { user, token } = await AuthService.login(req.body);
+
+            // Set cookie
+            res.cookie('token', token, {
+                httpOnly: true,
+                expires: new Date(Date.now() + config.jwt.cookieExpire * 24 * 60 * 60 * 1000),
+                secure: config.env === 'production',
+            });
+
+            const { password, ...userWithoutPassword } = user;
+            return ApiResponse.success(res, { ...userWithoutPassword, token }, 'Login successful');
+        } catch (error: any) {
+            return ApiResponse.error(res, error.message, 401);
+        }
+    }
+
+    static async logout(req: Request, res: Response) {
+        res.cookie('token', 'none', {
+            expires: new Date(Date.now() + 10 * 1000),
+            httpOnly: true,
+        });
+        return ApiResponse.success(res, {}, 'Logged out successfully');
+    }
+
+    static async getProfile(req: any, res: Response) {
+        try {
+            const user = await AuthService.getProfile(req.user.id);
+            return ApiResponse.success(res, user, 'Profile retrieved');
+        } catch (error: any) {
+            return ApiResponse.error(res, error.message, 404);
+        }
+    }
+}

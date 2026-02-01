@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, useEffect } from 'react';
 import api from '@/lib/api';
+import socketService from '@/lib/socket';
 
 const AuthContext = createContext();
 
@@ -20,6 +21,14 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     fetchUser();
   }, []);
+
+  useEffect(() => {
+    if (user) {
+      socketService.connect();
+    } else {
+      socketService.disconnect();
+    }
+  }, [user]);
 
   const fetchUser = async () => {
     try {

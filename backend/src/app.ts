@@ -8,6 +8,9 @@ import routes from './routes';
 
 const app: Application = express();
 
+import { limiter } from './middlewares/rateLimit.middleware';
+import { tenantMiddleware } from './middlewares/tenant.middleware';
+
 // Middleware
 app.use(cors({
     origin: config.cors.origin,
@@ -16,6 +19,8 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(limiter);
+app.use(tenantMiddleware);
 
 // Static Files
 app.use('/uploads', express.static(config.upload.path));

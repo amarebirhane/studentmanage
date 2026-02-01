@@ -188,19 +188,18 @@ export default function RegisterPage() {
       router.push('/dashboard');
     }
   }, [isAdmin, isLoading, router]);
-}, [isAdmin, isLoading, router]);
 
-if (isLoading) {
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <LoadingSpinner size="lg" />
+      </div>
+    );
+  }
+
   return (
-    <div className="flex items-center justify-center min-h-screen">
-      <LoadingSpinner size="lg" />
-    </div>
+    <ProtectedRoute adminOnly>
+      <RegisterContent />
+    </ProtectedRoute>
   );
-}
-
-return (
-  <ProtectedRoute adminOnly>
-    <RegisterContent />
-  </ProtectedRoute>
-);
 }

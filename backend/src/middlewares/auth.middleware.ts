@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { prisma } from '../config';
 import { verifyToken } from '../utils/jwt';
 
-export const protect = async (req: any, res: Response, next: NextFunction) => {
+export const protect = async (req: Request, res: Response, next: NextFunction) => {
     let token;
 
     if (req.cookies?.token) {
@@ -33,7 +33,7 @@ export const protect = async (req: any, res: Response, next: NextFunction) => {
 };
 
 export const authorize = (...roles: string[]) => {
-    return (req: any, res: Response, next: NextFunction) => {
+    return (req: Request, res: Response, next: NextFunction) => {
         if (!req.user || !roles.includes(req.user.role)) {
             return res.status(403).json({
                 message: `Role ${req.user?.role} is not authorized to access this route`,

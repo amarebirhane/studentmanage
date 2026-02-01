@@ -6,7 +6,7 @@ import { useAuth } from '@/hooks/useAuth';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import DataTable from '@/components/DataTable';
+import DataTable from '@/components/tables/data-table';
 import api from '@/lib/api';
 import { UserPlus, Eye, Edit, Trash2, Search, Filter } from 'lucide-react';
 import toast from 'react-hot-toast';

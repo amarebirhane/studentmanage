@@ -2,7 +2,7 @@
 
 import { useAuth } from '@/hooks/useAuth';
 import ProtectedRoute from '@/components/ProtectedRoute';
-import StudentForm from '@/components/StudentForm';
+import StudentForm from '@/components/forms/student-form';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 

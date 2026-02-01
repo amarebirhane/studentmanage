@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import ProtectedRoute from '@/components/ProtectedRoute';
-import StudentForm from '@/components/StudentForm';
+import StudentForm from '@/components/forms/student-form';
 import api from '@/lib/api';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import toast from 'react-hot-toast';

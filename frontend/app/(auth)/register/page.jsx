@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -179,27 +179,28 @@ function RegisterContent() {
 }
 
 export default function RegisterPage() {
-  const { isAdmin, loading } = useAuth();
+  const { isAdmin, isLoading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (!loading && !isAdmin) {
+    if (!isLoading && !isAdmin) {
       toast.error('Only admins can register new users');
       router.push('/dashboard');
     }
-  }, [isAdmin, loading, router]);
+  }, [isAdmin, isLoading, router]);
+}, [isAdmin, isLoading, router]);
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <LoadingSpinner size="lg" />
-      </div>
-    );
-  }
-
+if (isLoading) {
   return (
-    <ProtectedRoute adminOnly>
-      <RegisterContent />
-    </ProtectedRoute>
+    <div className="flex items-center justify-center min-h-screen">
+      <LoadingSpinner size="lg" />
+    </div>
   );
+}
+
+return (
+  <ProtectedRoute adminOnly>
+    <RegisterContent />
+  </ProtectedRoute>
+);
 }

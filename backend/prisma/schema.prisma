@@ -444,3 +444,24 @@ model GeneratedDocument {
   fileUrl   String
   createdAt DateTime        @default(now())
 }
+
+model School {
+  id          String   @id @default(uuid())
+  name        String
+  address     String?
+  phone       String?
+  email       String?
+  logoUrl     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Announcement {
+  id          String   @id @default(uuid())
+  title       String
+  content     String
+  target      String   @default("ALL") // ALL, TEACHERS, STUDENTS, PARENTS
+  createdById String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

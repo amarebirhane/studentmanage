@@ -4,6 +4,7 @@ import cookieParser from 'cookie-parser';
 import path from 'path';
 import { config } from './config';
 import { errorMiddleware } from './middlewares/error.middleware';
+import routes from './routes';
 
 const app: Application = express();
 

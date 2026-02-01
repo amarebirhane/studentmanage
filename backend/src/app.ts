@@ -30,8 +30,8 @@ app.get('/health', (req, res) => {
     res.status(200).json({ status: 'UP', timestamp: new Date().toISOString() });
 });
 
-// Routes Placeholder (To be implemented)
-// app.use('/api/v1', routes);
+// Routes
+app.use('/api/v1', routes);
 
 // Error Handling
 app.use(errorMiddleware);

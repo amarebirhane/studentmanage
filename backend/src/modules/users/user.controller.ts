@@ -14,7 +14,7 @@ export class UserController {
 
     static async getUserById(req: Request, res: Response) {
         try {
-            const user = await UserService.getUserById(req.params.id);
+            const user = await UserService.getUserById(req.params.id as string);
             return ApiResponse.success(res, user, 'User retrieved');
         } catch (error: any) {
             return ApiResponse.error(res, error.message, 404);
@@ -23,7 +23,7 @@ export class UserController {
 
     static async updateUser(req: Request, res: Response) {
         try {
-            const user = await UserService.updateUser(req.params.id, req.body);
+            const user = await UserService.updateUser(req.params.id as string, req.body);
             return ApiResponse.success(res, user, 'User updated successfully');
         } catch (error: any) {
             return ApiResponse.error(res, error.message, 400);
@@ -32,7 +32,7 @@ export class UserController {
 
     static async deleteUser(req: Request, res: Response) {
         try {
-            await UserService.deleteUser(req.params.id);
+            await UserService.deleteUser(req.params.id as string);
             return ApiResponse.success(res, {}, 'User deleted successfully');
         } catch (error: any) {
             return ApiResponse.error(res, error.message, 400);

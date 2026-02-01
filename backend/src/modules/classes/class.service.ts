@@ -25,8 +25,8 @@ export class ClassService {
         });
     }
 
-    static async createClass(name: string) {
-        return prisma.class.create({ data: { name } });
+    static async createClass(name: string, grade: string) {
+        return prisma.class.create({ data: { name, grade } });
     }
 
     static async createSection(name: string, classId: string) {

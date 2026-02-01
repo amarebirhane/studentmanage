@@ -22,7 +22,7 @@ export class StudentController {
 
     static async getStudentById(req: Request, res: Response) {
         try {
-            const student = await StudentService.getStudentById(req.params.id);
+            const student = await StudentService.getStudentById(req.params.id as string);
             return ApiResponse.success(res, student, 'Student retrieved');
         } catch (error: any) {
             return ApiResponse.error(res, error.message, 404);
@@ -40,7 +40,7 @@ export class StudentController {
 
     static async updateStudent(req: Request, res: Response) {
         try {
-            const student = await StudentService.updateStudent(req.params.id, req.body);
+            const student = await StudentService.updateStudent(req.params.id as string, req.body);
             return ApiResponse.success(res, student, 'Student updated successfully');
         } catch (error: any) {
             return ApiResponse.error(res, error.message, 400);
@@ -49,7 +49,7 @@ export class StudentController {
 
     static async deleteStudent(req: Request, res: Response) {
         try {
-            await StudentService.deleteStudent(req.params.id);
+            await StudentService.deleteStudent(req.params.id as string);
             return ApiResponse.success(res, {}, 'Student deleted successfully');
         } catch (error: any) {
             return ApiResponse.error(res, error.message, 400);

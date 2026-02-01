@@ -23,8 +23,8 @@ export class ClassController {
 
     static async createClass(req: Request, res: Response) {
         try {
-            const { name } = req.body;
-            const cls = await ClassService.createClass(name);
+            const { name, grade } = req.body;
+            const cls = await ClassService.createClass(name, grade);
             return ApiResponse.success(res, cls, 'Class created successfully', 201);
         } catch (error: any) {
             return ApiResponse.error(res, error.message, 400);
@@ -43,7 +43,7 @@ export class ClassController {
 
     static async deleteClass(req: Request, res: Response) {
         try {
-            await ClassService.deleteClass(req.params.id);
+            await ClassService.deleteClass(req.params.id as string);
             return ApiResponse.success(res, {}, 'Class deleted successfully');
         } catch (error: any) {
             return ApiResponse.error(res, error.message, 400);
@@ -52,7 +52,7 @@ export class ClassController {
 
     static async deleteSection(req: Request, res: Response) {
         try {
-            await ClassService.deleteSection(req.params.id);
+            await ClassService.deleteSection(req.params.id as string);
             return ApiResponse.success(res, {}, 'Section deleted successfully');
         } catch (error: any) {
             return ApiResponse.error(res, error.message, 400);

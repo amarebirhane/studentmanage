@@ -19,7 +19,12 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 
-const StudentForm = ({ studentId, initialData }) => {
+interface StudentFormProps {
+  studentId?: string;
+  initialData?: any;
+}
+
+const StudentForm = ({ studentId, initialData }: StudentFormProps) => {
   const router = useRouter();
   const [formData, setFormData] = useState({
     firstName: '',
@@ -39,12 +44,12 @@ const StudentForm = ({ studentId, initialData }) => {
     avatarUrl: null,
   });
 
-  const [classes, setClasses] = useState([]);
-  const [sections, setSections] = useState([]);
-  const [avatarFile, setAvatarFile] = useState(null);
-  const [avatarPreview, setAvatarPreview] = useState(null);
+  const [classes, setClasses] = useState<any[]>([]);
+  const [sections, setSections] = useState<any[]>([]);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     fetchMetadata();
@@ -89,19 +94,19 @@ const StudentForm = ({ studentId, initialData }) => {
     }
   }, [initialData]);
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
-    if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
+    if (errors[name as keyof typeof errors]) setErrors(prev => ({ ...prev, [name]: '' }));
   };
 
-  const handleSelectChange = (name, value) => {
+  const handleSelectChange = (name: string, value: string) => {
     setFormData(prev => ({ ...prev, [name]: value }));
     if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
   };
 
-  const handleAvatarChange = (e) => {
-    const file = e.target.files[0];
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
     if (file) {
       if (file.size > 2 * 1024 * 1024) {
         toast.error('Avatar size must be less than 2MB');
@@ -109,7 +114,11 @@ const StudentForm = ({ studentId, initialData }) => {
       }
       setAvatarFile(file);
       const reader = new FileReader();
-      reader.onloadend = () => setAvatarPreview(reader.result);
+      reader.onloadend = () => {
+        if (typeof reader.result === 'string') {
+          setAvatarPreview(reader.result);
+        }
+      };
       reader.readAsDataURL(file);
     }
   };
@@ -129,7 +138,7 @@ const StudentForm = ({ studentId, initialData }) => {
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setErrors({});
@@ -149,8 +158,11 @@ const StudentForm = ({ studentId, initialData }) => {
     const result = schema.safeParse(submitData);
 
     if (!result.success) {
-      const fieldErrors = {};
-      result.error.errors.forEach(err => { fieldErrors[err.path[0]] = err.message; });
+      const fieldErrors: Record<string, string> = {};
+      result.error.errors.forEach(err => {
+        const field = err.path[0] as string;
+        fieldErrors[field] = err.message;
+      });
       setErrors(fieldErrors);
       setLoading(false);
       toast.error('Please fix the errors in the form');
@@ -166,7 +178,7 @@ const StudentForm = ({ studentId, initialData }) => {
         toast.success('New student added successfully');
       }
       router.push('/dashboard/students');
-    } catch (error) {
+    } catch (error: any) {
       toast.error(error.response?.data?.message || 'Operation failed');
     } finally {
       setLoading(false);
@@ -189,12 +201,12 @@ const StudentForm = ({ studentId, initialData }) => {
               <div className="space-y-2">
                 <Label>First Name <span className="text-destructive">*</span></Label>
                 <Input name="firstName" value={formData.firstName} onChange={handleChange} placeholder="John" />
-                {errors.firstName && <p className="text-xs text-destructive">{errors.firstName}</p>}
+                {errors['firstName'] && <p className="text-xs text-destructive">{errors['firstName']}</p>}
               </div>
               <div className="space-y-2">
                 <Label>Last Name <span className="text-destructive">*</span></Label>
                 <Input name="lastName" value={formData.lastName} onChange={handleChange} placeholder="Doe" />
-                {errors.lastName && <p className="text-xs text-destructive">{errors.lastName}</p>}
+                {errors['lastName'] && <p className="text-xs text-destructive">{errors['lastName']}</p>}
               </div>
               <div className="space-y-2">
                 <Label>Email Address <span className="text-destructive">*</span></Label>
@@ -202,7 +214,7 @@ const StudentForm = ({ studentId, initialData }) => {
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input name="email" type="email" value={formData.email} onChange={handleChange} className="pl-9" placeholder="john.doe@example.com" />
                 </div>
-                {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
+                {errors['email'] && <p className="text-xs text-destructive">{errors['email']}</p>}
               </div>
               <div className="space-y-2">
                 <Label>Phone Number</Label>
@@ -279,7 +291,7 @@ const StudentForm = ({ studentId, initialData }) => {
                   <Hash className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input name="enrollmentNo" value={formData.enrollmentNo} onChange={handleChange} className="pl-9 font-mono" placeholder="STU-2026-001" />
                 </div>
-                {errors.enrollmentNo && <p className="text-xs text-destructive">{errors.enrollmentNo}</p>}
+                {errors['enrollmentNo'] && <p className="text-xs text-destructive">{errors['enrollmentNo']}</p>}
               </div>
 
               <div className="space-y-2">

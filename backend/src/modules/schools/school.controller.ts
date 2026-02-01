@@ -13,7 +13,7 @@ export const createSchool = async (req: Request, res: Response, next: NextFuncti
 
 export const getSchool = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const school = await schoolService.getSchoolById(req.params.id);
+        const school = await schoolService.getSchoolById(req.params.id as string);
         new ApiResponse(res, 200, 'School details', school).send();
     } catch (error) {
         next(error);
@@ -22,7 +22,7 @@ export const getSchool = async (req: Request, res: Response, next: NextFunction)
 
 export const updateSchool = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const school = await schoolService.updateSchool(req.params.id, req.body);
+        const school = await schoolService.updateSchool(req.params.id as string, req.body);
         new ApiResponse(res, 200, 'School updated successfully', school).send();
     } catch (error) {
         next(error);
@@ -31,7 +31,7 @@ export const updateSchool = async (req: Request, res: Response, next: NextFuncti
 
 export const deleteSchool = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        await schoolService.deleteSchool(req.params.id);
+        await schoolService.deleteSchool(req.params.id as string);
         new ApiResponse(res, 200, 'School deleted successfully').send();
     } catch (error) {
         next(error);

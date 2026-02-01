@@ -13,7 +13,7 @@ export const createAttendance = async (req: Request, res: Response, next: NextFu
 
 export const getAttendance = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const attendance = await attendanceService.getAttendanceById(req.params.id);
+        const attendance = await attendanceService.getAttendanceById(req.params.id as string);
         new ApiResponse(res, 200, 'Attendance details', attendance).send();
     } catch (error) {
         next(error);
@@ -22,7 +22,7 @@ export const getAttendance = async (req: Request, res: Response, next: NextFunct
 
 export const updateAttendance = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const attendance = await attendanceService.updateAttendance(req.params.id, req.body);
+        const attendance = await attendanceService.updateAttendance(req.params.id as string, req.body);
         new ApiResponse(res, 200, 'Attendance updated successfully', attendance).send();
     } catch (error) {
         next(error);
@@ -31,7 +31,7 @@ export const updateAttendance = async (req: Request, res: Response, next: NextFu
 
 export const deleteAttendance = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        await attendanceService.deleteAttendance(req.params.id);
+        await attendanceService.deleteAttendance(req.params.id as string);
         new ApiResponse(res, 200, 'Attendance record deleted successfully').send();
     } catch (error) {
         next(error);

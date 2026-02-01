@@ -13,7 +13,7 @@ export const createExam = async (req: Request, res: Response, next: NextFunction
 
 export const getExam = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const exam = await examService.getExamById(req.params.id);
+        const exam = await examService.getExamById(req.params.id as string);
         new ApiResponse(res, 200, 'Exam details', exam).send();
     } catch (error) {
         next(error);
@@ -22,7 +22,7 @@ export const getExam = async (req: Request, res: Response, next: NextFunction) =
 
 export const updateExam = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const exam = await examService.updateExam(req.params.id, req.body);
+        const exam = await examService.updateExam(req.params.id as string, req.body);
         new ApiResponse(res, 200, 'Exam updated successfully', exam).send();
     } catch (error) {
         next(error);
@@ -31,7 +31,7 @@ export const updateExam = async (req: Request, res: Response, next: NextFunction
 
 export const deleteExam = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        await examService.deleteExam(req.params.id);
+        await examService.deleteExam(req.params.id as string);
         new ApiResponse(res, 200, 'Exam deleted successfully').send();
     } catch (error) {
         next(error);

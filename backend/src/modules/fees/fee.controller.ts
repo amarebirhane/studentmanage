@@ -13,7 +13,7 @@ export const createFeeInvoice = async (req: Request, res: Response, next: NextFu
 
 export const getFeeInvoice = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const feeInvoice = await feeService.getFeeInvoiceById(req.params.id);
+        const feeInvoice = await feeService.getFeeInvoiceById(req.params.id as string);
         new ApiResponse(res, 200, 'Fee invoice details', feeInvoice).send();
     } catch (error) {
         next(error);
@@ -22,7 +22,7 @@ export const getFeeInvoice = async (req: Request, res: Response, next: NextFunct
 
 export const updateFeeInvoice = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const feeInvoice = await feeService.updateFeeInvoice(req.params.id, req.body);
+        const feeInvoice = await feeService.updateFeeInvoice(req.params.id as string, req.body);
         new ApiResponse(res, 200, 'Fee invoice updated successfully', feeInvoice).send();
     } catch (error) {
         next(error);
@@ -31,7 +31,7 @@ export const updateFeeInvoice = async (req: Request, res: Response, next: NextFu
 
 export const deleteFeeInvoice = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        await feeService.deleteFeeInvoice(req.params.id);
+        await feeService.deleteFeeInvoice(req.params.id as string);
         new ApiResponse(res, 200, 'Fee invoice deleted successfully').send();
     } catch (error) {
         next(error);

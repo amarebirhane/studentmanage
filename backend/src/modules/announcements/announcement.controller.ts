@@ -16,7 +16,7 @@ export const createAnnouncement = async (req: Request, res: Response, next: Next
 
 export const getAnnouncement = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const announcement = await announcementService.getAnnouncementById(req.params.id);
+        const announcement = await announcementService.getAnnouncementById(req.params.id as string);
         new ApiResponse(res, 200, 'Announcement details', announcement).send();
     } catch (error) {
         next(error);
@@ -25,7 +25,7 @@ export const getAnnouncement = async (req: Request, res: Response, next: NextFun
 
 export const updateAnnouncement = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const announcement = await announcementService.updateAnnouncement(req.params.id, req.body);
+        const announcement = await announcementService.updateAnnouncement(req.params.id as string, req.body);
         new ApiResponse(res, 200, 'Announcement updated successfully', announcement).send();
     } catch (error) {
         next(error);
@@ -34,7 +34,7 @@ export const updateAnnouncement = async (req: Request, res: Response, next: Next
 
 export const deleteAnnouncement = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        await announcementService.deleteAnnouncement(req.params.id);
+        await announcementService.deleteAnnouncement(req.params.id as string);
         new ApiResponse(res, 200, 'Announcement deleted successfully').send();
     } catch (error) {
         next(error);

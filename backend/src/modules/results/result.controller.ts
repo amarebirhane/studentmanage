@@ -13,7 +13,7 @@ export const createResult = async (req: Request, res: Response, next: NextFuncti
 
 export const getResult = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const result = await resultService.getResultById(req.params.id);
+        const result = await resultService.getResultById(req.params.id as string);
         new ApiResponse(res, 200, 'Result details', result).send();
     } catch (error) {
         next(error);
@@ -22,7 +22,7 @@ export const getResult = async (req: Request, res: Response, next: NextFunction)
 
 export const updateResult = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const result = await resultService.updateResult(req.params.id, req.body);
+        const result = await resultService.updateResult(req.params.id as string, req.body);
         new ApiResponse(res, 200, 'Result updated successfully', result).send();
     } catch (error) {
         next(error);
@@ -31,7 +31,7 @@ export const updateResult = async (req: Request, res: Response, next: NextFuncti
 
 export const deleteResult = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        await resultService.deleteResult(req.params.id);
+        await resultService.deleteResult(req.params.id as string);
         new ApiResponse(res, 200, 'Result deleted successfully').send();
     } catch (error) {
         next(error);

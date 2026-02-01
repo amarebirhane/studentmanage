@@ -49,17 +49,21 @@ export const AuthProvider = ({ children }) => {
       }
       return data;
     } catch (error) {
-      throw error.response?.data?.message || 'Login failed';
+      throw error;
     }
   };
 
-  const register = async (name, email, password, role) => {
+  const register = async ({ firstName, lastName, email, password, role, phone }) => {
     try {
-      const { data } = await api.post('/auth/register', { name, email, password, role });
-      setUser(data);
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('user', JSON.stringify(data));
-      }
+      const { data } = await api.post('/auth/register', {
+        firstName,
+        lastName,
+        email,
+        password,
+        role: role.toUpperCase(),
+        phone
+      });
+      // We don't automatically set user here because typically admin registers others
       return data;
     } catch (error) {
       throw error.response?.data?.message || 'Registration failed';
@@ -85,8 +89,10 @@ export const AuthProvider = ({ children }) => {
     register,
     logout,
     loading,
-    isAdmin: user?.role === 'admin',
-    isTeacher: user?.role === 'teacher' || user?.role === 'admin',
+    isAdmin: user?.role === 'ADMIN',
+    isTeacher: user?.role === 'TEACHER',
+    isStudent: user?.role === 'STUDENT',
+    isParent: user?.role === 'PARENT',
     refreshUser: fetchUser,
   };
 

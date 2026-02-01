@@ -1,11 +1,22 @@
-const User = require('../models/User');
+const prisma = require('../lib/prisma');
 
 // @desc    Get all users
-// @route   GET /api/admin/users
+// @route   GET /api/v1/admin/users
 // @access  Private/Admin
 const getUsers = async (req, res) => {
   try {
-    const users = await User.find({}).select('-password').sort({ createdAt: -1 });
+    const users = await prisma.user.findMany({
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+        role: true,
+        phone: true,
+        createdAt: true,
+      },
+      orderBy: { createdAt: 'desc' },
+    });
     res.json(users);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -13,12 +24,22 @@ const getUsers = async (req, res) => {
 };
 
 // @desc    Get user by ID
-// @route   GET /api/admin/users/:id
+// @route   GET /api/v1/admin/users/:id
 // @access  Private/Admin
 const getUserById = async (req, res) => {
   try {
-    const user = await User.findById(req.params.id).select('-password');
-    
+    const user = await prisma.user.findUnique({
+      where: { id: req.params.id },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+        role: true,
+        phone: true,
+      },
+    });
+
     if (user) {
       res.json(user);
     } else {
@@ -30,54 +51,65 @@ const getUserById = async (req, res) => {
 };
 
 // @desc    Update user
-// @route   PUT /api/admin/users/:id
+// @route   PUT /api/v1/admin/users/:id
 // @access  Private/Admin
 const updateUser = async (req, res) => {
   try {
-    const { name, email, role } = req.body;
+    const { firstName, lastName, email, role } = req.body;
 
-    const user = await User.findById(req.params.id);
+    const updatedUser = await prisma.user.update({
+      where: { id: req.params.id },
+      data: {
+        firstName,
+        lastName,
+        email: email?.toLowerCase(),
+        role: role?.toUpperCase(),
+      },
+    });
 
-    if (user) {
-      if (email && email !== user.email) {
-        const emailExists = await User.findOne({ email, _id: { $ne: req.params.id } });
-        if (emailExists) {
-          return res.status(400).json({ message: 'Email already exists' });
-        }
-      }
-
-      user.name = name || user.name;
-      user.email = email || user.email;
-      if (role) user.role = role;
-
-      const updatedUser = await user.save();
-      res.json({
-        _id: updatedUser._id,
-        name: updatedUser.name,
-        email: updatedUser.email,
-        role: updatedUser.role,
-      });
-    } else {
-      res.status(404).json({ message: 'User not found' });
-    }
+    res.json(updatedUser);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
 // @desc    Delete user
-// @route   DELETE /api/admin/users/:id
+// @route   DELETE /api/v1/admin/users/:id
 // @access  Private/Admin
 const deleteUser = async (req, res) => {
   try {
-    const user = await User.findById(req.params.id);
+    await prisma.user.delete({ where: { id: req.params.id } });
+    res.json({ message: 'User removed' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 
-    if (user) {
-      await user.deleteOne();
-      res.json({ message: 'User removed' });
-    } else {
-      res.status(404).json({ message: 'User not found' });
-    }
+// @desc    Get all classes
+// @route   GET /api/v1/admin/classes
+const getClasses = async (req, res) => {
+  try {
+    const classes = await prisma.class.findMany({
+      include: {
+        sections: true,
+      }
+    });
+    res.json(classes);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Get all sections
+// @route   GET /api/v1/admin/sections
+const getSections = async (req, res) => {
+  try {
+    const sections = await prisma.section.findMany({
+      include: {
+        class: true,
+      }
+    });
+    res.json(sections);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -88,5 +120,7 @@ module.exports = {
   getUserById,
   updateUser,
   deleteUser,
+  getClasses,
+  getSections,
 };
 

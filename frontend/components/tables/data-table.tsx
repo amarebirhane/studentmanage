@@ -8,13 +8,25 @@ import {
   getSortedRowModel,
   getFilteredRowModel,
   flexRender,
+  ColumnDef,
+  SortingState,
 } from '@tanstack/react-table';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 
-const DataTable = ({ data, columns, searchPlaceholder = 'Search...' }) => {
-  const [sorting, setSorting] = useState([]);
+interface DataTableProps<TData, TValue> {
+  columns: ColumnDef<TData, TValue>[];
+  data: TData[];
+  searchPlaceholder?: string;
+}
+
+export function DataTable<TData, TValue>({
+  data,
+  columns,
+  searchPlaceholder = 'Search...',
+}: DataTableProps<TData, TValue>) {
+  const [sorting, setSorting] = useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = useState('');
 
   const table = useReactTable({
@@ -73,7 +85,7 @@ const DataTable = ({ data, columns, searchPlaceholder = 'Search...' }) => {
                             {{
                               asc: ' ↑',
                               desc: ' ↓',
-                            }[header.column.getIsSorted()] ?? ' ↕'}
+                            }[header.column.getIsSorted() as 'asc' | 'desc'] ?? ' ↕'}
                           </span>
                         )}
                       </div>

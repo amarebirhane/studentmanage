@@ -138,7 +138,7 @@ const Sidebar = () => {
             <div className="mt-auto p-4 glass-card bg-secondary/50 border-none">
                 <div className="flex items-center space-x-3">
                     <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20">
-                        <span className="font-bold text-primary">{user?.firstName?.[0] || user?.name?.[0]}</span>
+                        <span className="font-bold text-primary">{user?.firstName?.[0]}</span>
                     </div>
                     <div className="flex-1 min-w-0">
                         <p className="text-sm font-semibold truncate">{user?.firstName} {user?.lastName}</p>

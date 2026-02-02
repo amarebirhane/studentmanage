@@ -155,12 +155,26 @@ export class StudentService {
                 where: { id },
                 data: {
                     ...profileData,
+                    status: status || undefined,
                     dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : undefined,
                 },
                 include: { user: true },
             });
 
             return updatedProfile;
+        });
+    }
+
+    static async approveAdmission(id: string, schoolId?: string) {
+        const student = await prisma.studentProfile.findUnique({ where: { id } });
+        if (!student || (schoolId && student.schoolId !== schoolId)) {
+            throw new Error('Student not found');
+        }
+
+        return await prisma.studentProfile.update({
+            where: { id },
+            data: { status: 'ADMITTED' },
+            include: { user: true },
         });
     }
 

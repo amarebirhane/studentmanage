@@ -5,8 +5,18 @@ import { ApiError } from '../../utils/apiResponse';
 export const createFeeInvoice = async (data: any, schoolId?: string) => {
     return feeRepository.createFeeInvoice({
         ...data,
+        discount: data.discount || 0,
+        scholarship: data.scholarship || 0,
         school: schoolId ? { connect: { id: schoolId } } : undefined
     });
+};
+
+export const applyDiscountAndScholarship = async (id: string, data: { discount?: number, scholarship?: number }, schoolId?: string) => {
+    const feeInvoice = await feeRepository.findFeeInvoiceById(id);
+    if (!feeInvoice || (schoolId && feeInvoice.schoolId !== schoolId)) {
+        throw new ApiError(404, 'Fee invoice not found');
+    }
+    return feeRepository.updateFeeInvoice(id, data);
 };
 
 export const getFeeInvoiceById = async (id: string) => {

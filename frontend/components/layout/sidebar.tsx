@@ -28,7 +28,7 @@ const Sidebar = () => {
             items: [
                 {
                     title: 'Dashboard',
-                    href: '/dashboard',
+                    href: user?.role ? `/dashboard/${user.role.toLowerCase()}` : '/dashboard/admin',
                     icon: LayoutDashboard,
                     show: true,
                 },

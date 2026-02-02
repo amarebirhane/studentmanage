@@ -34,7 +34,7 @@ export default function AdminDashboard() {
                     activeSessions: Math.floor(Math.random() * 10) + 5 // Placeholder for active sessions
                 });
             } catch (error) {
-                console.error('Failed to fetch dashboard stats');
+                console.error('Failed to fetch dashboard stats', error);
             } finally {
                 setLoading(false);
             }

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { useAuthStore } from '@/store/auth.store';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -60,9 +61,8 @@ export default function LoginPage() {
         try {
             await login(formData);
 
-            // Get the updated user from the auth hook
-            // Note: We need to use the store directly since state updates are async
-            const { user: loggedInUser } = useAuth();
+            // Get the user directly from the store after login completes
+            const loggedInUser = useAuthStore.getState().user;
 
             if (loggedInUser) {
                 const dashboardRoute = getDashboardRoute(loggedInUser.role);

@@ -2,7 +2,11 @@ import express, { Application } from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import path from 'path';
+import helmet from 'helmet';
+import morgan from 'morgan';
+import swaggerUi from 'swagger-ui-express';
 import { config } from './config';
+import { swaggerSpec } from './config/swagger';
 import { errorMiddleware } from './middlewares/error.middleware';
 import routes from './routes';
 
@@ -12,6 +16,10 @@ import { limiter } from './middlewares/rateLimit.middleware';
 import { tenantMiddleware } from './middlewares/tenant.middleware';
 
 // Middleware
+app.use(helmet({
+    crossOriginResourcePolicy: false,
+}));
+app.use(morgan('dev'));
 app.use(cors({
     origin: config.cors.origin,
     credentials: true,
@@ -34,6 +42,9 @@ app.get('/.well-known/appspecific/com.chrome.devtools.json', (req, res) => {
 app.get('/health', (req, res) => {
     res.status(200).json({ status: 'UP', timestamp: new Date().toISOString() });
 });
+
+// Swagger Documentation
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Routes
 app.use('/api/v1', routes);

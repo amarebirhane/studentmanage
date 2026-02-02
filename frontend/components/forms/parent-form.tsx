@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { parentSchema, updateParentSchema } from '@/lib/schema';
+import { parentSchema, updateParentSchema } from '@/lib/validation';
 import toast from 'react-hot-toast';
 import { User, Phone, Mail, Shield, Users, Search, X } from 'lucide-react';
 import { cn } from '@/lib/utils';

@@ -20,7 +20,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
-import { loginSchema } from '@/lib/schema';
+import { loginSchema } from '@/lib/validation';
 import { getDashboardRoute } from '@/lib/utils/routes';
 import toast from 'react-hot-toast';
 

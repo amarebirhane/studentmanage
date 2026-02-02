@@ -4,8 +4,11 @@ import { ApiResponse, PaginatedResponse, PaginationParams } from '@/types/api';
 
 export const studentService = {
     async getStudents(params?: PaginationParams): Promise<PaginatedResponse<StudentProfile>> {
-        const { data } = await api.get<ApiResponse<PaginatedResponse<StudentProfile>>>('/students', { params });
-        return data.data!;
+        const { data } = await api.get<ApiResponse<any>>('/students', { params });
+        return {
+            data: data.data.students,
+            pagination: data.data.pagination
+        };
     },
 
     async getStudentById(id: string): Promise<StudentProfile> {

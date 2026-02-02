@@ -42,5 +42,6 @@ router.use('/fees', feeRoutes);
 router.use('/fee-structures', feeStructureRoutes);
 router.use('/announcements', announcementRoutes);
 router.use('/messages', messageRoutes);
+router.use('/assignments', assignmentRoutes);
 
 export default router;

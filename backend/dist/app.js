@@ -10,6 +10,8 @@ const config_1 = require("./config");
 const error_middleware_1 = require("./middlewares/error.middleware");
 const routes_1 = __importDefault(require("./routes"));
 const app = (0, express_1.default)();
+const rateLimit_middleware_1 = require("./middlewares/rateLimit.middleware");
+const tenant_middleware_1 = require("./middlewares/tenant.middleware");
 // Middleware
 app.use((0, cors_1.default)({
     origin: config_1.config.cors.origin,
@@ -18,6 +20,8 @@ app.use((0, cors_1.default)({
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: false }));
 app.use((0, cookie_parser_1.default)());
+app.use(rateLimit_middleware_1.limiter);
+app.use(tenant_middleware_1.tenantMiddleware);
 // Static Files
 app.use('/uploads', express_1.default.static(config_1.config.upload.path));
 // Ignore Chrome DevTools requests

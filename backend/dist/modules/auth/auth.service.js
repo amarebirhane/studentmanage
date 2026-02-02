@@ -51,5 +51,18 @@ class AuthService {
         const { password, ...userWithoutPassword } = user;
         return userWithoutPassword;
     }
+    static async updateProfile(userId, data) {
+        const { firstName, lastName, phone } = data;
+        const user = await config_1.prisma.user.update({
+            where: { id: userId },
+            data: {
+                firstName,
+                lastName,
+                phone,
+            },
+        });
+        const { password, ...userWithoutPassword } = user;
+        return userWithoutPassword;
+    }
 }
 exports.AuthService = AuthService;

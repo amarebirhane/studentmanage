@@ -22,6 +22,8 @@ class AuthController {
                 httpOnly: true,
                 expires: new Date(Date.now() + config_1.config.jwt.cookieExpire * 24 * 60 * 60 * 1000),
                 secure: config_1.config.env === 'production',
+                sameSite: 'lax',
+                path: '/',
             });
             const { password, ...userWithoutPassword } = user;
             return apiResponse_1.ApiResponse.success(res, { ...userWithoutPassword, token }, 'Login successful');
@@ -31,9 +33,12 @@ class AuthController {
         }
     }
     static async logout(req, res) {
-        res.cookie('token', 'none', {
-            expires: new Date(Date.now() + 10 * 1000),
+        res.cookie('token', '', {
             httpOnly: true,
+            expires: new Date(0),
+            secure: config_1.config.env === 'production',
+            sameSite: 'strict',
+            path: '/'
         });
         return apiResponse_1.ApiResponse.success(res, {}, 'Logged out successfully');
     }
@@ -44,6 +49,15 @@ class AuthController {
         }
         catch (error) {
             return apiResponse_1.ApiResponse.error(res, error.message, 404);
+        }
+    }
+    static async updateProfile(req, res) {
+        try {
+            const user = await auth_service_1.AuthService.updateProfile(req.user.id, req.body);
+            return apiResponse_1.ApiResponse.success(res, user, 'Profile updated successfully');
+        }
+        catch (error) {
+            return apiResponse_1.ApiResponse.error(res, error.message, 400);
         }
     }
 }

@@ -8,6 +8,8 @@ router.route('/')
     .get(protect, authorize('ADMIN', 'TEACHER'), TeacherController.getTeachers)
     .post(protect, authorize('ADMIN'), TeacherController.createTeacher);
 
+router.get('/dashboard', protect, authorize('TEACHER'), TeacherController.getDashboardStats);
+
 router.route('/:id')
     .get(protect, authorize('ADMIN', 'TEACHER'), TeacherController.getTeacherById)
     .put(protect, authorize('ADMIN'), TeacherController.updateTeacher)

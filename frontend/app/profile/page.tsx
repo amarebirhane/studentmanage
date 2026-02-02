@@ -16,7 +16,7 @@ import { toast } from 'react-hot-toast';
 import { authService } from '@/services/auth.service';
 
 export default function ProfilePage() {
-    const { user, isLoading, login } = useAuth(); // Assuming login or a similar method updates the local user state
+    const { user, isLoading, updateProfile } = useAuth(); // Assuming login or a similar method updates the local user state
     const router = useRouter();
     const [isEditing, setIsEditing] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
@@ -51,13 +51,9 @@ export default function ProfilePage() {
     const handleSave = async () => {
         setIsSaving(true);
         try {
-            const updatedUser = await authService.updateProfile(formData);
-            // We need to update the local user state. 
-            // Ideally, useAuth should expose a way to mutate the user, or we can just reload the page/re-fetch.
-            // For now, let's assume valid data and reload is a simple fallback if useAuth doesn't support direct mutation.
+            await updateProfile(formData);
             toast.success('Profile updated successfully');
             setIsEditing(false);
-            window.location.reload();
         } catch (error: any) {
             toast.error(error.message || 'Failed to update profile');
         } finally {

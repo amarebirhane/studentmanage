@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useAuthStore } from '@/store/auth.store';
 
 export const useAuth = () => {
-    const { user, isAuthenticated, isLoading, error, hasAttemptedLoad, login, register, logout, loadUser } = useAuthStore();
+    const { user, isAuthenticated, isLoading, error, hasAttemptedLoad, login, register, logout, loadUser, updateProfile } = useAuthStore();
 
     // Load user only once on initial mount if token exists but user is not loaded
     useEffect(() => {
@@ -24,6 +24,7 @@ export const useAuth = () => {
         register,
         logout,
         loadUser,
+        updateProfile,
         isAdmin: user?.role === 'ADMIN',
         isTeacher: user?.role === 'TEACHER',
         isStudent: user?.role === 'STUDENT',

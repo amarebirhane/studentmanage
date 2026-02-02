@@ -77,6 +77,9 @@ model User {
   assignments     Assignment[]
   notifications   Notification[]
   onlineExams     OnlineExam[]       @relation("OnlineExamCreator")
+  sentMessages    Message[]          @relation("SentMessages")
+  receivedMessages Message[]         @relation("ReceivedMessages")
+  permissions     Permission[]
 }
 
 model StudentProfile {
@@ -119,18 +122,19 @@ model StudentProfile {
 }
 
 model TeacherProfile {
-  id          String           @id @default(uuid())
-  user        User             @relation(fields: [userId], references: [id])
-  userId      String           @unique
-  bio         String?
-  subjects    String?
-  sections    Section[]
-  timetable   TimetableEntry[] @relation("TeacherTimetable")
-  assignments Assignment[]
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
-  schoolId    String?
-  school      School?          @relation(fields: [schoolId], references: [id])
+  id              String           @id @default(uuid())
+  user            User             @relation(fields: [userId], references: [id])
+  userId          String           @unique
+  bio             String?
+  subjects        String?
+  sections        Section[]        @relation("SectionTeacher")
+  classSections   Section[]        @relation("ClassTeacher")
+  timetable       TimetableEntry[] @relation("TeacherTimetable")
+  assignments     Assignment[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  schoolId        String?
+  school          School?          @relation(fields: [schoolId], references: [id])
 }
 
 model ParentProfile {
@@ -170,19 +174,21 @@ model Class {
 }
 
 model Section {
-  id          String           @id @default(uuid())
-  name        String
-  class       Class            @relation(fields: [classId], references: [id])
-  classId     String
-  teacher     TeacherProfile?  @relation(fields: [teacherId], references: [id])
-  teacherId   String?
-  students    StudentProfile[]
-  timetable   TimetableEntry[]
-  exams       Exam[]
-  assignments Assignment[]
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
-  onlineExams OnlineExam[]
+  id              String           @id @default(uuid())
+  name            String
+  class           Class            @relation(fields: [classId], references: [id])
+  classId         String
+  teacher         TeacherProfile?  @relation("SectionTeacher", fields: [teacherId], references: [id])
+  teacherId       String?
+  classTeacher    TeacherProfile?  @relation("ClassTeacher", fields: [classTeacherId], references: [id])
+  classTeacherId  String?
+  students        StudentProfile[]
+  timetable       TimetableEntry[]
+  exams           Exam[]
+  assignments     Assignment[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  onlineExams     OnlineExam[]
 }
 
 model TimetableEntry {
@@ -207,6 +213,7 @@ model AttendanceRecord {
   student      StudentProfile   @relation(fields: [studentId], references: [id])
   studentId    String
   date         DateTime
+  periodNumber Int?             // For period-wise attendance
   status       AttendanceStatus
   remarks      String?
   recordedBy   User             @relation("AttendanceTaken", fields: [recordedById], references: [id])
@@ -215,7 +222,7 @@ model AttendanceRecord {
   schoolId     String?
   school       School?          @relation(fields: [schoolId], references: [id])
 
-  @@unique([studentId, date], map: "attendance_unique_student_date")
+  @@unique([studentId, date, periodNumber], map: "attendance_unique_student_date_period")
 }
 
 model Exam {
@@ -298,10 +305,12 @@ model Assignment {
   classId      String?
   section      Section?               @relation(fields: [sectionId], references: [id])
   sectionId    String?
+  subject      String?
   teacher      TeacherProfile?        @relation(fields: [teacherId], references: [id])
   teacherId    String?
   status       AssignmentStatus       @default(DRAFT)
   resourcesUrl String?
+  attachmentUrl String?
   submissions  AssignmentSubmission[]
   createdAt    DateTime               @default(now())
   updatedAt    DateTime               @updatedAt
@@ -319,8 +328,12 @@ model AssignmentSubmission {
   studentId    String
   submittedAt  DateTime       @default(now())
   fileUrl      String?
+  content      String?        // Text submission
   grade        String?
+  marks        Int?
   feedback     String?
+  gradedAt     DateTime?
+  gradedBy     String?        // Teacher userId
 
   @@unique([assignmentId, studentId], map: "assignment_submission_unique")
 }

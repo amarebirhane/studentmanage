@@ -1,5 +1,6 @@
 import { Response, NextFunction } from 'express';
 import { PlatformService } from './platform.service';
+import { AuditLogService } from './audit.service';
 import { ApiResponse } from '../../utils/apiResponse';
 
 export const getGlobalStats = async (req: any, res: Response, next: NextFunction) => {
@@ -31,8 +32,14 @@ export const getAllSchools = async (req: any, res: Response, next: NextFunction)
 
 export const getSystemLogs = async (req: any, res: Response, next: NextFunction) => {
     try {
-        // Placeholder for audit logs
-        new ApiResponse(res, 200, 'System audit logs', []).send();
+        const { module, userId, page, limit } = req.query;
+        const result = await AuditLogService.getLogs({
+            module: module as string,
+            userId: userId as string,
+            page: page ? parseInt(page as string) : 1,
+            limit: limit ? parseInt(limit as string) : 50,
+        });
+        new ApiResponse(res, 200, 'System audit logs', result).send();
     } catch (error) {
         next(error);
     }

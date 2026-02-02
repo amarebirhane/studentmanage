@@ -22,7 +22,7 @@ import { Button } from '@/components/ui/button';
 const Sidebar = () => {
     const pathname = usePathname();
     const { user, logout } = useAuth();
-    const { isSuperAdmin, isAdmin, isTeacher, isStudent, isAccountant } = useRole({ userRole: user?.role as any });
+    const { isSuperAdmin, isAdmin, isTeacher, isStudent, isAccountant, isParent } = useRole({ userRole: user?.role as any });
 
     const menuGroups = [
         {
@@ -95,13 +95,19 @@ const Sidebar = () => {
                     title: 'Fee Invoices',
                     href: '/dashboard/admin/fees',
                     icon: ClipboardList,
-                    show: isAdmin || isAccountant,
+                    show: isAdmin || isAccountant || isStudent || isParent,
                 },
                 {
                     title: 'Reports',
                     href: '/dashboard/admin/reports',
                     icon: BookOpen,
                     show: isAdmin || isAccountant,
+                },
+                {
+                    title: 'My Profile',
+                    href: '/dashboard/settings',
+                    icon: UserPlus,
+                    show: isStudent || isParent,
                 },
             ]
         },

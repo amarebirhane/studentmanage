@@ -13,6 +13,8 @@ import feeRoutes from './modules/fees/fee.routes';
 import announcementRoutes from './modules/announcements/announcement.routes';
 
 const router = Router();
+console.log('🛣️  Routes initializing...');
+
 
 router.use('/auth', authRoutes);
 router.use('/students', studentRoutes);

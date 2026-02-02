@@ -11,6 +11,7 @@ import examRoutes from './modules/exams/exam.routes';
 import resultRoutes from './modules/results/result.routes';
 import feeRoutes from './modules/fees/fee.routes';
 import announcementRoutes from './modules/announcements/announcement.routes';
+import platformRoutes from './modules/platform/platform.routes';
 
 import { protect } from './middlewares/auth.middleware';
 import { tenantMiddleware } from './middlewares/tenant.middleware';

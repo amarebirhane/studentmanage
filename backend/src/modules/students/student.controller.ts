@@ -13,7 +13,7 @@ export class StudentController {
                 limit: req.query.limit ? parseInt(req.query.limit as string, 10) : 10,
             };
 
-            const result = await StudentService.getStudents(filters);
+            const result = await StudentService.getStudents(filters, (req as any).schoolId, (req as any).user?.id, (req as any).user?.role);
             return ApiResponse.success(res, result, 'Students retrieved');
         } catch (error: any) {
             return ApiResponse.error(res, error.message);
@@ -22,10 +22,19 @@ export class StudentController {
 
     static async getStudentById(req: Request, res: Response) {
         try {
-            const student = await StudentService.getStudentById(req.params.id as string);
+            const student = await StudentService.getStudentById(req.params.id as string, (req as any).schoolId);
             return ApiResponse.success(res, student, 'Student retrieved');
         } catch (error: any) {
             return ApiResponse.error(res, error.message, 404);
+        }
+    }
+
+    static async approveAdmission(req: Request, res: Response) {
+        try {
+            const student = await StudentService.approveAdmission(req.params.id as string, (req as any).schoolId);
+            return ApiResponse.success(res, student, 'Student admission approved');
+        } catch (error: any) {
+            return ApiResponse.error(res, error.message, 400);
         }
     }
 

@@ -14,6 +14,7 @@ import announcementRoutes from './modules/announcements/announcement.routes';
 import platformRoutes from './modules/platform/platform.routes';
 import messageRoutes from './modules/messages/message.routes';
 import feeStructureRoutes from './modules/fee-structures/fee-structure.routes';
+import assignmentRoutes from './modules/assignments/assignment.routes';
 
 import { protect } from './middlewares/auth.middleware';
 import { tenantMiddleware } from './middlewares/tenant.middleware';

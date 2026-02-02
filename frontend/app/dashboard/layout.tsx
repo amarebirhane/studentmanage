@@ -14,26 +14,14 @@ export default function DashboardLayout({
     const { user, isLoading, isAuthenticated } = useAuth();
     const router = useRouter();
 
-    // Debug logging
-    useEffect(() => {
-        console.log('Dashboard Layout - Auth State:', {
-            user,
-            isLoading,
-            isAuthenticated,
-            hasUser: !!user
-        });
-    }, [user, isLoading, isAuthenticated]);
-
     useEffect(() => {
         // If not loading and not authenticated, redirect to login
         if (!isLoading && !isAuthenticated && !user) {
-            console.log('Redirecting to login - no user');
             router.push('/login');
         }
     }, [isLoading, isAuthenticated, user, router]);
 
     if (isLoading) {
-        console.log('Dashboard Layout - Showing loading spinner');
         return (
             <div className="flex items-center justify-center min-h-screen">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
@@ -42,7 +30,6 @@ export default function DashboardLayout({
     }
 
     if (!user) {
-        console.log('Dashboard Layout - No user, showing loading while redirecting');
         // Show loading while redirecting
         return (
             <div className="flex items-center justify-center min-h-screen">
@@ -50,8 +37,6 @@ export default function DashboardLayout({
             </div>
         );
     }
-
-    console.log('Dashboard Layout - Rendering dashboard with user:', user.email);
     return (
         <div className="flex min-h-screen bg-background nebula-gradient">
             <Sidebar />

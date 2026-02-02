@@ -52,12 +52,6 @@ const Sidebar = () => {
                     show: isTeacher || isAdmin,
                 },
                 {
-                    title: 'Teachers',
-                    href: '/dashboard/admin/teachers',
-                    icon: Users,
-                    show: isAdmin,
-                },
-                {
                     title: 'Classes',
                     href: '/dashboard/admin/classes',
                     icon: GraduationCap,
@@ -81,9 +75,9 @@ const Sidebar = () => {
             label: 'Administrative',
             items: [
                 {
-                    title: 'Staff Directory',
+                    title: 'Teachers',
                     href: '/dashboard/admin/teachers',
-                    icon: ShieldCheck,
+                    icon: Users,
                     show: true,
                 },
                 {

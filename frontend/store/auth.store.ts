@@ -64,15 +64,21 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         try {
             await authService.logout();
         } catch (error) {
-            console.error("Logout error", error);
+            console.error("Logout API error", error);
         } finally {
+            // Always clear state even if API call fails
             set({
                 user: null,
                 token: null,
                 isAuthenticated: false,
-                hasAttemptedLoad: true, // We've attempted to load (and we know it's empty)
+                hasAttemptedLoad: true,
                 isLoading: false,
             });
+
+            // Hard redirect to login to clear all memory state and ensure clean slate
+            if (typeof window !== 'undefined') {
+                window.location.href = '/login';
+            }
         }
     },
 

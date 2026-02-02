@@ -33,9 +33,12 @@ export class AuthController {
     }
 
     static async logout(req: AuthenticatedRequest, res: Response) {
-        res.cookie('token', 'none', {
-            expires: new Date(Date.now() + 10 * 1000),
+        res.cookie('token', '', {
             httpOnly: true,
+            expires: new Date(0),
+            secure: config.env === 'production',
+            sameSite: 'strict',
+            path: '/'
         });
         return ApiResponse.success(res, {}, 'Logged out successfully');
     }

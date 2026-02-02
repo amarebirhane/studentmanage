@@ -42,7 +42,7 @@ export const getExam = async (req: AuthenticatedRequest, res: Response, next: Ne
 export const enterMarks = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     try {
         const results = await ExamService.enterMarks({
-            examId: req.params.id,
+            examId: req.params.id as string,
             marks: req.body.marks,
             schoolId: req.schoolId,
         });

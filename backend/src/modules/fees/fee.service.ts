@@ -37,7 +37,7 @@ export const updateFeeInvoice = async (id: string, data: any, schoolId?: string)
 
 export const deleteFeeInvoice = async (id: string, schoolId?: string) => {
     const feeInvoice = await feeRepository.findFeeInvoiceById(id);
-    if (!feeInvoice || (schoolId && feeInvoice.schoolId !== schoolId)) {
+    if (!feeInvoice || (schoolId && (feeInvoice as any).schoolId !== schoolId)) {
         throw new ApiError(404, 'Fee invoice not found');
     }
     return feeRepository.deleteFeeInvoice(id);

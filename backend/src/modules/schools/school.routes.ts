@@ -7,7 +7,7 @@ import { UserRole } from '@prisma/client';
 const router = Router();
 
 router.use(protect); // All routes require authentication
-router.use(authorize(UserRole.ADMIN)); // Only admins can manage schools
+router.use(authorize('SUPER_ADMIN' as any)); // Only Super Admin can manage schools
 
 router.post('/', schoolController.createSchool);
 router.get('/', schoolController.getSchools);

@@ -81,6 +81,8 @@ model User {
   receivedMessages Message[]         @relation("ReceivedMessages")
   permissions     Permission[]
   activityLogs    ActivityLog[]
+  resetToken      String?
+  resetTokenExpiry DateTime?
 }
 
 model StudentProfile {

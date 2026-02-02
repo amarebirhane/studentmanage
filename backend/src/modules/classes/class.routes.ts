@@ -1,16 +1,18 @@
 import { Router } from 'express';
 import { ClassController } from './class.controller';
-import { protect, authorize } from '../../middlewares/auth.middleware';
+import { checkPermission } from '../../middlewares/permission.middleware';
 
 const router = Router();
 
-router.get('/', protect, ClassController.getClasses);
-router.get('/sections', protect, ClassController.getSections);
+// Routes are already protected and tenant-isolated by the parent router in routes.ts
 
-router.post('/', protect, authorize('ADMIN'), ClassController.createClass);
-router.post('/sections', protect, authorize('ADMIN'), ClassController.createSection);
+router.get('/', checkPermission('classes', 'view'), ClassController.getClasses);
+router.get('/sections', checkPermission('classes', 'view'), ClassController.getSections);
 
-router.delete('/:id', protect, authorize('ADMIN'), ClassController.deleteClass);
-router.delete('/sections/:id', protect, authorize('ADMIN'), ClassController.deleteSection);
+router.post('/', checkPermission('classes', 'create'), ClassController.createClass);
+router.post('/sections', checkPermission('classes', 'create'), ClassController.createSection);
+
+router.delete('/:id', checkPermission('classes', 'delete'), ClassController.deleteClass);
+router.delete('/sections/:id', checkPermission('classes', 'delete'), ClassController.deleteSection);
 
 export default router;

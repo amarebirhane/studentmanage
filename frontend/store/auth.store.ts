@@ -27,7 +27,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     login: async (credentials) => {
         set({ isLoading: true, error: null });
         try {
+            console.log('Auth Store - Calling login API...');
             const response = await authService.login(credentials);
+            console.log('Auth Store - Login API response:', response);
+            console.log('Auth Store - Setting state with user:', response.user);
+
             set({
                 user: response.user,
                 token: response.token,
@@ -35,7 +39,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
                 isLoading: false,
                 hasAttemptedLoad: true,
             });
+
+            console.log('Auth Store - State updated, current user:', get().user);
         } catch (err: any) {
+            console.error('Auth Store - Login error:', err);
             set({
                 error: err.response?.data?.message || 'Login failed',
                 isLoading: false,

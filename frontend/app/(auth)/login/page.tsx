@@ -58,25 +58,39 @@ export default function LoginPage() {
             return;
         }
 
+
         try {
+            console.log('Login Page - Starting login with:', formData.email);
             await login(formData);
 
             // Get the user directly from the store after login completes
             const loggedInUser = useAuthStore.getState().user;
+            const authState = useAuthStore.getState();
+
+            console.log('Login Page - After login, full auth state:', {
+                user: loggedInUser,
+                isAuthenticated: authState.isAuthenticated,
+                token: authState.token ? 'exists' : 'missing',
+                hasAttemptedLoad: authState.hasAttemptedLoad
+            });
 
             if (loggedInUser) {
                 const dashboardRoute = getDashboardRoute(loggedInUser.role);
+                console.log('Login Page - Redirecting to:', dashboardRoute);
                 toast.success(`Welcome back, ${loggedInUser.firstName}!`);
                 router.push(dashboardRoute);
             } else {
+                console.warn('Login Page - User is null after login, using fallback');
                 // Fallback to admin dashboard if user is not available
                 toast.success('Login successful!');
                 router.push('/dashboard/admin');
             }
         } catch (err: any) {
             const errorMessage = err.response?.data?.message || err.message || 'Login failed';
+            console.error('Login Page - Error:', err);
             toast.error(errorMessage);
         }
+
     };
 
     const togglePasswordVisibility = (e: React.MouseEvent) => {

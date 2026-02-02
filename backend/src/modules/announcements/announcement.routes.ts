@@ -1,17 +1,15 @@
 import { Router } from 'express';
 import * as announcementController from './announcement.controller';
-import { protect } from '../../middlewares/auth.middleware';
-import { authorize } from '../../middlewares/role.middleware';
-import { UserRole } from '@prisma/client';
+import { checkPermission } from '../../middlewares/permission.middleware';
 
 const router = Router();
 
-router.use(protect);
+// Routes are already protected and tenant-isolated by the parent router in routes.ts
 
-router.post('/', authorize(UserRole.ADMIN, UserRole.TEACHER), announcementController.createAnnouncement);
-router.get('/', announcementController.getAnnouncements);
-router.get('/:id', announcementController.getAnnouncement);
-router.patch('/:id', authorize(UserRole.ADMIN, UserRole.TEACHER), announcementController.updateAnnouncement);
-router.delete('/:id', authorize(UserRole.ADMIN), announcementController.deleteAnnouncement);
+router.post('/', checkPermission('announcements', 'create'), announcementController.createAnnouncement);
+router.get('/', checkPermission('announcements', 'view'), announcementController.getAnnouncements);
+router.get('/:id', checkPermission('announcements', 'view'), announcementController.getAnnouncement);
+router.patch('/:id', checkPermission('announcements', 'edit'), announcementController.updateAnnouncement);
+router.delete('/:id', checkPermission('announcements', 'delete'), announcementController.deleteAnnouncement);
 
 export default router;

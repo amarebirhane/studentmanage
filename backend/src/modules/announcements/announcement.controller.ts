@@ -1,14 +1,15 @@
 import { Response, NextFunction } from 'express';
 import { AnnouncementService } from './announcement.service';
 import { ApiResponse } from '../../utils/apiResponse';
+import { AuthenticatedRequest } from '../../types';
 
-export const createAnnouncement = async (req: any, res: Response, next: NextFunction) => {
+export const createAnnouncement = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     try {
         const announcement = await AnnouncementService.createAnnouncement({
             title: req.body.title,
             content: req.body.content,
             target: req.body.target,
-            createdById: req.user.id,
+            createdById: req.user?.id as string,
             schoolId: req.schoolId,
         });
         new ApiResponse(res, 201, 'Announcement created successfully', announcement).send();
@@ -17,21 +18,22 @@ export const createAnnouncement = async (req: any, res: Response, next: NextFunc
     }
 };
 
-export const getAnnouncement = async (req: any, res: Response, next: NextFunction) => {
+export const getAnnouncement = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     try {
-        const announcement = await AnnouncementService.getAnnouncementById(req.params.id);
+        const announcement = await AnnouncementService.getAnnouncementById(req.params.id, req.schoolId);
         new ApiResponse(res, 200, 'Announcement details', announcement).send();
     } catch (error) {
         next(error);
     }
 };
 
-export const updateAnnouncement = async (req: any, res: Response, next: NextFunction) => {
+export const updateAnnouncement = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     try {
         const announcement = await AnnouncementService.updateAnnouncement(
             req.params.id,
             req.body,
-            req.user.id
+            req.user?.id as string,
+            req.schoolId
         );
         new ApiResponse(res, 200, 'Announcement updated successfully', announcement).send();
     } catch (error) {
@@ -39,9 +41,9 @@ export const updateAnnouncement = async (req: any, res: Response, next: NextFunc
     }
 };
 
-export const deleteAnnouncement = async (req: any, res: Response, next: NextFunction) => {
+export const deleteAnnouncement = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     try {
-        await AnnouncementService.deleteAnnouncement(req.params.id, req.user.id);
+        await AnnouncementService.deleteAnnouncement(req.params.id, req.user?.id as string, req.schoolId);
         new ApiResponse(res, 200, 'Announcement deleted successfully').send();
     } catch (error) {
         next(error);

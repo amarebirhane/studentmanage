@@ -17,18 +17,25 @@ export class AnnouncementService {
         });
     }
 
-    static async getAnnouncementById(id: string): Promise<Announcement | null> {
-        return prisma.announcement.findUnique({
-            where: { id },
+    static async getAnnouncementById(id: string, schoolId?: string): Promise<Announcement | null> {
+        const where: any = { id };
+        if (schoolId) where.schoolId = schoolId;
+
+        return prisma.announcement.findFirst({
+            where,
         });
     }
 
     static async updateAnnouncement(
         id: string,
         data: Prisma.AnnouncementUpdateInput,
-        userId: string
+        userId: string,
+        schoolId?: string
     ): Promise<Announcement> {
-        const announcement = await prisma.announcement.findUnique({ where: { id } });
+        const where: any = { id };
+        if (schoolId) where.schoolId = schoolId;
+
+        const announcement = await prisma.announcement.findFirst({ where });
 
         if (!announcement || announcement.createdById !== userId) {
             throw new Error('Announcement not found or unauthorized');
@@ -40,8 +47,11 @@ export class AnnouncementService {
         });
     }
 
-    static async deleteAnnouncement(id: string, userId: string): Promise<Announcement> {
-        const announcement = await prisma.announcement.findUnique({ where: { id } });
+    static async deleteAnnouncement(id: string, userId: string, schoolId?: string): Promise<Announcement> {
+        const where: any = { id };
+        if (schoolId) where.schoolId = schoolId;
+
+        const announcement = await prisma.announcement.findFirst({ where });
 
         if (!announcement || announcement.createdById !== userId) {
             throw new Error('Announcement not found or unauthorized');

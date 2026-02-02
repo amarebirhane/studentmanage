@@ -171,13 +171,14 @@ model TeacherProfile {
   user            User             @relation(fields: [userId], references: [id])
   userId          String           @unique
   bio             String?
-  subjects        String?
+  subjects        Subject[]
   sections        Section[]        @relation("SectionTeacher")
   classSections   Section[]        @relation("ClassTeacher")
   timetable       TimetableEntry[] @relation("TeacherTimetable")
   assignments     Assignment[]
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
+  deletedAt       DateTime?
   schoolId        String?
   school          School?          @relation(fields: [schoolId], references: [id])
 }
@@ -208,11 +209,14 @@ model Class {
   description String?
   sections    Section[]
   students    StudentProfile[]
+  subjects    Subject[]
+  enrollments Enrollment[]
   timetable   TimetableEntry[]
   exams       Exam[]
   assignments Assignment[]
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
+  deletedAt   DateTime?
   schoolId    String?
   school      School?          @relation(fields: [schoolId], references: [id])
   feeStructures FeeStructure[]
@@ -229,11 +233,13 @@ model Section {
   classTeacher    TeacherProfile?  @relation("ClassTeacher", fields: [classTeacherId], references: [id])
   classTeacherId  String?
   students        StudentProfile[]
+  enrollments     Enrollment[]
   timetable       TimetableEntry[]
   exams           Exam[]
   assignments     Assignment[]
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
+  deletedAt       DateTime?
   onlineExams     OnlineExam[]
 }
 
@@ -576,16 +582,22 @@ model School {
   students    StudentProfile[]
   teachers    TeacherProfile[]
   classes     Class[]
+  subjects    Subject[]
+  enrollments Enrollment[]
   attendance  AttendanceRecord[]
   exams       Exam[]
   fees        FeeInvoice[]
   assignments Assignment[]
+  libraryBooks LibraryBook[]
+  transportRoutes TransportRoute[]
+  hostelRooms HostelRoom[]
   announcements Announcement[]
   messages    Message[]
   feeStructures FeeStructure[]
   timetables  TimetableEntry[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  deletedAt   DateTime?
 }
 
 model Announcement {

@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.NotificationService = void 0;
-const config_1 = require("../config");
+const config_1 = require("../../config");
 class NotificationService {
     static async sendNotification(data) {
         return config_1.prisma.notification.create({

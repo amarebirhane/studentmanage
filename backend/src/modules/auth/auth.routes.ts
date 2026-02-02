@@ -8,7 +8,6 @@ router.post('/register', AuthController.register);
 router.post('/login', AuthController.login);
 router.post('/logout', AuthController.logout);
 router.get('/profile', protect, AuthController.getProfile);
-router.patch('/profile', AuthController.updateProfile);
-router.get('/test', (req, res) => res.send('Auth route works'));
+router.patch('/profile', protect, AuthController.updateProfile);
 
 export default router;

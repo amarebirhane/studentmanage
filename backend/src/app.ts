@@ -21,10 +21,6 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(limiter);
 app.use(tenantMiddleware);
-app.use((req, res, next) => {
-    console.log(`${req.method} ${req.url}`);
-    next();
-});
 
 // Static Files
 app.use('/uploads', express.static(config.upload.path));
@@ -40,7 +36,6 @@ app.get('/health', (req, res) => {
 });
 
 // Routes
-app.patch('/test-patch', (req, res) => res.send('Patch works'));
 app.use('/api/v1', routes);
 
 // Error Handling

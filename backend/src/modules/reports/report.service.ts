@@ -121,7 +121,7 @@ export class ReportService {
 
         // Header Info
         sheet.getCell('A1').value = `Exam: ${exam.name}`;
-        sheet.getCell('A2').value = `Subject: ${exam.subject || 'N/A'}`;
+        sheet.getCell('A2').value = `Subject: ${(exam as any).subject || 'N/A'}`;
         sheet.getCell('A3').value = `Date: ${exam.examDate.toDateString()}`;
         sheet.getCell('A4').value = `Class: ${exam.class?.name || 'N/A'} ${exam.section?.name || ''}`;
 

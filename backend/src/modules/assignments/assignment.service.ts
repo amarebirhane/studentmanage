@@ -141,7 +141,7 @@ export class AssignmentService {
         return prisma.assignmentSubmission.update({
             where: { id: data.submissionId },
             data: {
-                marks: data.marks,
+                marks: data.marks as any,
                 grade: data.grade,
                 feedback: data.feedback,
                 gradedBy: data.gradedBy,

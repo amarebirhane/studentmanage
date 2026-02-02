@@ -141,7 +141,7 @@ export class ExamService {
                         studentId_examId_subject: {
                             studentId: entry.studentId,
                             examId: data.examId,
-                            subject: exam.subject || 'General',
+                            subject: (exam as any).subject || 'General',
                         },
                     },
                     update: {

@@ -18,7 +18,7 @@ export default function TeachersPage() {
         try {
             setLoading(true);
             const data = await teacherService.getTeachers();
-            setTeachers(data.data || []);
+            setTeachers(data || []);
         } catch (error) {
             toast.error('Failed to fetch teachers');
         } finally {
@@ -54,12 +54,13 @@ export default function TeachersPage() {
             cell: ({ row }) => row.original.user?.lastName,
         },
         {
-            accessorKey: 'employeeId',
-            header: 'Employee ID',
+            accessorKey: 'id',
+            header: 'Teacher ID',
+            cell: ({ row }) => <span className="text-xs font-mono">{row.original.id.split('-')[0]}</span>,
         },
         {
-            accessorKey: 'specialization',
-            header: 'Specialization',
+            accessorKey: 'subjects',
+            header: 'Subjects / Specialization',
         },
         {
             id: 'actions',

@@ -14,6 +14,7 @@ interface AuthState {
     register: (userData: any) => Promise<void>;
     logout: () => void;
     loadUser: () => Promise<void>;
+    updateProfile: (data: Partial<User>) => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
@@ -95,6 +96,16 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             set({ user, isAuthenticated: true, isLoading: false, hasAttemptedLoad: true });
         } catch (error) {
             set({ user: null, token: null, isAuthenticated: false, isLoading: false, hasAttemptedLoad: true });
+        }
+    },
+
+    updateProfile: async (data) => {
+        try {
+            const updatedUser = await authService.updateProfile(data);
+            set({ user: updatedUser });
+        } catch (error) {
+            console.error('Update profile error:', error);
+            throw error;
         }
     }
 }));

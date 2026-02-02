@@ -1,19 +1,28 @@
 import { Response, NextFunction } from 'express';
 import { AuthenticatedRequest } from '../types';
-import { UserRole } from '@prisma/client';
 import { ApiError } from '../utils/apiResponse';
 
-export const authorize = (...roles: UserRole[]) => {
+/**
+ * Middleware to restrict access based on user roles.
+ */
+export const authorize = (...roles: string[]) => {
     return (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
         if (!req.user) {
-            return next(new ApiError(401, 'Not authorized to access this route'));
+            return next(new ApiError(401, 'Authentication required'));
         }
 
-        if (!roles.includes(req.user.role)) {
+        const userRole = req.user.role as string;
+
+        // Super Admin has access to everything
+        if (userRole === 'SUPER_ADMIN') {
+            return next();
+        }
+
+        if (!roles.includes(userRole)) {
             return next(
                 new ApiError(
                     403,
-                    `User role ${req.user.role} is not authorized to access this route`
+                    `Access Denied: Role '${userRole}' does not have permission to access this resource`
                 )
             );
         }

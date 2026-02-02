@@ -12,19 +12,24 @@ import resultRoutes from './modules/results/result.routes';
 import feeRoutes from './modules/fees/fee.routes';
 import announcementRoutes from './modules/announcements/announcement.routes';
 
+import { protect } from './middlewares/auth.middleware';
+import { tenantMiddleware } from './middlewares/tenant.middleware';
+
 const router = Router();
 console.log('🛣️  Routes initializing...');
 
-
+// Public / Platform-wide routes
 router.use('/auth', authRoutes);
+router.use('/schools', schoolRoutes);
+
+// School-specific routes (Isolated by tenantMiddleware)
+router.use(protect, tenantMiddleware);
+
 router.use('/students', studentRoutes);
 router.use('/classes', classRoutes);
 router.use('/admin', userRoutes);
 router.use('/teachers', teacherRoutes);
 router.use('/parents', parentRoutes);
-
-// New Routes
-router.use('/schools', schoolRoutes);
 router.use('/attendance', attendanceRoutes);
 router.use('/exams', examRoutes);
 router.use('/results', resultRoutes);

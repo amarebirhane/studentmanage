@@ -1,13 +1,13 @@
 import api from '@/lib/api';
 import { StudentProfile, StudentFormData } from '@/types/student';
-import { ApiResponse, PaginatedResponse, PaginationParams } from '@/types/api';
+import { ApiResponse, PaginatedResponse, PaginationParams, PaginationMeta } from '@/types/api';
 
 export const studentService = {
     async getStudents(params?: PaginationParams): Promise<PaginatedResponse<StudentProfile>> {
-        const { data } = await api.get<ApiResponse<any>>('/students', { params });
+        const { data } = await api.get<ApiResponse<{ students: StudentProfile[]; pagination: PaginationMeta }>>('/students', { params });
         return {
-            data: data.data.students,
-            pagination: data.data.pagination
+            data: data.data?.students || [],
+            pagination: data.data?.pagination!
         };
     },
 

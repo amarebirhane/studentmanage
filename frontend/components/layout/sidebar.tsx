@@ -46,6 +46,18 @@ const Sidebar = () => {
                     show: isTeacher || isAdmin,
                 },
                 {
+                    title: 'Parents',
+                    href: '/dashboard/admin/parents',
+                    icon: Users,
+                    show: isTeacher || isAdmin,
+                },
+                {
+                    title: 'Teachers',
+                    href: '/dashboard/admin/teachers',
+                    icon: Users,
+                    show: isAdmin,
+                },
+                {
                     title: 'Classes',
                     href: '/dashboard/admin/classes',
                     icon: GraduationCap,

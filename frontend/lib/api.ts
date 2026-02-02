@@ -24,7 +24,8 @@ api.interceptors.response.use(
     (response) => response,
     (error: AxiosError) => {
         if (error.response?.status === 401) {
-            // Clear any local storage
+            // Clear any local storage but DON'T hard redirect
+            // Let the middleware/auth store handle the state transition
             if (typeof window !== 'undefined') {
                 localStorage.removeItem('user');
             }

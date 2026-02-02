@@ -582,3 +582,13 @@ model Permission {
 
   @@unique([userId, module])
 }
+model AuditLog {
+  id        String   @id @default(uuid())
+  action    String   // e.g., "CREATE_SCHOOL", "DELETE_STUDENT"
+  module    String   // e.g., "SCHOOL", "STUDENT"
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  details   Json?
+  schoolId  String?
+  createdAt DateTime @default(now())
+}

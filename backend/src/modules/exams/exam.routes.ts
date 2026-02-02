@@ -1,65 +1,66 @@
 import { Router } from 'express';
 import * as examController from './exam.controller';
 import { protect } from '../../middlewares/auth.middleware';
-import { authorize } from '../../middlewares/role.middleware';
+import { tenantMiddleware } from '../../middlewares/tenant.middleware';
+import { checkPermission } from '../../middlewares/permission.middleware';
 
 const router = Router();
 
-router.use(protect); // All routes require authentication
+// Apply protection and tenant isolation to all exam routes
+router.use(protect, tenantMiddleware);
 
-// Create Exam (Teacher/Admin)
+// Create Exam
 router.post(
     '/',
-    authorize('ADMIN', 'TEACHER'),
+    checkPermission('exams', 'create'),
     examController.createExam
 );
 
-// Get All Exams (Everyone with role filtering)
+// Get All Exams
 router.get(
     '/',
-    authorize('ADMIN', 'TEACHER', 'STUDENT', 'PARENT'),
+    checkPermission('exams', 'view'),
     examController.getAllExams
 );
 
 // Student: Get My Results
 router.get(
     '/my-results',
-    authorize('STUDENT'),
-    examController.getMyResults
+    examController.getMyResults // Specific view for students
 );
 
-// Enter Marks (Teacher/Admin)
+// Enter Marks
 router.put(
     '/:id/marks',
-    authorize('ADMIN', 'TEACHER'),
+    checkPermission('exams', 'edit'),
     examController.enterMarks
 );
 
-// Publish Results (Teacher/Admin)
+// Publish Results
 router.post(
     '/:id/publish',
-    authorize('ADMIN', 'TEACHER'),
+    checkPermission('exams', 'edit'),
     examController.publishResults
 );
 
 // Get Single Exam
 router.get(
     '/:id',
-    authorize('ADMIN', 'TEACHER', 'STUDENT', 'PARENT'),
+    checkPermission('exams', 'view'),
     examController.getExam
 );
 
 // Update Exam
 router.patch(
     '/:id',
-    authorize('ADMIN', 'TEACHER'),
+    checkPermission('exams', 'edit'),
     examController.updateExam
 );
 
 // Delete Exam
 router.delete(
     '/:id',
-    authorize('ADMIN', 'TEACHER'),
+    checkPermission('exams', 'delete'),
     examController.deleteExam
 );
 

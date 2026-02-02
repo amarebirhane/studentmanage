@@ -77,7 +77,7 @@ class StudentService {
         }
         return student;
     }
-    static async createStudent(data) {
+    static async createStudent(data, schoolId) {
         const { firstName, lastName, email, password, phone, enrollmentNo, ...profileData } = data;
         // Check if user already exists
         const userExists = await config_1.prisma.user.findUnique({ where: { email } });
@@ -101,14 +101,15 @@ class StudentService {
                     password: hashedPassword,
                     role: 'STUDENT',
                     phone,
-                    schoolId: profileData.schoolId, // Ensure schoolId is passed
+                    schoolId,
                 },
             });
             const profile = await tx.studentProfile.create({
                 data: {
+                    ...profileData,
                     userId: user.id,
                     enrollmentNo,
-                    ...profileData,
+                    schoolId,
                     dateOfBirth: profileData.dateOfBirth ? new Date(profileData.dateOfBirth) : null,
                 },
                 include: { user: true },
@@ -116,9 +117,12 @@ class StudentService {
             return profile;
         });
     }
-    static async updateStudent(id, data) {
+    static async updateStudent(id, data, schoolId) {
         const { firstName, lastName, phone, email, dateOfBirth, status, ...profileData } = data;
-        const student = await config_1.prisma.studentProfile.findUnique({ where: { id } });
+        const where = { id };
+        if (schoolId)
+            where.schoolId = schoolId;
+        const student = await config_1.prisma.studentProfile.findFirst({ where });
         if (!student) {
             throw new Error('Student not found');
         }
@@ -152,8 +156,11 @@ class StudentService {
             include: { user: true },
         });
     }
-    static async deleteStudent(id) {
-        const student = await config_1.prisma.studentProfile.findUnique({ where: { id } });
+    static async deleteStudent(id, schoolId) {
+        const where = { id };
+        if (schoolId)
+            where.schoolId = schoolId;
+        const student = await config_1.prisma.studentProfile.findFirst({ where });
         if (!student) {
             throw new Error('Student not found');
         }

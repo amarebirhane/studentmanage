@@ -7,7 +7,7 @@ const createExam = async (req, res, next) => {
     try {
         const exam = await exam_service_1.ExamService.createExam({
             ...req.body,
-            createdById: req.user.id,
+            createdById: req.user?.id,
             schoolId: req.schoolId,
         });
         new apiResponse_1.ApiResponse(res, 201, 'Exam created successfully', exam).send();
@@ -22,7 +22,7 @@ const getAllExams = async (req, res, next) => {
         const filters = {
             ...req.query,
             schoolId: req.schoolId,
-            teacherId: req.user.role === 'TEACHER' ? req.user.id : undefined,
+            teacherId: req.user?.role === 'TEACHER' ? req.user?.id : undefined,
         };
         const exams = await exam_service_1.ExamService.getExams(filters);
         new apiResponse_1.ApiResponse(res, 200, 'All exams', exams).send();
@@ -34,7 +34,7 @@ const getAllExams = async (req, res, next) => {
 exports.getAllExams = getAllExams;
 const getExam = async (req, res, next) => {
     try {
-        const exam = await exam_service_1.ExamService.getExamById(req.params.id);
+        const exam = await exam_service_1.ExamService.getExamById(req.params.id, req.schoolId);
         new apiResponse_1.ApiResponse(res, 200, 'Exam details', exam).send();
     }
     catch (error) {
@@ -44,11 +44,10 @@ const getExam = async (req, res, next) => {
 exports.getExam = getExam;
 const enterMarks = async (req, res, next) => {
     try {
-        // Teacher/Admin validation
-        // (Middleware should handle role check, but good to add ownership check)
         const results = await exam_service_1.ExamService.enterMarks({
             examId: req.params.id,
             marks: req.body.marks,
+            schoolId: req.schoolId,
         });
         new apiResponse_1.ApiResponse(res, 200, 'Marks recorded successfully', results).send();
     }
@@ -59,7 +58,7 @@ const enterMarks = async (req, res, next) => {
 exports.enterMarks = enterMarks;
 const publishResults = async (req, res, next) => {
     try {
-        const exam = await exam_service_1.ExamService.publishResults(req.params.id);
+        const exam = await exam_service_1.ExamService.publishResults(req.params.id, req.schoolId);
         new apiResponse_1.ApiResponse(res, 200, 'Results published successfully', exam).send();
     }
     catch (error) {
@@ -69,13 +68,19 @@ const publishResults = async (req, res, next) => {
 exports.publishResults = publishResults;
 const getMyResults = async (req, res, next) => {
     try {
-        const studentProfile = await require('../../config').prisma.studentProfile.findUnique({
-            where: { userId: req.user.id }
+        const studentProfile = await require('../../config').prisma.studentProfile.findFirst({
+            where: {
+                userId: req.user?.id,
+                schoolId: req.schoolId
+            }
         });
         if (!studentProfile) {
             return new apiResponse_1.ApiResponse(res, 404, 'Student profile not found').send();
         }
-        const results = await exam_service_1.ExamService.getMyResults(studentProfile.id, req.query);
+        const results = await exam_service_1.ExamService.getMyResults(studentProfile.id, {
+            ...req.query,
+            schoolId: req.schoolId
+        });
         new apiResponse_1.ApiResponse(res, 200, 'My results', results).send();
     }
     catch (error) {
@@ -86,7 +91,7 @@ exports.getMyResults = getMyResults;
 // Legacy exports
 const updateExam = async (req, res, next) => {
     try {
-        const exam = await require('./exam.service').updateExam(req.params.id, req.body);
+        const exam = await exam_service_1.ExamService.updateExam(req.params.id, req.body, req.schoolId);
         new apiResponse_1.ApiResponse(res, 200, 'Exam updated successfully', exam).send();
     }
     catch (error) {
@@ -96,7 +101,7 @@ const updateExam = async (req, res, next) => {
 exports.updateExam = updateExam;
 const deleteExam = async (req, res, next) => {
     try {
-        await require('./exam.service').deleteExam(req.params.id);
+        await exam_service_1.ExamService.deleteExam(req.params.id, req.schoolId);
         new apiResponse_1.ApiResponse(res, 200, 'Exam deleted successfully').send();
     }
     catch (error) {

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateExam = exports.deleteExam = exports.getExamById = exports.getAllExams = exports.createExam = exports.ExamService = void 0;
+exports.ExamService = void 0;
 const config_1 = require("../../config");
 class ExamService {
     static async createExam(data) {
@@ -39,9 +39,12 @@ class ExamService {
             orderBy: { examDate: 'desc' },
         });
     }
-    static async getExamById(id) {
-        return config_1.prisma.exam.findUnique({
-            where: { id },
+    static async getExamById(id, schoolId) {
+        const where = { id };
+        if (schoolId)
+            where.schoolId = schoolId;
+        const exam = await config_1.prisma.exam.findFirst({
+            where,
             include: {
                 class: true,
                 section: true,
@@ -58,6 +61,32 @@ class ExamService {
                 },
             },
         });
+        if (!exam)
+            throw new Error('Exam not found');
+        return exam;
+    }
+    static async updateExam(id, data, schoolId) {
+        const where = { id };
+        if (schoolId)
+            where.schoolId = schoolId;
+        const exam = await config_1.prisma.exam.findFirst({ where });
+        if (!exam)
+            throw new Error('Exam not found');
+        return config_1.prisma.exam.update({
+            where: { id },
+            data,
+        });
+    }
+    static async deleteExam(id, schoolId) {
+        const where = { id };
+        if (schoolId)
+            where.schoolId = schoolId;
+        const exam = await config_1.prisma.exam.findFirst({ where });
+        if (!exam)
+            throw new Error('Exam not found');
+        return config_1.prisma.exam.delete({
+            where: { id },
+        });
     }
     static calculateGrade(percentage) {
         if (percentage >= 90)
@@ -73,8 +102,11 @@ class ExamService {
         return 'F';
     }
     static async enterMarks(data) {
-        const exam = await config_1.prisma.exam.findUnique({
-            where: { id: data.examId },
+        const where = { id: data.examId };
+        if (data.schoolId)
+            where.schoolId = data.schoolId;
+        const exam = await config_1.prisma.exam.findFirst({
+            where,
         });
         if (!exam)
             throw new Error('Exam not found');
@@ -108,7 +140,13 @@ class ExamService {
         }));
         return results;
     }
-    static async publishResults(examId) {
+    static async publishResults(examId, schoolId) {
+        const where = { id: examId };
+        if (schoolId)
+            where.schoolId = schoolId;
+        const exam = await config_1.prisma.exam.findFirst({ where });
+        if (!exam)
+            throw new Error('Exam not found');
         return config_1.prisma.exam.update({
             where: { id: examId },
             data: {
@@ -118,14 +156,18 @@ class ExamService {
         });
     }
     static async getMyResults(studentId, filters = {}) {
-        return config_1.prisma.gradeRecord.findMany({
-            where: {
-                studentId,
-                exam: {
-                    published: true,
-                    ...(filters.term ? { term: filters.term } : {}),
-                },
+        const where = {
+            studentId,
+            exam: {
+                published: true,
+                ...(filters.term ? { term: filters.term } : {}),
             },
+        };
+        if (filters.schoolId) {
+            where.exam.schoolId = filters.schoolId;
+        }
+        return config_1.prisma.gradeRecord.findMany({
+            where,
             include: {
                 exam: true,
             },
@@ -134,12 +176,3 @@ class ExamService {
     }
 }
 exports.ExamService = ExamService;
-// Compatibility exports
-exports.createExam = ExamService.createExam;
-const getAllExams = (filters) => ExamService.getExams(filters);
-exports.getAllExams = getAllExams;
-exports.getExamById = ExamService.getExamById;
-const deleteExam = (id) => config_1.prisma.exam.delete({ where: { id } });
-exports.deleteExam = deleteExam;
-const updateExam = (id, data) => config_1.prisma.exam.update({ where: { id }, data });
-exports.updateExam = updateExam;

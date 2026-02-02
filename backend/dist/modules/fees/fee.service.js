@@ -53,9 +53,9 @@ const applyDiscountAndScholarship = async (id, data, schoolId) => {
     return feeRepository.updateFeeInvoice(id, data);
 };
 exports.applyDiscountAndScholarship = applyDiscountAndScholarship;
-const getFeeInvoiceById = async (id) => {
+const getFeeInvoiceById = async (id, schoolId) => {
     const feeInvoice = await feeRepository.findFeeInvoiceById(id);
-    if (!feeInvoice) {
+    if (!feeInvoice || (schoolId && feeInvoice.schoolId !== schoolId)) {
         throw new apiResponse_1.ApiError(404, 'Fee invoice not found');
     }
     return feeInvoice;
@@ -69,9 +69,9 @@ const updateFeeInvoice = async (id, data, schoolId) => {
     return feeRepository.updateFeeInvoice(id, data);
 };
 exports.updateFeeInvoice = updateFeeInvoice;
-const deleteFeeInvoice = async (id) => {
+const deleteFeeInvoice = async (id, schoolId) => {
     const feeInvoice = await feeRepository.findFeeInvoiceById(id);
-    if (!feeInvoice) {
+    if (!feeInvoice || (schoolId && feeInvoice.schoolId !== schoolId)) {
         throw new apiResponse_1.ApiError(404, 'Fee invoice not found');
     }
     return feeRepository.deleteFeeInvoice(id);

@@ -40,7 +40,7 @@ class StudentController {
     }
     static async createStudent(req, res) {
         try {
-            const student = await student_service_1.StudentService.createStudent(req.body);
+            const student = await student_service_1.StudentService.createStudent(req.body, req.schoolId);
             return apiResponse_1.ApiResponse.success(res, student, 'Student created successfully', 201);
         }
         catch (error) {
@@ -49,7 +49,7 @@ class StudentController {
     }
     static async updateStudent(req, res) {
         try {
-            const student = await student_service_1.StudentService.updateStudent(req.params.id, req.body);
+            const student = await student_service_1.StudentService.updateStudent(req.params.id, req.body, req.schoolId);
             return apiResponse_1.ApiResponse.success(res, student, 'Student updated successfully');
         }
         catch (error) {
@@ -58,7 +58,7 @@ class StudentController {
     }
     static async deleteStudent(req, res) {
         try {
-            await student_service_1.StudentService.deleteStudent(req.params.id);
+            await student_service_1.StudentService.deleteStudent(req.params.id, req.schoolId);
             return apiResponse_1.ApiResponse.success(res, {}, 'Student deleted successfully');
         }
         catch (error) {

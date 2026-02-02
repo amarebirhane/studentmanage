@@ -4,8 +4,12 @@ exports.TeacherService = void 0;
 const config_1 = require("../../config");
 const password_1 = require("../../utils/password");
 class TeacherService {
-    static async getTeachers() {
+    static async getTeachers(schoolId) {
+        const where = {};
+        if (schoolId)
+            where.schoolId = schoolId;
         return config_1.prisma.teacherProfile.findMany({
+            where,
             include: {
                 user: {
                     select: {
@@ -25,9 +29,12 @@ class TeacherService {
             orderBy: { createdAt: 'desc' },
         });
     }
-    static async getTeacherById(id) {
-        const teacher = await config_1.prisma.teacherProfile.findUnique({
-            where: { id },
+    static async getTeacherById(id, schoolId) {
+        const where = { id };
+        if (schoolId)
+            where.schoolId = schoolId;
+        const teacher = await config_1.prisma.teacherProfile.findFirst({
+            where,
             include: {
                 user: true,
                 sections: {
@@ -42,7 +49,7 @@ class TeacherService {
         }
         return teacher;
     }
-    static async createTeacher(data) {
+    static async createTeacher(data, schoolId) {
         const { firstName, lastName, email, password, phone, bio, subjects } = data;
         const userExists = await config_1.prisma.user.findUnique({ where: { email } });
         if (userExists) {
@@ -58,7 +65,7 @@ class TeacherService {
                     password: hashedPassword,
                     role: 'TEACHER',
                     phone,
-                    schoolId: data.schoolId,
+                    schoolId,
                 },
             });
             const profile = await tx.teacherProfile.create({
@@ -66,16 +73,19 @@ class TeacherService {
                     userId: user.id,
                     bio,
                     subjects,
-                    schoolId: data.schoolId,
+                    schoolId,
                 },
                 include: { user: true },
             });
             return profile;
         });
     }
-    static async updateTeacher(id, data) {
+    static async updateTeacher(id, data, schoolId) {
         const { firstName, lastName, phone, email, bio, subjects } = data;
-        const teacher = await config_1.prisma.teacherProfile.findUnique({ where: { id } });
+        const where = { id };
+        if (schoolId)
+            where.schoolId = schoolId;
+        const teacher = await config_1.prisma.teacherProfile.findFirst({ where });
         if (!teacher) {
             throw new Error('Teacher not found');
         }
@@ -106,8 +116,11 @@ class TeacherService {
             },
         });
     }
-    static async deleteTeacher(id) {
-        const teacher = await config_1.prisma.teacherProfile.findUnique({ where: { id } });
+    static async deleteTeacher(id, schoolId) {
+        const where = { id };
+        if (schoolId)
+            where.schoolId = schoolId;
+        const teacher = await config_1.prisma.teacherProfile.findFirst({ where });
         if (!teacher) {
             throw new Error('Teacher not found');
         }

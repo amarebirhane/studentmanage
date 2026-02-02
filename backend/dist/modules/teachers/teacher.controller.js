@@ -6,7 +6,7 @@ const apiResponse_1 = require("../../utils/apiResponse");
 class TeacherController {
     static async getTeachers(req, res) {
         try {
-            const teachers = await teacher_service_1.TeacherService.getTeachers();
+            const teachers = await teacher_service_1.TeacherService.getTeachers(req.schoolId);
             return apiResponse_1.ApiResponse.success(res, teachers, 'Teachers retrieved');
         }
         catch (error) {
@@ -15,7 +15,7 @@ class TeacherController {
     }
     static async getTeacherById(req, res) {
         try {
-            const teacher = await teacher_service_1.TeacherService.getTeacherById(req.params.id);
+            const teacher = await teacher_service_1.TeacherService.getTeacherById(req.params.id, req.schoolId);
             return apiResponse_1.ApiResponse.success(res, teacher, 'Teacher retrieved');
         }
         catch (error) {
@@ -24,7 +24,7 @@ class TeacherController {
     }
     static async createTeacher(req, res) {
         try {
-            const teacher = await teacher_service_1.TeacherService.createTeacher(req.body);
+            const teacher = await teacher_service_1.TeacherService.createTeacher(req.body, req.schoolId);
             return apiResponse_1.ApiResponse.success(res, teacher, 'Teacher created successfully', 201);
         }
         catch (error) {
@@ -33,7 +33,7 @@ class TeacherController {
     }
     static async updateTeacher(req, res) {
         try {
-            const teacher = await teacher_service_1.TeacherService.updateTeacher(req.params.id, req.body);
+            const teacher = await teacher_service_1.TeacherService.updateTeacher(req.params.id, req.body, req.schoolId);
             return apiResponse_1.ApiResponse.success(res, teacher, 'Teacher updated successfully');
         }
         catch (error) {
@@ -42,7 +42,7 @@ class TeacherController {
     }
     static async deleteTeacher(req, res) {
         try {
-            await teacher_service_1.TeacherService.deleteTeacher(req.params.id);
+            await teacher_service_1.TeacherService.deleteTeacher(req.params.id, req.schoolId);
             return apiResponse_1.ApiResponse.success(res, {}, 'Teacher deleted successfully');
         }
         catch (error) {

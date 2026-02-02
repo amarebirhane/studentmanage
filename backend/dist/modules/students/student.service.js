@@ -4,10 +4,19 @@ exports.StudentService = void 0;
 const config_1 = require("../../config");
 const password_1 = require("../../utils/password");
 class StudentService {
-    static async getStudents(filters) {
+    static async getStudents(filters, schoolId, userId, role) {
         const { search, classId, sectionId, page = 1, limit = 10 } = filters;
         const skip = (page - 1) * limit;
         const where = {};
+        if (schoolId)
+            where.schoolId = schoolId;
+        // Role-based filtering
+        if (role === 'PARENT' && userId) {
+            where.parentProfiles = { some: { userId } };
+        }
+        else if (role === 'STUDENT' && userId) {
+            where.userId = userId;
+        }
         if (classId)
             where.classId = classId;
         if (sectionId)
@@ -51,9 +60,12 @@ class StudentService {
             },
         };
     }
-    static async getStudentById(id) {
+    static async getStudentById(id, schoolId) {
+        const where = { id };
+        if (schoolId)
+            where.schoolId = schoolId;
         const student = await config_1.prisma.studentProfile.findUnique({
-            where: { id },
+            where,
             include: {
                 user: true,
                 class: true,
@@ -89,6 +101,7 @@ class StudentService {
                     password: hashedPassword,
                     role: 'STUDENT',
                     phone,
+                    schoolId: profileData.schoolId, // Ensure schoolId is passed
                 },
             });
             const profile = await tx.studentProfile.create({
@@ -104,7 +117,7 @@ class StudentService {
         });
     }
     static async updateStudent(id, data) {
-        const { firstName, lastName, phone, email, dateOfBirth, ...profileData } = data;
+        const { firstName, lastName, phone, email, dateOfBirth, status, ...profileData } = data;
         const student = await config_1.prisma.studentProfile.findUnique({ where: { id } });
         if (!student) {
             throw new Error('Student not found');
@@ -120,11 +133,23 @@ class StudentService {
                 where: { id },
                 data: {
                     ...profileData,
+                    status: status || undefined,
                     dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : undefined,
                 },
                 include: { user: true },
             });
             return updatedProfile;
+        });
+    }
+    static async approveAdmission(id, schoolId) {
+        const student = await config_1.prisma.studentProfile.findUnique({ where: { id } });
+        if (!student || (schoolId && student.schoolId !== schoolId)) {
+            throw new Error('Student not found');
+        }
+        return await config_1.prisma.studentProfile.update({
+            where: { id },
+            data: { status: 'ADMITTED' },
+            include: { user: true },
         });
     }
     static async deleteStudent(id) {

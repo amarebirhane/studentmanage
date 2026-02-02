@@ -16,19 +16,35 @@ const exam_routes_1 = __importDefault(require("./modules/exams/exam.routes"));
 const result_routes_1 = __importDefault(require("./modules/results/result.routes"));
 const fee_routes_1 = __importDefault(require("./modules/fees/fee.routes"));
 const announcement_routes_1 = __importDefault(require("./modules/announcements/announcement.routes"));
+const platform_routes_1 = __importDefault(require("./modules/platform/platform.routes"));
+const message_routes_1 = __importDefault(require("./modules/messages/message.routes"));
+const fee_structure_routes_1 = __importDefault(require("./modules/fee-structures/fee-structure.routes"));
+const assignment_routes_1 = __importDefault(require("./modules/assignments/assignment.routes"));
+const permission_routes_1 = __importDefault(require("./modules/permissions/permission.routes"));
+const report_routes_1 = __importDefault(require("./modules/reports/report.routes"));
+const auth_middleware_1 = require("./middlewares/auth.middleware");
+const tenant_middleware_1 = require("./middlewares/tenant.middleware");
 const router = (0, express_1.Router)();
 console.log('🛣️  Routes initializing...');
+// Public / Platform-wide routes
 router.use('/auth', auth_routes_1.default);
+router.use('/schools', school_routes_1.default);
+router.use('/platform', platform_routes_1.default);
+// School-specific routes (Isolated by tenantMiddleware)
+router.use(auth_middleware_1.protect, tenant_middleware_1.tenantMiddleware);
 router.use('/students', student_routes_1.default);
 router.use('/classes', class_routes_1.default);
 router.use('/admin', user_routes_1.default);
 router.use('/teachers', teacher_routes_1.default);
 router.use('/parents', parent_routes_1.default);
-// New Routes
-router.use('/schools', school_routes_1.default);
 router.use('/attendance', attendance_routes_1.default);
 router.use('/exams', exam_routes_1.default);
 router.use('/results', result_routes_1.default);
 router.use('/fees', fee_routes_1.default);
+router.use('/fee-structures', fee_structure_routes_1.default);
 router.use('/announcements', announcement_routes_1.default);
+router.use('/messages', message_routes_1.default);
+router.use('/assignments', assignment_routes_1.default);
+router.use('/permissions', permission_routes_1.default);
+router.use('/reports', report_routes_1.default);
 exports.default = router;

@@ -33,7 +33,7 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAllSchools = exports.deleteSchool = exports.updateSchool = exports.getSchoolById = exports.createSchool = void 0;
+exports.updateGradingSystem = exports.configureAcademicYear = exports.setSuspensionStatus = exports.getAllSchools = exports.deleteSchool = exports.updateSchool = exports.getSchoolById = exports.createSchool = void 0;
 const schoolRepository = __importStar(require("./school.repository"));
 const apiResponse_1 = require("../../utils/apiResponse");
 const createSchool = async (data) => {
@@ -68,3 +68,15 @@ const getAllSchools = async () => {
     return schoolRepository.findAllSchools();
 };
 exports.getAllSchools = getAllSchools;
+const setSuspensionStatus = async (id, isSuspended) => {
+    return schoolRepository.updateSchool(id, { isSuspended });
+};
+exports.setSuspensionStatus = setSuspensionStatus;
+const configureAcademicYear = async (id, academicYear) => {
+    return schoolRepository.updateSchool(id, { academicYear });
+};
+exports.configureAcademicYear = configureAcademicYear;
+const updateGradingSystem = async (id, gradingSystem) => {
+    return schoolRepository.updateSchool(id, { gradingSystem });
+};
+exports.updateGradingSystem = updateGradingSystem;

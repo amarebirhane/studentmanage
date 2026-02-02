@@ -37,12 +37,22 @@ const express_1 = require("express");
 const examController = __importStar(require("./exam.controller"));
 const auth_middleware_1 = require("../../middlewares/auth.middleware");
 const role_middleware_1 = require("../../middlewares/role.middleware");
-const client_1 = require("@prisma/client");
 const router = (0, express_1.Router)();
-router.use(auth_middleware_1.protect);
-router.post('/', (0, role_middleware_1.authorize)(client_1.UserRole.ADMIN, client_1.UserRole.TEACHER), examController.createExam);
-router.get('/', (0, role_middleware_1.authorize)(client_1.UserRole.ADMIN, client_1.UserRole.TEACHER, client_1.UserRole.STUDENT, client_1.UserRole.PARENT), examController.getAllExams);
-router.get('/:id', (0, role_middleware_1.authorize)(client_1.UserRole.ADMIN, client_1.UserRole.TEACHER, client_1.UserRole.STUDENT, client_1.UserRole.PARENT), examController.getExam);
-router.patch('/:id', (0, role_middleware_1.authorize)(client_1.UserRole.ADMIN, client_1.UserRole.TEACHER), examController.updateExam);
-router.delete('/:id', (0, role_middleware_1.authorize)(client_1.UserRole.ADMIN, client_1.UserRole.TEACHER), examController.deleteExam);
+router.use(auth_middleware_1.protect); // All routes require authentication
+// Create Exam (Teacher/Admin)
+router.post('/', (0, role_middleware_1.authorize)('ADMIN', 'TEACHER'), examController.createExam);
+// Get All Exams (Everyone with role filtering)
+router.get('/', (0, role_middleware_1.authorize)('ADMIN', 'TEACHER', 'STUDENT', 'PARENT'), examController.getAllExams);
+// Student: Get My Results
+router.get('/my-results', (0, role_middleware_1.authorize)('STUDENT'), examController.getMyResults);
+// Enter Marks (Teacher/Admin)
+router.put('/:id/marks', (0, role_middleware_1.authorize)('ADMIN', 'TEACHER'), examController.enterMarks);
+// Publish Results (Teacher/Admin)
+router.post('/:id/publish', (0, role_middleware_1.authorize)('ADMIN', 'TEACHER'), examController.publishResults);
+// Get Single Exam
+router.get('/:id', (0, role_middleware_1.authorize)('ADMIN', 'TEACHER', 'STUDENT', 'PARENT'), examController.getExam);
+// Update Exam
+router.patch('/:id', (0, role_middleware_1.authorize)('ADMIN', 'TEACHER'), examController.updateExam);
+// Delete Exam
+router.delete('/:id', (0, role_middleware_1.authorize)('ADMIN', 'TEACHER'), examController.deleteExam);
 exports.default = router;

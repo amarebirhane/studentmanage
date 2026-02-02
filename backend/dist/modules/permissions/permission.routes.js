@@ -34,15 +34,20 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
-const feeController = __importStar(require("./fee.controller"));
+const permissionController = __importStar(require("./permission.controller"));
 const auth_middleware_1 = require("../../middlewares/auth.middleware");
 const role_middleware_1 = require("../../middlewares/role.middleware");
 const router = (0, express_1.Router)();
-router.use(auth_middleware_1.protect);
-router.post('/', (0, role_middleware_1.authorize)('ADMIN', 'ACCOUNTANT'), feeController.createFeeInvoice);
-router.get('/', (0, role_middleware_1.authorize)('ADMIN', 'ACCOUNTANT', 'PARENT', 'STUDENT'), feeController.getAllFeeInvoices);
-router.get('/:id', (0, role_middleware_1.authorize)('ADMIN', 'ACCOUNTANT', 'PARENT', 'STUDENT'), feeController.getFeeInvoice);
-router.patch('/:id', (0, role_middleware_1.authorize)('ADMIN', 'ACCOUNTANT'), feeController.updateFeeInvoice);
-router.patch('/:id/adjustment', (0, role_middleware_1.authorize)('ADMIN', 'ACCOUNTANT'), feeController.applyAdjustment);
-router.delete('/:id', (0, role_middleware_1.authorize)('ADMIN', 'ACCOUNTANT'), feeController.deleteFeeInvoice);
+router.use(auth_middleware_1.protect); // All routes require authentication
+// Only admins can manage permissions
+router.post('/', (0, role_middleware_1.authorize)('ADMIN', 'SUPER_ADMIN'), permissionController.createPermission);
+router.post('/bulk', (0, role_middleware_1.authorize)('ADMIN', 'SUPER_ADMIN'), permissionController.bulkCreatePermissions);
+router.patch('/:userId/:module', (0, role_middleware_1.authorize)('ADMIN', 'SUPER_ADMIN'), permissionController.updatePermission);
+router.delete('/:userId/:module', (0, role_middleware_1.authorize)('ADMIN', 'SUPER_ADMIN'), permissionController.deletePermission);
+// Get permissions for a user
+router.get('/:userId', permissionController.getUserPermissions);
+// Check specific permission
+router.get('/:userId/:module/check', permissionController.checkPermission);
+// Get all users with permissions for a module
+router.get('/module/:module', (0, role_middleware_1.authorize)('ADMIN', 'SUPER_ADMIN'), permissionController.getModulePermissions);
 exports.default = router;

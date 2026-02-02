@@ -4,6 +4,9 @@ const express_1 = require("express");
 const parent_controller_1 = require("./parent.controller");
 const auth_middleware_1 = require("../../middlewares/auth.middleware");
 const router = (0, express_1.Router)();
+// Parent Portal Routes
+router.get('/financials', auth_middleware_1.protect, (0, auth_middleware_1.authorize)('PARENT'), parent_controller_1.ParentController.getFinancials);
+// Admin-only Routes
 router.use(auth_middleware_1.protect, (0, auth_middleware_1.authorize)('ADMIN'));
 router.route('/')
     .get(parent_controller_1.ParentController.getParents)

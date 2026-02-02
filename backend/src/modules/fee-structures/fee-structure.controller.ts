@@ -28,7 +28,7 @@ export const getAllFeeStructures = async (req: any, res: Response, next: NextFun
 
 export const getFeeStructureById = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const feeStructure = await FeeStructureService.getFeeStructureById(req.params.id);
+        const feeStructure = await FeeStructureService.getFeeStructureById(req.params.id as string);
         new ApiResponse(res, 200, 'Fee structure details', feeStructure).send();
     } catch (error) {
         next(error);
@@ -38,7 +38,7 @@ export const getFeeStructureById = async (req: Request, res: Response, next: Nex
 export const updateFeeStructure = async (req: any, res: Response, next: NextFunction) => {
     try {
         const feeStructure = await FeeStructureService.updateFeeStructure(
-            req.params.id,
+            req.params.id as string,
             req.body,
             req.schoolId
         );
@@ -50,7 +50,7 @@ export const updateFeeStructure = async (req: any, res: Response, next: NextFunc
 
 export const deleteFeeStructure = async (req: any, res: Response, next: NextFunction) => {
     try {
-        await FeeStructureService.deleteFeeStructure(req.params.id, req.schoolId);
+        await FeeStructureService.deleteFeeStructure(req.params.id as string, req.schoolId);
         new ApiResponse(res, 200, 'Fee structure deleted successfully').send();
     } catch (error) {
         next(error);

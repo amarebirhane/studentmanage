@@ -34,15 +34,13 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
-const feeController = __importStar(require("./fee.controller"));
+const messageController = __importStar(require("./message.controller"));
 const auth_middleware_1 = require("../../middlewares/auth.middleware");
-const role_middleware_1 = require("../../middlewares/role.middleware");
 const router = (0, express_1.Router)();
-router.use(auth_middleware_1.protect);
-router.post('/', (0, role_middleware_1.authorize)('ADMIN', 'ACCOUNTANT'), feeController.createFeeInvoice);
-router.get('/', (0, role_middleware_1.authorize)('ADMIN', 'ACCOUNTANT', 'PARENT', 'STUDENT'), feeController.getAllFeeInvoices);
-router.get('/:id', (0, role_middleware_1.authorize)('ADMIN', 'ACCOUNTANT', 'PARENT', 'STUDENT'), feeController.getFeeInvoice);
-router.patch('/:id', (0, role_middleware_1.authorize)('ADMIN', 'ACCOUNTANT'), feeController.updateFeeInvoice);
-router.patch('/:id/adjustment', (0, role_middleware_1.authorize)('ADMIN', 'ACCOUNTANT'), feeController.applyAdjustment);
-router.delete('/:id', (0, role_middleware_1.authorize)('ADMIN', 'ACCOUNTANT'), feeController.deleteFeeInvoice);
+router.use(auth_middleware_1.protect); // All routes require authentication
+router.post('/', messageController.sendMessage);
+router.get('/inbox', messageController.getInbox);
+router.get('/sent', messageController.getSentMessages);
+router.patch('/:id/read', messageController.markAsRead);
+router.delete('/:id', messageController.deleteMessage);
 exports.default = router;

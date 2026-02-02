@@ -34,15 +34,13 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
-const feeController = __importStar(require("./fee.controller"));
+const reportController = __importStar(require("./report.controller"));
 const auth_middleware_1 = require("../../middlewares/auth.middleware");
 const role_middleware_1 = require("../../middlewares/role.middleware");
 const router = (0, express_1.Router)();
 router.use(auth_middleware_1.protect);
-router.post('/', (0, role_middleware_1.authorize)('ADMIN', 'ACCOUNTANT'), feeController.createFeeInvoice);
-router.get('/', (0, role_middleware_1.authorize)('ADMIN', 'ACCOUNTANT', 'PARENT', 'STUDENT'), feeController.getAllFeeInvoices);
-router.get('/:id', (0, role_middleware_1.authorize)('ADMIN', 'ACCOUNTANT', 'PARENT', 'STUDENT'), feeController.getFeeInvoice);
-router.patch('/:id', (0, role_middleware_1.authorize)('ADMIN', 'ACCOUNTANT'), feeController.updateFeeInvoice);
-router.patch('/:id/adjustment', (0, role_middleware_1.authorize)('ADMIN', 'ACCOUNTANT'), feeController.applyAdjustment);
-router.delete('/:id', (0, role_middleware_1.authorize)('ADMIN', 'ACCOUNTANT'), feeController.deleteFeeInvoice);
+// Attendance Report (Admin, Teacher, Staff)
+router.get('/attendance', (0, role_middleware_1.authorize)('ADMIN', 'TEACHER', 'STAFF'), reportController.getAttendanceReport);
+// Exam Report (Admin, Teacher)
+router.get('/exams/:examId', (0, role_middleware_1.authorize)('ADMIN', 'TEACHER'), reportController.getExamReport);
 exports.default = router;

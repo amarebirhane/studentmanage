@@ -33,7 +33,7 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getSchools = exports.deleteSchool = exports.updateSchool = exports.getSchool = exports.createSchool = void 0;
+exports.updateGradingSystem = exports.configureAcademicYear = exports.setSuspension = exports.getSchools = exports.deleteSchool = exports.updateSchool = exports.getSchool = exports.createSchool = void 0;
 const schoolService = __importStar(require("./school.service"));
 const apiResponse_1 = require("../../utils/apiResponse");
 const createSchool = async (req, res, next) => {
@@ -86,3 +86,35 @@ const getSchools = async (req, res, next) => {
     }
 };
 exports.getSchools = getSchools;
+const setSuspension = async (req, res, next) => {
+    try {
+        const school = await schoolService.setSuspensionStatus(req.params.id, req.body.isSuspended);
+        new apiResponse_1.ApiResponse(res, 200, `School suspension status updated to ${req.body.isSuspended}`, school).send();
+    }
+    catch (error) {
+        next(error);
+    }
+};
+exports.setSuspension = setSuspension;
+const configureAcademicYear = async (req, res, next) => {
+    try {
+        const schoolId = req.schoolId || req.params.id;
+        const school = await schoolService.configureAcademicYear(schoolId, req.body.academicYear);
+        new apiResponse_1.ApiResponse(res, 200, 'Academic year configured', school).send();
+    }
+    catch (error) {
+        next(error);
+    }
+};
+exports.configureAcademicYear = configureAcademicYear;
+const updateGradingSystem = async (req, res, next) => {
+    try {
+        const schoolId = req.schoolId || req.params.id;
+        const school = await schoolService.updateGradingSystem(schoolId, req.body.gradingSystem);
+        new apiResponse_1.ApiResponse(res, 200, 'Grading system updated', school).send();
+    }
+    catch (error) {
+        next(error);
+    }
+};
+exports.updateGradingSystem = updateGradingSystem;

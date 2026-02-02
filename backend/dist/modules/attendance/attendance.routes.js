@@ -37,12 +37,21 @@ const express_1 = require("express");
 const attendanceController = __importStar(require("./attendance.controller"));
 const auth_middleware_1 = require("../../middlewares/auth.middleware");
 const role_middleware_1 = require("../../middlewares/role.middleware");
-const client_1 = require("@prisma/client");
 const router = (0, express_1.Router)();
-router.use(auth_middleware_1.protect);
-router.post('/', (0, role_middleware_1.authorize)(client_1.UserRole.ADMIN, client_1.UserRole.TEACHER), attendanceController.createAttendance);
-router.get('/', (0, role_middleware_1.authorize)(client_1.UserRole.ADMIN, client_1.UserRole.TEACHER, client_1.UserRole.PARENT), attendanceController.getAllAttendance);
-router.get('/:id', (0, role_middleware_1.authorize)(client_1.UserRole.ADMIN, client_1.UserRole.TEACHER, client_1.UserRole.PARENT), attendanceController.getAttendance);
-router.patch('/:id', (0, role_middleware_1.authorize)(client_1.UserRole.ADMIN, client_1.UserRole.TEACHER), attendanceController.updateAttendance);
-router.delete('/:id', (0, role_middleware_1.authorize)(client_1.UserRole.ADMIN, client_1.UserRole.TEACHER), attendanceController.deleteAttendance);
+router.use(auth_middleware_1.protect); // All routes require authentication
+// Mark single attendance
+router.post('/mark', (0, role_middleware_1.authorize)('ADMIN', 'TEACHER'), attendanceController.markAttendance);
+// Bulk mark attendance for entire class/section
+router.post('/bulk-mark', (0, role_middleware_1.authorize)('ADMIN', 'TEACHER'), attendanceController.bulkMarkAttendance);
+// Get attendance records with filters
+router.get('/', (0, role_middleware_1.authorize)('ADMIN', 'TEACHER', 'PARENT', 'STUDENT'), attendanceController.getAttendanceRecords);
+// Get attendance summary for a student
+router.get('/summary/:studentId', (0, role_middleware_1.authorize)('ADMIN', 'TEACHER', 'PARENT', 'STUDENT'), attendanceController.getAttendanceSummary);
+// Get daily report for a section/class
+router.get('/daily-report', (0, role_middleware_1.authorize)('ADMIN', 'TEACHER'), attendanceController.getDailyReport);
+// Legacy routes for compatibility
+router.post('/', (0, role_middleware_1.authorize)('ADMIN', 'TEACHER'), attendanceController.createAttendance);
+router.get('/:id', (0, role_middleware_1.authorize)('ADMIN', 'TEACHER', 'PARENT'), attendanceController.getAttendance);
+router.patch('/:id', (0, role_middleware_1.authorize)('ADMIN', 'TEACHER'), attendanceController.updateAttendance);
+router.delete('/:id', (0, role_middleware_1.authorize)('ADMIN', 'TEACHER'), attendanceController.deleteAttendance);
 exports.default = router;

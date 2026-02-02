@@ -1,36 +1,64 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAllAnnouncements = exports.deleteAnnouncement = exports.updateAnnouncement = exports.getAnnouncementById = exports.createAnnouncement = void 0;
+exports.getAllAnnouncements = exports.deleteAnnouncement = exports.updateAnnouncement = exports.getAnnouncementById = exports.createAnnouncement = exports.AnnouncementService = void 0;
 const config_1 = require("../../config");
-const createAnnouncement = async (data) => {
-    return config_1.prisma.announcement.create({
-        data,
-    });
-};
-exports.createAnnouncement = createAnnouncement;
-const getAnnouncementById = async (id) => {
-    return config_1.prisma.announcement.findUnique({
-        where: { id },
-    });
-};
-exports.getAnnouncementById = getAnnouncementById;
-const updateAnnouncement = async (id, data) => {
-    return config_1.prisma.announcement.update({
-        where: { id },
-        data,
-    });
-};
+class AnnouncementService {
+    static async createAnnouncement(data) {
+        return config_1.prisma.announcement.create({
+            data: {
+                ...data,
+                target: data.target || 'ALL',
+            },
+        });
+    }
+    static async getAnnouncementById(id) {
+        return config_1.prisma.announcement.findUnique({
+            where: { id },
+        });
+    }
+    static async updateAnnouncement(id, data, userId) {
+        const announcement = await config_1.prisma.announcement.findUnique({ where: { id } });
+        if (!announcement || announcement.createdById !== userId) {
+            throw new Error('Announcement not found or unauthorized');
+        }
+        return config_1.prisma.announcement.update({
+            where: { id },
+            data,
+        });
+    }
+    static async deleteAnnouncement(id, userId) {
+        const announcement = await config_1.prisma.announcement.findUnique({ where: { id } });
+        if (!announcement || announcement.createdById !== userId) {
+            throw new Error('Announcement not found or unauthorized');
+        }
+        return config_1.prisma.announcement.delete({
+            where: { id },
+        });
+    }
+    static async getAnnouncements(schoolId, userRole) {
+        const where = {};
+        if (schoolId)
+            where.schoolId = schoolId;
+        // Filter by target based on user role
+        if (userRole && userRole !== 'ADMIN' && userRole !== 'SUPER_ADMIN') {
+            where.OR = [
+                { target: 'ALL' },
+                { target: userRole === 'TEACHER' ? 'TEACHERS' : userRole + 'S' }, // STUDENTS, PARENTS
+            ];
+        }
+        return config_1.prisma.announcement.findMany({
+            where,
+            orderBy: { createdAt: 'desc' },
+        });
+    }
+}
+exports.AnnouncementService = AnnouncementService;
+// Legacy exports for compatibility
+exports.createAnnouncement = AnnouncementService.createAnnouncement;
+exports.getAnnouncementById = AnnouncementService.getAnnouncementById;
+const updateAnnouncement = (id, data) => AnnouncementService.updateAnnouncement(id, data, '');
 exports.updateAnnouncement = updateAnnouncement;
-const deleteAnnouncement = async (id) => {
-    return config_1.prisma.announcement.delete({
-        where: { id },
-    });
-};
+const deleteAnnouncement = (id) => AnnouncementService.deleteAnnouncement(id, '');
 exports.deleteAnnouncement = deleteAnnouncement;
-const getAllAnnouncements = async (where) => {
-    return config_1.prisma.announcement.findMany({
-        where,
-        orderBy: { createdAt: 'desc' }
-    });
-};
+const getAllAnnouncements = (where) => config_1.prisma.announcement.findMany({ where, orderBy: { createdAt: 'desc' } });
 exports.getAllAnnouncements = getAllAnnouncements;

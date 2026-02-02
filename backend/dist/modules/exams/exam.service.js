@@ -1,70 +1,145 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || (function () {
-    var ownKeys = function(o) {
-        ownKeys = Object.getOwnPropertyNames || function (o) {
-            var ar = [];
-            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-            return ar;
-        };
-        return ownKeys(o);
-    };
-    return function (mod) {
-        if (mod && mod.__esModule) return mod;
-        var result = {};
-        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-        __setModuleDefault(result, mod);
-        return result;
-    };
-})();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAllExams = exports.deleteExam = exports.updateExam = exports.getExamById = exports.createExam = void 0;
-const examRepository = __importStar(require("./exam.repository"));
-const apiResponse_1 = require("../../utils/apiResponse");
-const createExam = async (data) => {
-    return examRepository.createExam(data);
-};
-exports.createExam = createExam;
-const getExamById = async (id) => {
-    const exam = await examRepository.findExamById(id);
-    if (!exam) {
-        throw new apiResponse_1.ApiError(404, 'Exam not found');
+exports.updateExam = exports.deleteExam = exports.getExamById = exports.getAllExams = exports.createExam = exports.ExamService = void 0;
+const config_1 = require("../../config");
+class ExamService {
+    static async createExam(data) {
+        return config_1.prisma.exam.create({
+            data: {
+                ...data,
+                published: false,
+            },
+            include: {
+                class: true,
+                section: true,
+            },
+        });
     }
-    return exam;
-};
-exports.getExamById = getExamById;
-const updateExam = async (id, data) => {
-    const exam = await examRepository.findExamById(id);
-    if (!exam) {
-        throw new apiResponse_1.ApiError(404, 'Exam not found');
+    static async getExams(filters) {
+        const where = {};
+        if (filters.schoolId)
+            where.schoolId = filters.schoolId;
+        if (filters.classId)
+            where.classId = filters.classId;
+        if (filters.sectionId)
+            where.sectionId = filters.sectionId;
+        if (filters.term)
+            where.term = filters.term;
+        if (filters.teacherId)
+            where.createdById = filters.teacherId;
+        return config_1.prisma.exam.findMany({
+            where,
+            include: {
+                class: true,
+                section: true,
+                _count: {
+                    select: { grades: true },
+                },
+            },
+            orderBy: { examDate: 'desc' },
+        });
     }
-    return examRepository.updateExam(id, data);
-};
-exports.updateExam = updateExam;
-const deleteExam = async (id) => {
-    const exam = await examRepository.findExamById(id);
-    if (!exam) {
-        throw new apiResponse_1.ApiError(404, 'Exam not found');
+    static async getExamById(id) {
+        return config_1.prisma.exam.findUnique({
+            where: { id },
+            include: {
+                class: true,
+                section: true,
+                grades: {
+                    include: {
+                        student: {
+                            include: {
+                                user: {
+                                    select: { firstName: true, lastName: true },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        });
     }
-    return examRepository.deleteExam(id);
-};
-exports.deleteExam = deleteExam;
-const getAllExams = async (filters = {}) => {
-    return examRepository.findAllExams({ where: filters });
-};
+    static calculateGrade(percentage) {
+        if (percentage >= 90)
+            return 'A+';
+        if (percentage >= 80)
+            return 'A';
+        if (percentage >= 70)
+            return 'B';
+        if (percentage >= 60)
+            return 'C';
+        if (percentage >= 50)
+            return 'D';
+        return 'F';
+    }
+    static async enterMarks(data) {
+        const exam = await config_1.prisma.exam.findUnique({
+            where: { id: data.examId },
+        });
+        if (!exam)
+            throw new Error('Exam not found');
+        const results = await Promise.all(data.marks.map((entry) => {
+            const percentage = (entry.scoredMarks / exam.maxMarks) * 100;
+            const grade = this.calculateGrade(percentage);
+            return config_1.prisma.gradeRecord.upsert({
+                where: {
+                    studentId_examId_subject: {
+                        studentId: entry.studentId,
+                        examId: data.examId,
+                        subject: exam.subject || 'General',
+                    },
+                },
+                update: {
+                    scoredMarks: entry.scoredMarks,
+                    totalMarks: exam.maxMarks,
+                    grade,
+                    remarks: entry.remarks,
+                },
+                create: {
+                    studentId: entry.studentId,
+                    examId: data.examId,
+                    subject: exam.subject || 'General',
+                    scoredMarks: entry.scoredMarks,
+                    totalMarks: exam.maxMarks,
+                    grade,
+                    remarks: entry.remarks,
+                },
+            });
+        }));
+        return results;
+    }
+    static async publishResults(examId) {
+        return config_1.prisma.exam.update({
+            where: { id: examId },
+            data: {
+                published: true,
+                publishedAt: new Date(),
+            },
+        });
+    }
+    static async getMyResults(studentId, filters = {}) {
+        return config_1.prisma.gradeRecord.findMany({
+            where: {
+                studentId,
+                exam: {
+                    published: true,
+                    ...(filters.term ? { term: filters.term } : {}),
+                },
+            },
+            include: {
+                exam: true,
+            },
+            orderBy: { exam: { examDate: 'desc' } },
+        });
+    }
+}
+exports.ExamService = ExamService;
+// Compatibility exports
+exports.createExam = ExamService.createExam;
+const getAllExams = (filters) => ExamService.getExams(filters);
 exports.getAllExams = getAllExams;
+exports.getExamById = ExamService.getExamById;
+const deleteExam = (id) => config_1.prisma.exam.delete({ where: { id } });
+exports.deleteExam = deleteExam;
+const updateExam = (id, data) => config_1.prisma.exam.update({ where: { id }, data });
+exports.updateExam = updateExam;

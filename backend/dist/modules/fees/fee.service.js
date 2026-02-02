@@ -33,13 +33,26 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAllFeeInvoices = exports.deleteFeeInvoice = exports.updateFeeInvoice = exports.getFeeInvoiceById = exports.createFeeInvoice = void 0;
+exports.getAllFeeInvoices = exports.deleteFeeInvoice = exports.updateFeeInvoice = exports.getFeeInvoiceById = exports.applyDiscountAndScholarship = exports.createFeeInvoice = void 0;
 const feeRepository = __importStar(require("./fee.repository"));
 const apiResponse_1 = require("../../utils/apiResponse");
-const createFeeInvoice = async (data) => {
-    return feeRepository.createFeeInvoice(data);
+const createFeeInvoice = async (data, schoolId) => {
+    return feeRepository.createFeeInvoice({
+        ...data,
+        discount: data.discount || 0,
+        scholarship: data.scholarship || 0,
+        school: schoolId ? { connect: { id: schoolId } } : undefined
+    });
 };
 exports.createFeeInvoice = createFeeInvoice;
+const applyDiscountAndScholarship = async (id, data, schoolId) => {
+    const feeInvoice = await feeRepository.findFeeInvoiceById(id);
+    if (!feeInvoice || (schoolId && feeInvoice.schoolId !== schoolId)) {
+        throw new apiResponse_1.ApiError(404, 'Fee invoice not found');
+    }
+    return feeRepository.updateFeeInvoice(id, data);
+};
+exports.applyDiscountAndScholarship = applyDiscountAndScholarship;
 const getFeeInvoiceById = async (id) => {
     const feeInvoice = await feeRepository.findFeeInvoiceById(id);
     if (!feeInvoice) {
@@ -48,9 +61,9 @@ const getFeeInvoiceById = async (id) => {
     return feeInvoice;
 };
 exports.getFeeInvoiceById = getFeeInvoiceById;
-const updateFeeInvoice = async (id, data) => {
+const updateFeeInvoice = async (id, data, schoolId) => {
     const feeInvoice = await feeRepository.findFeeInvoiceById(id);
-    if (!feeInvoice) {
+    if (!feeInvoice || (schoolId && feeInvoice.schoolId !== schoolId)) {
         throw new apiResponse_1.ApiError(404, 'Fee invoice not found');
     }
     return feeRepository.updateFeeInvoice(id, data);
@@ -64,7 +77,17 @@ const deleteFeeInvoice = async (id) => {
     return feeRepository.deleteFeeInvoice(id);
 };
 exports.deleteFeeInvoice = deleteFeeInvoice;
-const getAllFeeInvoices = async (filters = {}) => {
-    return feeRepository.findAllFeeInvoices({ where: filters });
+const getAllFeeInvoices = async (filters = {}, schoolId, userId, role) => {
+    const where = { ...filters };
+    if (schoolId)
+        where.schoolId = schoolId;
+    // Role-based filtering
+    if (role === 'STUDENT' && userId) {
+        where.student = { userId };
+    }
+    else if (role === 'PARENT' && userId) {
+        where.student = { parentProfiles: { some: { userId } } };
+    }
+    return feeRepository.findAllFeeInvoices({ where });
 };
 exports.getAllFeeInvoices = getAllFeeInvoices;

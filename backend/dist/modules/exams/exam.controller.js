@@ -1,44 +1,15 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || (function () {
-    var ownKeys = function(o) {
-        ownKeys = Object.getOwnPropertyNames || function (o) {
-            var ar = [];
-            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-            return ar;
-        };
-        return ownKeys(o);
-    };
-    return function (mod) {
-        if (mod && mod.__esModule) return mod;
-        var result = {};
-        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-        __setModuleDefault(result, mod);
-        return result;
-    };
-})();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAllExams = exports.deleteExam = exports.updateExam = exports.getExam = exports.createExam = void 0;
-const examService = __importStar(require("./exam.service"));
+exports.deleteExam = exports.updateExam = exports.getMyResults = exports.publishResults = exports.enterMarks = exports.getExam = exports.getAllExams = exports.createExam = void 0;
+const exam_service_1 = require("./exam.service");
 const apiResponse_1 = require("../../utils/apiResponse");
 const createExam = async (req, res, next) => {
     try {
-        const exam = await examService.createExam(req.body);
+        const exam = await exam_service_1.ExamService.createExam({
+            ...req.body,
+            createdById: req.user.id,
+            schoolId: req.schoolId,
+        });
         new apiResponse_1.ApiResponse(res, 201, 'Exam created successfully', exam).send();
     }
     catch (error) {
@@ -46,9 +17,24 @@ const createExam = async (req, res, next) => {
     }
 };
 exports.createExam = createExam;
+const getAllExams = async (req, res, next) => {
+    try {
+        const filters = {
+            ...req.query,
+            schoolId: req.schoolId,
+            teacherId: req.user.role === 'TEACHER' ? req.user.id : undefined,
+        };
+        const exams = await exam_service_1.ExamService.getExams(filters);
+        new apiResponse_1.ApiResponse(res, 200, 'All exams', exams).send();
+    }
+    catch (error) {
+        next(error);
+    }
+};
+exports.getAllExams = getAllExams;
 const getExam = async (req, res, next) => {
     try {
-        const exam = await examService.getExamById(req.params.id);
+        const exam = await exam_service_1.ExamService.getExamById(req.params.id);
         new apiResponse_1.ApiResponse(res, 200, 'Exam details', exam).send();
     }
     catch (error) {
@@ -56,9 +42,51 @@ const getExam = async (req, res, next) => {
     }
 };
 exports.getExam = getExam;
+const enterMarks = async (req, res, next) => {
+    try {
+        // Teacher/Admin validation
+        // (Middleware should handle role check, but good to add ownership check)
+        const results = await exam_service_1.ExamService.enterMarks({
+            examId: req.params.id,
+            marks: req.body.marks,
+        });
+        new apiResponse_1.ApiResponse(res, 200, 'Marks recorded successfully', results).send();
+    }
+    catch (error) {
+        next(error);
+    }
+};
+exports.enterMarks = enterMarks;
+const publishResults = async (req, res, next) => {
+    try {
+        const exam = await exam_service_1.ExamService.publishResults(req.params.id);
+        new apiResponse_1.ApiResponse(res, 200, 'Results published successfully', exam).send();
+    }
+    catch (error) {
+        next(error);
+    }
+};
+exports.publishResults = publishResults;
+const getMyResults = async (req, res, next) => {
+    try {
+        const studentProfile = await require('../../config').prisma.studentProfile.findUnique({
+            where: { userId: req.user.id }
+        });
+        if (!studentProfile) {
+            return new apiResponse_1.ApiResponse(res, 404, 'Student profile not found').send();
+        }
+        const results = await exam_service_1.ExamService.getMyResults(studentProfile.id, req.query);
+        new apiResponse_1.ApiResponse(res, 200, 'My results', results).send();
+    }
+    catch (error) {
+        next(error);
+    }
+};
+exports.getMyResults = getMyResults;
+// Legacy exports
 const updateExam = async (req, res, next) => {
     try {
-        const exam = await examService.updateExam(req.params.id, req.body);
+        const exam = await require('./exam.service').updateExam(req.params.id, req.body);
         new apiResponse_1.ApiResponse(res, 200, 'Exam updated successfully', exam).send();
     }
     catch (error) {
@@ -68,7 +96,7 @@ const updateExam = async (req, res, next) => {
 exports.updateExam = updateExam;
 const deleteExam = async (req, res, next) => {
     try {
-        await examService.deleteExam(req.params.id);
+        await require('./exam.service').deleteExam(req.params.id);
         new apiResponse_1.ApiResponse(res, 200, 'Exam deleted successfully').send();
     }
     catch (error) {
@@ -76,13 +104,3 @@ const deleteExam = async (req, res, next) => {
     }
 };
 exports.deleteExam = deleteExam;
-const getAllExams = async (req, res, next) => {
-    try {
-        const exams = await examService.getAllExams(req.query);
-        new apiResponse_1.ApiResponse(res, 200, 'All exams', exams).send();
-    }
-    catch (error) {
-        next(error);
-    }
-};
-exports.getAllExams = getAllExams;

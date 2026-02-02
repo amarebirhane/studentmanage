@@ -37,13 +37,17 @@ const express_1 = require("express");
 const schoolController = __importStar(require("./school.controller"));
 const auth_middleware_1 = require("../../middlewares/auth.middleware");
 const role_middleware_1 = require("../../middlewares/role.middleware");
-const client_1 = require("@prisma/client");
 const router = (0, express_1.Router)();
 router.use(auth_middleware_1.protect); // All routes require authentication
-router.use((0, role_middleware_1.authorize)(client_1.UserRole.ADMIN)); // Only admins can manage schools
-router.post('/', schoolController.createSchool);
-router.get('/', schoolController.getSchools);
-router.get('/:id', schoolController.getSchool);
-router.patch('/:id', schoolController.updateSchool); // using patch for partial updates
-router.delete('/:id', schoolController.deleteSchool);
+router.use((0, role_middleware_1.authorize)('SUPER_ADMIN')); // Only Super Admin can manage schools
+// Platform management (Super Admin only)
+router.post('/', (0, role_middleware_1.authorize)('SUPER_ADMIN'), schoolController.createSchool);
+router.get('/', (0, role_middleware_1.authorize)('SUPER_ADMIN'), schoolController.getSchools);
+router.patch('/:id/suspend', (0, role_middleware_1.authorize)('SUPER_ADMIN'), schoolController.setSuspension);
+router.delete('/:id', (0, role_middleware_1.authorize)('SUPER_ADMIN'), schoolController.deleteSchool);
+// School configuration (Super Admin or School Admin)
+router.get('/:id', (0, role_middleware_1.authorize)('SUPER_ADMIN', 'ADMIN'), schoolController.getSchool);
+router.patch('/:id', (0, role_middleware_1.authorize)('SUPER_ADMIN', 'ADMIN'), schoolController.updateSchool);
+router.post('/:id/academic-year', (0, role_middleware_1.authorize)('SUPER_ADMIN', 'ADMIN'), schoolController.configureAcademicYear);
+router.post('/:id/grading-system', (0, role_middleware_1.authorize)('SUPER_ADMIN', 'ADMIN'), schoolController.updateGradingSystem);
 exports.default = router;

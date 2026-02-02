@@ -13,7 +13,7 @@ class StudentController {
                 page: req.query.page ? parseInt(req.query.page, 10) : 1,
                 limit: req.query.limit ? parseInt(req.query.limit, 10) : 10,
             };
-            const result = await student_service_1.StudentService.getStudents(filters);
+            const result = await student_service_1.StudentService.getStudents(filters, req.schoolId, req.user?.id, req.user?.role);
             return apiResponse_1.ApiResponse.success(res, result, 'Students retrieved');
         }
         catch (error) {
@@ -22,11 +22,20 @@ class StudentController {
     }
     static async getStudentById(req, res) {
         try {
-            const student = await student_service_1.StudentService.getStudentById(req.params.id);
+            const student = await student_service_1.StudentService.getStudentById(req.params.id, req.schoolId);
             return apiResponse_1.ApiResponse.success(res, student, 'Student retrieved');
         }
         catch (error) {
             return apiResponse_1.ApiResponse.error(res, error.message, 404);
+        }
+    }
+    static async approveAdmission(req, res) {
+        try {
+            const student = await student_service_1.StudentService.approveAdmission(req.params.id, req.schoolId);
+            return apiResponse_1.ApiResponse.success(res, student, 'Student admission approved');
+        }
+        catch (error) {
+            return apiResponse_1.ApiResponse.error(res, error.message, 400);
         }
     }
     static async createStudent(req, res) {

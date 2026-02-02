@@ -33,12 +33,12 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAllFeeInvoices = exports.deleteFeeInvoice = exports.updateFeeInvoice = exports.getFeeInvoice = exports.createFeeInvoice = void 0;
+exports.applyAdjustment = exports.getAllFeeInvoices = exports.deleteFeeInvoice = exports.updateFeeInvoice = exports.getFeeInvoice = exports.createFeeInvoice = void 0;
 const feeService = __importStar(require("./fee.service"));
 const apiResponse_1 = require("../../utils/apiResponse");
 const createFeeInvoice = async (req, res, next) => {
     try {
-        const feeInvoice = await feeService.createFeeInvoice(req.body);
+        const feeInvoice = await feeService.createFeeInvoice(req.body, req.schoolId);
         new apiResponse_1.ApiResponse(res, 201, 'Fee invoice created successfully', feeInvoice).send();
     }
     catch (error) {
@@ -49,6 +49,7 @@ exports.createFeeInvoice = createFeeInvoice;
 const getFeeInvoice = async (req, res, next) => {
     try {
         const feeInvoice = await feeService.getFeeInvoiceById(req.params.id);
+        // Additional check for role-based access if needed
         new apiResponse_1.ApiResponse(res, 200, 'Fee invoice details', feeInvoice).send();
     }
     catch (error) {
@@ -58,7 +59,7 @@ const getFeeInvoice = async (req, res, next) => {
 exports.getFeeInvoice = getFeeInvoice;
 const updateFeeInvoice = async (req, res, next) => {
     try {
-        const feeInvoice = await feeService.updateFeeInvoice(req.params.id, req.body);
+        const feeInvoice = await feeService.updateFeeInvoice(req.params.id, req.body, req.schoolId);
         new apiResponse_1.ApiResponse(res, 200, 'Fee invoice updated successfully', feeInvoice).send();
     }
     catch (error) {
@@ -78,7 +79,8 @@ const deleteFeeInvoice = async (req, res, next) => {
 exports.deleteFeeInvoice = deleteFeeInvoice;
 const getAllFeeInvoices = async (req, res, next) => {
     try {
-        const feeInvoices = await feeService.getAllFeeInvoices(req.query);
+        const { id: userId, role } = req.user;
+        const feeInvoices = await feeService.getAllFeeInvoices(req.query, req.schoolId, userId, role);
         new apiResponse_1.ApiResponse(res, 200, 'All fee invoices', feeInvoices).send();
     }
     catch (error) {
@@ -86,3 +88,13 @@ const getAllFeeInvoices = async (req, res, next) => {
     }
 };
 exports.getAllFeeInvoices = getAllFeeInvoices;
+const applyAdjustment = async (req, res, next) => {
+    try {
+        const feeInvoice = await feeService.applyDiscountAndScholarship(req.params.id, req.body, req.schoolId);
+        new apiResponse_1.ApiResponse(res, 200, 'Financial adjustment applied successfully', feeInvoice).send();
+    }
+    catch (error) {
+        next(error);
+    }
+};
+exports.applyAdjustment = applyAdjustment;

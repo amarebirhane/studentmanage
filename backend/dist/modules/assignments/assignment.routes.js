@@ -34,15 +34,21 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
-const feeController = __importStar(require("./fee.controller"));
+const assignmentController = __importStar(require("./assignment.controller"));
 const auth_middleware_1 = require("../../middlewares/auth.middleware");
 const role_middleware_1 = require("../../middlewares/role.middleware");
 const router = (0, express_1.Router)();
-router.use(auth_middleware_1.protect);
-router.post('/', (0, role_middleware_1.authorize)('ADMIN', 'ACCOUNTANT'), feeController.createFeeInvoice);
-router.get('/', (0, role_middleware_1.authorize)('ADMIN', 'ACCOUNTANT', 'PARENT', 'STUDENT'), feeController.getAllFeeInvoices);
-router.get('/:id', (0, role_middleware_1.authorize)('ADMIN', 'ACCOUNTANT', 'PARENT', 'STUDENT'), feeController.getFeeInvoice);
-router.patch('/:id', (0, role_middleware_1.authorize)('ADMIN', 'ACCOUNTANT'), feeController.updateFeeInvoice);
-router.patch('/:id/adjustment', (0, role_middleware_1.authorize)('ADMIN', 'ACCOUNTANT'), feeController.applyAdjustment);
-router.delete('/:id', (0, role_middleware_1.authorize)('ADMIN', 'ACCOUNTANT'), feeController.deleteFeeInvoice);
+router.use(auth_middleware_1.protect); // All routes require authentication
+// Create assignment (teachers only)
+router.post('/', (0, role_middleware_1.authorize)('TEACHER', 'ADMIN'), assignmentController.createAssignment);
+// Get assignments (students see theirs, teachers see all they created)
+router.get('/', assignmentController.getAssignments);
+// Submit assignment (students only)
+router.post('/:id/submit', (0, role_middleware_1.authorize)('STUDENT'), assignmentController.submitAssignment);
+// Grade submission (teachers only)
+router.patch('/submissions/:submissionId/grade', (0, role_middleware_1.authorize)('TEACHER', 'ADMIN'), assignmentController.gradeSubmission);
+// Get my submissions (students)
+router.get('/my-submissions', (0, role_middleware_1.authorize)('STUDENT'), assignmentController.getMySubmissions);
+// Get assignment submissions (teachers)
+router.get('/:id/submissions', (0, role_middleware_1.authorize)('TEACHER', 'ADMIN'), assignmentController.getAssignmentSubmissions);
 exports.default = router;

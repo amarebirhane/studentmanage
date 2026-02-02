@@ -49,5 +49,14 @@ class TeacherController {
             return apiResponse_1.ApiResponse.error(res, error.message, 400);
         }
     }
+    static async getDashboardStats(req, res) {
+        try {
+            const stats = await teacher_service_1.TeacherService.getDashboardStats(req.user.id);
+            return apiResponse_1.ApiResponse.success(res, stats, 'Dashboard stats retrieved');
+        }
+        catch (error) {
+            return apiResponse_1.ApiResponse.error(res, error.message);
+        }
+    }
 }
 exports.TeacherController = TeacherController;

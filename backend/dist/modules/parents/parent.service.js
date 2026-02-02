@@ -122,5 +122,52 @@ class ParentService {
             await tx.user.delete({ where: { id } });
         });
     }
+    static async getFinancialSummary(userId) {
+        // 1. Get all students for this parent
+        const parent = await config_1.prisma.user.findUnique({
+            where: { id: userId },
+            include: {
+                parentProfiles: {
+                    select: { studentId: true }
+                }
+            }
+        });
+        if (!parent)
+            throw new Error('Parent not found');
+        const studentIds = parent.parentProfiles.map(p => p.studentId);
+        // 2. Fetch all invoices for these students
+        const invoices = await config_1.prisma.feeInvoice.findMany({
+            where: {
+                studentId: { in: studentIds }
+            },
+            include: {
+                student: {
+                    include: {
+                        user: { select: { firstName: true, lastName: true } }
+                    }
+                }
+            },
+            orderBy: { dueDate: 'asc' }
+        });
+        // 3. Group by status
+        const history = invoices.filter(inv => inv.status === 'PAID');
+        const due = invoices.filter(inv => inv.status === 'PENDING' || inv.status === 'OVERDUE');
+        // 4. Calculate totals
+        const totalPaid = history.reduce((sum, inv) => sum + inv.amount, 0);
+        const totalDue = due.reduce((sum, inv) => sum + inv.amount, 0);
+        return {
+            totalPaid,
+            totalDue,
+            history,
+            dueAlerts: due.map(inv => ({
+                id: inv.id,
+                studentName: `${inv.student.user.firstName} ${inv.student.user.lastName}`,
+                amount: inv.amount,
+                dueDate: inv.dueDate,
+                status: inv.status,
+                description: inv.description
+            }))
+        };
+    }
 }
 exports.ParentService = ParentService;

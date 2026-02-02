@@ -279,7 +279,8 @@ model AttendanceRecord {
 model Exam {
   id          String        @id @default(uuid())
   name        String
-  subject     String?       // Subject name (Math, Science, etc.)
+  subject     Subject?      @relation(fields: [subjectId], references: [id])
+  subjectId   String?
   term        String?
   examDate    DateTime
   class       Class?        @relation(fields: [classId], references: [id])
@@ -293,6 +294,8 @@ model Exam {
   createdById String
   grades      GradeRecord[]
   createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  deletedAt   DateTime?
   schoolId    String?
   school      School?       @relation(fields: [schoolId], references: [id])
 }
@@ -303,15 +306,17 @@ model GradeRecord {
   studentId   String
   exam        Exam           @relation(fields: [examId], references: [id])
   examId      String
-  subject     String
+  subject     Subject        @relation(fields: [subjectId], references: [id])
+  subjectId   String
   scoredMarks Int
   totalMarks  Int
   grade       String?
   gpa         Float?
   remarks     String?
   createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
 
-  @@unique([studentId, examId, subject], map: "grade_unique_student_exam_subject")
+  @@unique([studentId, examId, subjectId], map: "grade_unique_student_exam_subject")
 }
 
 model BehaviorRecord {

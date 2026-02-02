@@ -1,18 +1,23 @@
 import { Router } from 'express';
 import { StudentController } from './student.controller';
-import { protect, authorize } from '../../middlewares/auth.middleware';
+import { protect } from '../../middlewares/auth.middleware';
+import { checkPermission } from '../../middlewares/permission.middleware';
+import { tenantMiddleware } from '../../middlewares/tenant.middleware';
 
 const router = Router();
 
-router.route('/')
-    .get(StudentController.getStudents) // Middleware in routes.ts handles protection
-    .post(authorize('ADMIN', 'SUPER_ADMIN' as any), StudentController.createStudent);
+// Apply protection and tenant middleware to all student routes
+router.use(protect, tenantMiddleware);
 
-router.post('/:id/approve', authorize('ADMIN', 'SUPER_ADMIN' as any), StudentController.approveAdmission);
+router.route('/')
+    .get(checkPermission('students', 'view'), StudentController.getStudents)
+    .post(checkPermission('students', 'create'), StudentController.createStudent);
+
+router.post('/:id/approve', checkPermission('students', 'edit'), StudentController.approveAdmission);
 
 router.route('/:id')
-    .get(authorize('ADMIN', 'TEACHER', 'PARENT', 'SUPER_ADMIN' as any), StudentController.getStudentById)
-    .put(authorize('ADMIN', 'SUPER_ADMIN' as any), StudentController.updateStudent)
-    .delete(authorize('ADMIN', 'SUPER_ADMIN' as any), StudentController.deleteStudent);
+    .get(checkPermission('students', 'view'), StudentController.getStudentById)
+    .put(checkPermission('students', 'edit'), StudentController.updateStudent)
+    .delete(checkPermission('students', 'delete'), StudentController.deleteStudent);
 
 export default router;

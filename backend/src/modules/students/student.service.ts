@@ -81,7 +81,7 @@ export class StudentService {
         return student;
     }
 
-    static async createStudent(data: any) {
+    static async createStudent(data: any, schoolId?: string) {
         const {
             firstName,
             lastName,
@@ -117,15 +117,16 @@ export class StudentService {
                     password: hashedPassword,
                     role: 'STUDENT',
                     phone,
-                    schoolId: profileData.schoolId, // Ensure schoolId is passed
+                    schoolId,
                 },
             });
 
             const profile = await tx.studentProfile.create({
                 data: {
+                    ...profileData,
                     userId: user.id,
                     enrollmentNo,
-                    ...profileData,
+                    schoolId,
                     dateOfBirth: profileData.dateOfBirth ? new Date(profileData.dateOfBirth) : null,
                 },
                 include: { user: true },
@@ -135,10 +136,13 @@ export class StudentService {
         });
     }
 
-    static async updateStudent(id: string, data: any) {
+    static async updateStudent(id: string, data: any, schoolId?: string) {
         const { firstName, lastName, phone, email, dateOfBirth, status, ...profileData } = data;
 
-        const student = await prisma.studentProfile.findUnique({ where: { id } });
+        const where: any = { id };
+        if (schoolId) where.schoolId = schoolId;
+
+        const student = await prisma.studentProfile.findFirst({ where });
         if (!student) {
             throw new Error('Student not found');
         }
@@ -178,8 +182,11 @@ export class StudentService {
         });
     }
 
-    static async deleteStudent(id: string) {
-        const student = await prisma.studentProfile.findUnique({ where: { id } });
+    static async deleteStudent(id: string, schoolId?: string) {
+        const where: any = { id };
+        if (schoolId) where.schoolId = schoolId;
+
+        const student = await prisma.studentProfile.findFirst({ where });
         if (!student) {
             throw new Error('Student not found');
         }

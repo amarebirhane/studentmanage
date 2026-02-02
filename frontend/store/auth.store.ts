@@ -20,7 +20,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     user: null,
     token: null,
     isAuthenticated: false,
-    isLoading: false, // Changed to false initially to prevent auto-load
+    isLoading: true, // Start in loading state to prevent premature redirects
     error: null,
     hasAttemptedLoad: false,
 
@@ -29,9 +29,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         try {
             console.log('Auth Store - Calling login API...');
             const response = await authService.login(credentials);
-            console.log('Auth Store - Login API response:', response);
-            console.log('Auth Store - Setting state with user:', response.user);
-
             set({
                 user: response.user,
                 token: response.token,
@@ -39,15 +36,13 @@ export const useAuthStore = create<AuthState>((set, get) => ({
                 isLoading: false,
                 hasAttemptedLoad: true,
             });
-
-            console.log('Auth Store - State updated, current user:', get().user);
         } catch (err: any) {
-            console.error('Auth Store - Login error:', err);
             set({
                 error: err.response?.data?.message || 'Login failed',
                 isLoading: false,
+                hasAttemptedLoad: true,
             });
-            throw err; // Re-throw to allow component to handle specific UI feedback (like toasts)
+            throw err;
         }
     },
 
@@ -75,23 +70,25 @@ export const useAuthStore = create<AuthState>((set, get) => ({
                 user: null,
                 token: null,
                 isAuthenticated: false,
-                hasAttemptedLoad: false,
+                hasAttemptedLoad: true, // We've attempted to load (and we know it's empty)
+                isLoading: false,
             });
         }
     },
 
     loadUser: async () => {
-        // Prevent multiple simultaneous loads
-        if (get().isLoading || get().hasAttemptedLoad) {
+        // Prevent multiple simultaneous loads or redundant loads
+        if (get().hasAttemptedLoad && get().user) {
+            set({ isLoading: false });
             return;
         }
 
-        set({ isLoading: true, hasAttemptedLoad: true });
+        set({ isLoading: true });
         try {
             const user = await authService.getProfile();
-            set({ user, isAuthenticated: true, isLoading: false });
+            set({ user, isAuthenticated: true, isLoading: false, hasAttemptedLoad: true });
         } catch (error) {
-            set({ user: null, token: null, isAuthenticated: false, isLoading: false });
+            set({ user: null, token: null, isAuthenticated: false, isLoading: false, hasAttemptedLoad: true });
         }
     }
 }));

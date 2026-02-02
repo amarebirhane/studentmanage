@@ -48,3 +48,12 @@ export const getAllFeeInvoices = async (req: any, res: Response, next: NextFunct
         next(error);
     }
 };
+
+export const applyAdjustment = async (req: any, res: Response, next: NextFunction) => {
+    try {
+        const feeInvoice = await feeService.applyDiscountAndScholarship(req.params.id as string, req.body, req.schoolId);
+        new ApiResponse(res, 200, 'Financial adjustment applied successfully', feeInvoice).send();
+    } catch (error) {
+        next(error);
+    }
+};

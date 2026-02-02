@@ -1,4 +1,4 @@
-import { prisma } from '../config';
+import { prisma } from '../../config';
 import { NotificationChannel } from '@prisma/client';
 
 export class NotificationService {

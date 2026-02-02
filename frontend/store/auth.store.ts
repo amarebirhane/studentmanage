@@ -6,8 +6,9 @@ interface AuthState {
     user: User | null;
     token: string | null;
     isAuthenticated: boolean;
-    isLoading: boolean; // Added loading state
+    isLoading: boolean;
     error: string | null;
+    hasAttemptedLoad: boolean; // Track if we've tried to load user
 
     login: (credentials: LoginCredentials) => Promise<void>;
     register: (userData: any) => Promise<void>;
@@ -17,10 +18,11 @@ interface AuthState {
 
 export const useAuthStore = create<AuthState>((set, get) => ({
     user: null,
-    token: null, // You might want to initialize this from localStorage if dealing with persistence directly here, or relying on cookies. 
+    token: null,
     isAuthenticated: false,
-    isLoading: true,
+    isLoading: false, // Changed to false initially to prevent auto-load
     error: null,
+    hasAttemptedLoad: false,
 
     login: async (credentials) => {
         set({ isLoading: true, error: null });
@@ -30,12 +32,13 @@ export const useAuthStore = create<AuthState>((set, get) => ({
                 user: response.user,
                 token: response.token,
                 isAuthenticated: true,
-                isLoading: false
+                isLoading: false,
+                hasAttemptedLoad: true,
             });
         } catch (err: any) {
             set({
                 error: err.response?.data?.message || 'Login failed',
-                isLoading: false
+                isLoading: false,
             });
             throw err; // Re-throw to allow component to handle specific UI feedback (like toasts)
         }
@@ -49,7 +52,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         } catch (err: any) {
             set({
                 error: err.response?.data?.message || 'Registration failed',
-                isLoading: false
+                isLoading: false,
             });
             throw err;
         }
@@ -61,13 +64,22 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         } catch (error) {
             console.error("Logout error", error);
         } finally {
-            set({ user: null, token: null, isAuthenticated: false });
+            set({
+                user: null,
+                token: null,
+                isAuthenticated: false,
+                hasAttemptedLoad: false,
+            });
         }
     },
 
     loadUser: async () => {
-        // Avoid infinite loading if already loaded? Or rely on useEffect in a wrapper.
-        set({ isLoading: true });
+        // Prevent multiple simultaneous loads
+        if (get().isLoading || get().hasAttemptedLoad) {
+            return;
+        }
+
+        set({ isLoading: true, hasAttemptedLoad: true });
         try {
             const user = await authService.getProfile();
             set({ user, isAuthenticated: true, isLoading: false });

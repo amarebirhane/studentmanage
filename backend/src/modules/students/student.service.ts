@@ -171,7 +171,7 @@ export class StudentService {
 
     static async approveAdmission(id: string, schoolId?: string) {
         const student = await prisma.studentProfile.findUnique({ where: { id } });
-        if (!student || (schoolId && student.schoolId !== schoolId)) {
+        if (!student || (schoolId && (student as any).schoolId !== schoolId)) {
             throw new Error('Student not found');
         }
 

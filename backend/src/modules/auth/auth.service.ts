@@ -63,7 +63,7 @@ export class AuthService {
                 where: { id: decoded.id },
             });
 
-            if (!user || user.refreshToken !== oldToken) {
+            if (!user || (user as any).refreshToken !== oldToken) {
                 throw new Error('Invalid refresh token');
             }
 

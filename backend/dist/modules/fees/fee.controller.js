@@ -48,8 +48,7 @@ const createFeeInvoice = async (req, res, next) => {
 exports.createFeeInvoice = createFeeInvoice;
 const getFeeInvoice = async (req, res, next) => {
     try {
-        const feeInvoice = await feeService.getFeeInvoiceById(req.params.id);
-        // Additional check for role-based access if needed
+        const feeInvoice = await feeService.getFeeInvoiceById(req.params.id, req.schoolId);
         new apiResponse_1.ApiResponse(res, 200, 'Fee invoice details', feeInvoice).send();
     }
     catch (error) {
@@ -69,7 +68,7 @@ const updateFeeInvoice = async (req, res, next) => {
 exports.updateFeeInvoice = updateFeeInvoice;
 const deleteFeeInvoice = async (req, res, next) => {
     try {
-        await feeService.deleteFeeInvoice(req.params.id);
+        await feeService.deleteFeeInvoice(req.params.id, req.schoolId);
         new apiResponse_1.ApiResponse(res, 200, 'Fee invoice deleted successfully').send();
     }
     catch (error) {
@@ -79,7 +78,8 @@ const deleteFeeInvoice = async (req, res, next) => {
 exports.deleteFeeInvoice = deleteFeeInvoice;
 const getAllFeeInvoices = async (req, res, next) => {
     try {
-        const { id: userId, role } = req.user;
+        const userId = req.user?.id;
+        const role = req.user?.role;
         const feeInvoices = await feeService.getAllFeeInvoices(req.query, req.schoolId, userId, role);
         new apiResponse_1.ApiResponse(res, 200, 'All fee invoices', feeInvoices).send();
     }

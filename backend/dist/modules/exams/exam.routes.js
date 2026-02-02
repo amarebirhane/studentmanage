@@ -36,23 +36,26 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const examController = __importStar(require("./exam.controller"));
 const auth_middleware_1 = require("../../middlewares/auth.middleware");
-const role_middleware_1 = require("../../middlewares/role.middleware");
+const tenant_middleware_1 = require("../../middlewares/tenant.middleware");
+const permission_middleware_1 = require("../../middlewares/permission.middleware");
 const router = (0, express_1.Router)();
-router.use(auth_middleware_1.protect); // All routes require authentication
-// Create Exam (Teacher/Admin)
-router.post('/', (0, role_middleware_1.authorize)('ADMIN', 'TEACHER'), examController.createExam);
-// Get All Exams (Everyone with role filtering)
-router.get('/', (0, role_middleware_1.authorize)('ADMIN', 'TEACHER', 'STUDENT', 'PARENT'), examController.getAllExams);
+// Apply protection and tenant isolation to all exam routes
+router.use(auth_middleware_1.protect, tenant_middleware_1.tenantMiddleware);
+// Create Exam
+router.post('/', (0, permission_middleware_1.checkPermission)('exams', 'create'), examController.createExam);
+// Get All Exams
+router.get('/', (0, permission_middleware_1.checkPermission)('exams', 'view'), examController.getAllExams);
 // Student: Get My Results
-router.get('/my-results', (0, role_middleware_1.authorize)('STUDENT'), examController.getMyResults);
-// Enter Marks (Teacher/Admin)
-router.put('/:id/marks', (0, role_middleware_1.authorize)('ADMIN', 'TEACHER'), examController.enterMarks);
-// Publish Results (Teacher/Admin)
-router.post('/:id/publish', (0, role_middleware_1.authorize)('ADMIN', 'TEACHER'), examController.publishResults);
+router.get('/my-results', examController.getMyResults // Specific view for students
+);
+// Enter Marks
+router.put('/:id/marks', (0, permission_middleware_1.checkPermission)('exams', 'edit'), examController.enterMarks);
+// Publish Results
+router.post('/:id/publish', (0, permission_middleware_1.checkPermission)('exams', 'edit'), examController.publishResults);
 // Get Single Exam
-router.get('/:id', (0, role_middleware_1.authorize)('ADMIN', 'TEACHER', 'STUDENT', 'PARENT'), examController.getExam);
+router.get('/:id', (0, permission_middleware_1.checkPermission)('exams', 'view'), examController.getExam);
 // Update Exam
-router.patch('/:id', (0, role_middleware_1.authorize)('ADMIN', 'TEACHER'), examController.updateExam);
+router.patch('/:id', (0, permission_middleware_1.checkPermission)('exams', 'edit'), examController.updateExam);
 // Delete Exam
-router.delete('/:id', (0, role_middleware_1.authorize)('ADMIN', 'TEACHER'), examController.deleteExam);
+router.delete('/:id', (0, permission_middleware_1.checkPermission)('exams', 'delete'), examController.deleteExam);
 exports.default = router;

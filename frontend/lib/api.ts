@@ -11,7 +11,13 @@ const api: AxiosInstance = axios.create({
 // Request interceptor
 api.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
-        // Could add token from localStorage here if needed
+        // Add X-School-ID if present in localStorage (especially for Super Admins)
+        if (typeof window !== 'undefined') {
+            const schoolId = localStorage.getItem('selectedSchoolId');
+            if (schoolId) {
+                config.headers['X-School-ID'] = schoolId;
+            }
+        }
         return config;
     },
     (error: AxiosError) => {

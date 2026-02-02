@@ -10,6 +10,8 @@ interface AuthState {
     error: string | null;
     hasAttemptedLoad: boolean; // Track if we've tried to load user
 
+    selectedSchoolId: string | null;
+    setSelectedSchoolId: (id: string | null) => void;
     login: (credentials: LoginCredentials) => Promise<void>;
     register: (userData: any) => Promise<void>;
     logout: () => void;
@@ -24,6 +26,14 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     isLoading: true, // Start in loading state to prevent premature redirects
     error: null,
     hasAttemptedLoad: false,
+    selectedSchoolId: typeof window !== 'undefined' ? localStorage.getItem('selectedSchoolId') : null,
+    setSelectedSchoolId: (id) => {
+        if (typeof window !== 'undefined') {
+            if (id) localStorage.setItem('selectedSchoolId', id);
+            else localStorage.removeItem('selectedSchoolId');
+        }
+        set({ selectedSchoolId: id });
+    },
 
     login: async (credentials) => {
         set({ isLoading: true, error: null });

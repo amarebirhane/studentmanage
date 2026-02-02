@@ -14,16 +14,22 @@ export const useRole = ({ userRole, allowedRoles }: UseRoleOptions) => {
         return allowedRoles.includes(userRole);
     }, [userRole, allowedRoles]);
 
-    const isAdmin = useMemo(() => userRole === 'ADMIN', [userRole]);
+    const isSuperAdmin = useMemo(() => userRole === 'SUPER_ADMIN' as any, [userRole]);
+    const isAdmin = useMemo(() => userRole === 'ADMIN' || userRole === 'SUPER_ADMIN' as any, [userRole]);
     const isTeacher = useMemo(() => userRole === 'TEACHER', [userRole]);
     const isStudent = useMemo(() => userRole === 'STUDENT', [userRole]);
     const isParent = useMemo(() => userRole === 'PARENT', [userRole]);
+    const isAccountant = useMemo(() => userRole === 'ACCOUNTANT' as any, [userRole]);
+    const isStaff = useMemo(() => userRole === 'STAFF' as any, [userRole]);
 
     return {
         hasAccess,
+        isSuperAdmin,
         isAdmin,
         isTeacher,
         isStudent,
         isParent,
+        isAccountant,
+        isStaff,
     };
 };

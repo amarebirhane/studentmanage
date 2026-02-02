@@ -22,17 +22,40 @@ import { Button } from '@/components/ui/button';
 const Sidebar = () => {
     const pathname = usePathname();
     const { user, logout } = useAuth();
-    const { isAdmin, isTeacher, isStudent } = useRole({ userRole: user?.role });
+    const { isSuperAdmin, isAdmin, isTeacher, isStudent, isAccountant } = useRole({ userRole: user?.role as any });
 
     const menuGroups = [
         {
             label: 'Main Menu',
             items: [
                 {
-                    title: 'Overview',
+                    title: 'System Overview',
+                    href: '/dashboard/superadmin',
+                    icon: ShieldCheck,
+                    show: isSuperAdmin,
+                },
+                {
+                    title: 'Dashboard',
                     href: user?.role ? `/dashboard/${user.role.toLowerCase()}` : '/dashboard/admin',
                     icon: LayoutDashboard,
-                    show: true,
+                    show: !isSuperAdmin,
+                },
+            ]
+        },
+        {
+            label: 'Platform Management',
+            items: [
+                {
+                    title: 'Schools',
+                    href: '/dashboard/schools',
+                    icon: GraduationCap,
+                    show: isSuperAdmin,
+                },
+                {
+                    title: 'Global Analytics',
+                    href: '/dashboard/analytics',
+                    icon: ClipboardList,
+                    show: isSuperAdmin,
                 },
             ]
         },
@@ -63,11 +86,22 @@ const Sidebar = () => {
                     icon: Calendar,
                     show: isTeacher || isAdmin || isStudent,
                 },
+            ]
+        },
+        {
+            label: 'Financial Management',
+            items: [
                 {
-                    title: 'Curriculum',
-                    href: '/dashboard/curriculum',
+                    title: 'Fee Invoices',
+                    href: '/dashboard/admin/fees',
+                    icon: ClipboardList,
+                    show: isAdmin || isAccountant,
+                },
+                {
+                    title: 'Reports',
+                    href: '/dashboard/admin/reports',
                     icon: BookOpen,
-                    show: true,
+                    show: isAdmin || isAccountant,
                 },
             ]
         },
@@ -78,12 +112,6 @@ const Sidebar = () => {
                     title: 'Teachers',
                     href: '/dashboard/admin/teachers',
                     icon: Users,
-                    show: true,
-                },
-                {
-                    title: 'Financials',
-                    href: '/dashboard/admin/fees',
-                    icon: ClipboardList,
                     show: true,
                 },
             ]

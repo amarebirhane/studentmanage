@@ -22,6 +22,7 @@ console.log('🛣️  Routes initializing...');
 // Public / Platform-wide routes
 router.use('/auth', authRoutes);
 router.use('/schools', schoolRoutes);
+router.use('/platform', platformRoutes);
 
 // School-specific routes (Isolated by tenantMiddleware)
 router.use(protect, tenantMiddleware);

@@ -3,11 +3,19 @@ import { hashPassword } from '../../utils/password';
 import { StudentFilters } from './student.types';
 
 export class StudentService {
-    static async getStudents(filters: StudentFilters) {
+    static async getStudents(filters: any, schoolId?: string, userId?: string, role?: string) {
         const { search, classId, sectionId, page = 1, limit = 10 } = filters;
         const skip = (page - 1) * limit;
 
         const where: any = {};
+        if (schoolId) where.schoolId = schoolId;
+
+        // Role-based filtering
+        if (role === 'PARENT' && userId) {
+            where.parentProfiles = { some: { userId } };
+        } else if (role === 'STUDENT' && userId) {
+            where.userId = userId;
+        }
 
         if (classId) where.classId = classId;
         if (sectionId) where.sectionId = sectionId;
@@ -53,9 +61,12 @@ export class StudentService {
         };
     }
 
-    static async getStudentById(id: string) {
+    static async getStudentById(id: string, schoolId?: string) {
+        const where: any = { id };
+        if (schoolId) where.schoolId = schoolId;
+
         const student = await prisma.studentProfile.findUnique({
-            where: { id },
+            where,
             include: {
                 user: true,
                 class: true,
@@ -106,6 +117,7 @@ export class StudentService {
                     password: hashedPassword,
                     role: 'STUDENT',
                     phone,
+                    schoolId: profileData.schoolId, // Ensure schoolId is passed
                 },
             });
 

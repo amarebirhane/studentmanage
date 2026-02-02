@@ -2,8 +2,12 @@ import { prisma } from '../../config';
 import { hashPassword } from '../../utils/password';
 
 export class TeacherService {
-    static async getTeachers() {
+    static async getTeachers(schoolId?: string) {
+        const where: any = {};
+        if (schoolId) where.schoolId = schoolId;
+
         return prisma.teacherProfile.findMany({
+            where,
             include: {
                 user: {
                     select: {
@@ -24,9 +28,12 @@ export class TeacherService {
         });
     }
 
-    static async getTeacherById(id: string) {
-        const teacher = await prisma.teacherProfile.findUnique({
-            where: { id },
+    static async getTeacherById(id: string, schoolId?: string) {
+        const where: any = { id };
+        if (schoolId) where.schoolId = schoolId;
+
+        const teacher = await prisma.teacherProfile.findFirst({
+            where,
             include: {
                 user: true,
                 sections: {
@@ -44,7 +51,7 @@ export class TeacherService {
         return teacher;
     }
 
-    static async createTeacher(data: any) {
+    static async createTeacher(data: any, schoolId?: string) {
         const { firstName, lastName, email, password, phone, bio, subjects } = data;
 
         const userExists = await prisma.user.findUnique({ where: { email } });
@@ -63,7 +70,7 @@ export class TeacherService {
                     password: hashedPassword,
                     role: 'TEACHER',
                     phone,
-                    schoolId: data.schoolId,
+                    schoolId,
                 },
             });
 
@@ -72,7 +79,7 @@ export class TeacherService {
                     userId: user.id,
                     bio,
                     subjects,
-                    schoolId: data.schoolId,
+                    schoolId,
                 },
                 include: { user: true },
             });
@@ -81,10 +88,13 @@ export class TeacherService {
         });
     }
 
-    static async updateTeacher(id: string, data: any) {
+    static async updateTeacher(id: string, data: any, schoolId?: string) {
         const { firstName, lastName, phone, email, bio, subjects } = data;
 
-        const teacher = await prisma.teacherProfile.findUnique({ where: { id } });
+        const where: any = { id };
+        if (schoolId) where.schoolId = schoolId;
+
+        const teacher = await prisma.teacherProfile.findFirst({ where });
         if (!teacher) {
             throw new Error('Teacher not found');
         }
@@ -120,8 +130,11 @@ export class TeacherService {
         });
     }
 
-    static async deleteTeacher(id: string) {
-        const teacher = await prisma.teacherProfile.findUnique({ where: { id } });
+    static async deleteTeacher(id: string, schoolId?: string) {
+        const where: any = { id };
+        if (schoolId) where.schoolId = schoolId;
+
+        const teacher = await prisma.teacherProfile.findFirst({ where });
         if (!teacher) {
             throw new Error('Teacher not found');
         }

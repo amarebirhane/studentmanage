@@ -1,18 +1,23 @@
 import { Router } from 'express';
 import { TeacherController } from './teacher.controller';
-import { protect, authorize } from '../../middlewares/auth.middleware';
+import { protect } from '../../middlewares/auth.middleware';
+import { tenantMiddleware } from '../../middlewares/tenant.middleware';
+import { checkPermission } from '../../middlewares/permission.middleware';
 
 const router = Router();
 
-router.route('/')
-    .get(protect, authorize('ADMIN', 'TEACHER'), TeacherController.getTeachers)
-    .post(protect, authorize('ADMIN'), TeacherController.createTeacher);
+// Apply protection and tenant isolation to all teacher routes
+router.use(protect, tenantMiddleware);
 
-router.get('/dashboard', protect, authorize('TEACHER'), TeacherController.getDashboardStats);
+router.route('/')
+    .get(checkPermission('teachers', 'view'), TeacherController.getTeachers)
+    .post(checkPermission('teachers', 'create'), TeacherController.createTeacher);
+
+router.get('/dashboard', TeacherController.getDashboardStats); // Role-specific view
 
 router.route('/:id')
-    .get(protect, authorize('ADMIN', 'TEACHER'), TeacherController.getTeacherById)
-    .put(protect, authorize('ADMIN'), TeacherController.updateTeacher)
-    .delete(protect, authorize('ADMIN'), TeacherController.deleteTeacher);
+    .get(checkPermission('teachers', 'view'), TeacherController.getTeacherById)
+    .put(checkPermission('teachers', 'edit'), TeacherController.updateTeacher)
+    .delete(checkPermission('teachers', 'delete'), TeacherController.deleteTeacher);
 
 export default router;

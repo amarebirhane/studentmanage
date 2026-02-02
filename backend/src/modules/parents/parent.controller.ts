@@ -47,4 +47,13 @@ export class ParentController {
             return ApiResponse.error(res, error.message, 400);
         }
     }
+
+    static async getFinancials(req: any, res: Response) {
+        try {
+            const stats = await ParentService.getFinancialSummary(req.user.id);
+            return ApiResponse.success(res, stats, 'Financial summary retrieved');
+        } catch (error: any) {
+            return ApiResponse.error(res, error.message);
+        }
+    }
 }

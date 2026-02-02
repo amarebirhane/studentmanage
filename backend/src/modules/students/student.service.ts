@@ -136,7 +136,7 @@ export class StudentService {
     }
 
     static async updateStudent(id: string, data: any) {
-        const { firstName, lastName, phone, email, dateOfBirth, ...profileData } = data;
+        const { firstName, lastName, phone, email, dateOfBirth, status, ...profileData } = data;
 
         const student = await prisma.studentProfile.findUnique({ where: { id } });
         if (!student) {

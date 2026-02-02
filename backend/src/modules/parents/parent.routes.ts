@@ -4,6 +4,10 @@ import { protect, authorize } from '../../middlewares/auth.middleware';
 
 const router = Router();
 
+// Parent Portal Routes
+router.get('/financials', protect, authorize('PARENT'), ParentController.getFinancials);
+
+// Admin-only Routes
 router.use(protect, authorize('ADMIN'));
 
 router.route('/')

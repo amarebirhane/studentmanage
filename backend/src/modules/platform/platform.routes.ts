@@ -10,5 +10,7 @@ router.use(authorize('SUPER_ADMIN'));
 
 router.get('/stats', platformController.getGlobalStats);
 router.get('/logs', platformController.getSystemLogs);
+router.get('/schools', platformController.getAllSchools);
+router.post('/assign-admin', platformController.assignSchoolAdmin);
 
 export default router;

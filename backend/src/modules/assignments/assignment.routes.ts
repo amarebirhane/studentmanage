@@ -1,47 +1,48 @@
 import { Router } from 'express';
 import * as assignmentController from './assignment.controller';
 import { protect } from '../../middlewares/auth.middleware';
-import { authorize } from '../../middlewares/role.middleware';
+import { tenantMiddleware } from '../../middlewares/tenant.middleware';
+import { checkPermission } from '../../middlewares/permission.middleware';
 
 const router = Router();
 
-router.use(protect); // All routes require authentication
+router.use(protect, tenantMiddleware);
 
 // Create assignment (teachers only)
 router.post(
     '/',
-    authorize('TEACHER', 'ADMIN'),
+    checkPermission('assignments', 'create'),
     assignmentController.createAssignment
 );
 
 // Get assignments (students see theirs, teachers see all they created)
-router.get('/', assignmentController.getAssignments);
+router.get('/', checkPermission('assignments', 'view'), assignmentController.getAssignments);
 
 // Submit assignment (students only)
 router.post(
     '/:id/submit',
-    authorize('STUDENT'),
+    checkPermission('assignments', 'create'), // Students 'create' a submission
     assignmentController.submitAssignment
 );
 
 // Grade submission (teachers only)
 router.patch(
     '/submissions/:submissionId/grade',
-    authorize('TEACHER', 'ADMIN'),
+    checkPermission('assignments', 'edit'), // Teachers 'edit' a submission (grading)
     assignmentController.gradeSubmission
 );
 
 // Get my submissions (students)
 router.get(
     '/my-submissions',
-    authorize('STUDENT'),
+    checkPermission('assignments', 'view'),
     assignmentController.getMySubmissions
 );
 
 // Get assignment submissions (teachers)
 router.get(
     '/:id/submissions',
-    authorize('TEACHER', 'ADMIN'),
+    checkPermission('assignments', 'view'),
     assignmentController.getAssignmentSubmissions
 );
 

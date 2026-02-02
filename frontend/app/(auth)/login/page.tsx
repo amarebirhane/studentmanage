@@ -8,24 +8,30 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { loginSchema } from '@/lib/validation'; // Need to ensure this exists or create it
+import { loginSchema } from '@/lib/validation';
 import toast from 'react-hot-toast';
 
 export default function LoginPage() {
     const [formData, setFormData] = useState({ email: '', password: '' });
     const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
-    const { login, isLoading } = useAuth(); // useAuth now returns store state/actions
+    const { login, isLoading } = useAuth();
     const router = useRouter();
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value,
-        });
-        // Clear error for this field
-        if (validationErrors[e.target.name]) {
-            setValidationErrors({ ...validationErrors, [e.target.name]: '' });
+        const { name, value } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: value,
+        }));
+
+        // Clear validation error for this field
+        if (validationErrors[name]) {
+            setValidationErrors(prev => {
+                const newErrors = { ...prev };
+                delete newErrors[name];
+                return newErrors;
+            });
         }
     };
 
@@ -34,27 +40,26 @@ export default function LoginPage() {
         setValidationErrors({});
 
         // Validate with Zod
-        // Check if loginSchema is available. If not, bypass or implement simple check.
-        // Assuming validation.js exists as per list_dir Step 24.
-        // If validation.js is JS, importing it might be tricky in TS if no types.
-        // But let's assume it works or I'll fix it.
-
-        // For safety, I'll inline a basic check or try to use schema if feasible.
-        // Let's rely on the previous code's logic but adapt for TS.
-
-        /* 
         const result = loginSchema.safeParse(formData);
+
         if (!result.success) {
-           ...
+            const errors: Record<string, string> = {};
+            result.error.errors.forEach((err) => {
+                if (err.path[0]) {
+                    errors[err.path[0] as string] = err.message;
+                }
+            });
+            setValidationErrors(errors);
+            return;
         }
-        */
 
         try {
-            await login({ email: formData.email, password: formData.password });
+            await login(formData);
             toast.success('Login successful!');
             router.push('/dashboard');
         } catch (err: any) {
-            toast.error(err.message || err.response?.data?.message || 'Login failed');
+            const errorMessage = err.response?.data?.message || err.message || 'Login failed';
+            toast.error(errorMessage);
         }
     };
 
@@ -75,7 +80,8 @@ export default function LoginPage() {
                                 name="email"
                                 value={formData.email}
                                 onChange={handleChange}
-                                required
+                                placeholder="you@example.com"
+                                disabled={isLoading}
                             />
                             {validationErrors.email && (
                                 <p className="text-sm text-destructive">{validationErrors.email}</p>
@@ -90,7 +96,8 @@ export default function LoginPage() {
                                 name="password"
                                 value={formData.password}
                                 onChange={handleChange}
-                                required
+                                placeholder="Enter your password"
+                                disabled={isLoading}
                             />
                             {validationErrors.password && (
                                 <p className="text-sm text-destructive">{validationErrors.password}</p>
@@ -103,7 +110,7 @@ export default function LoginPage() {
                     </form>
 
                     <p className="mt-4 text-center text-sm text-muted-foreground">
-                        Don't have an account?{' '}
+                        Don&apos;t have an account?{' '}
                         <Link href="/register" className="text-primary hover:underline">
                             Register
                         </Link>

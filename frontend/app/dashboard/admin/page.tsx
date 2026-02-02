@@ -28,8 +28,8 @@ export default function AdminDashboard() {
                 ]);
 
                 setStats({
-                    students: students.pagination.total || 0,
-                    teachers: teachers.pagination.total || 0,
+                    students: students.pagination?.total || 0,
+                    teachers: teachers.pagination?.total || 0,
                     classes: classes.length || 0,
                     activeSessions: Math.floor(Math.random() * 10) + 5 // Placeholder for active sessions
                 });

@@ -1,20 +1,20 @@
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ClipboardList } from 'lucide-react';
+import { Calendar } from 'lucide-react';
 
-export default function FeesPage() {
+export default function AttendancePage() {
     return (
         <div className="p-6 space-y-6">
-            <h1 className="text-3xl font-bold tracking-tight">Financial & Fee Management</h1>
+            <h1 className="text-3xl font-bold tracking-tight">Attendance Tracking</h1>
             <Card className="glass-card border-none">
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
-                        <ClipboardList className="h-5 w-5 text-primary" /> Student Fees
+                        <Calendar className="h-5 w-5 text-primary" /> Daily Attendance
                     </CardTitle>
                 </CardHeader>
                 <CardContent className="h-64 flex items-center justify-center text-muted-foreground italic">
-                    Fee processing and tracking is being integrated.
+                    Attendance module is coming soon.
                 </CardContent>
             </Card>
         </div>

@@ -49,7 +49,7 @@ export const getSchools = async (req: Request, res: Response, next: NextFunction
 
 export const setSuspension = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const school = await schoolService.setSuspensionStatus(req.params.id, req.body.isSuspended);
+        const school = await schoolService.setSuspensionStatus(req.params.id as string, req.body.isSuspended);
         new ApiResponse(res, 200, `School suspension status updated to ${req.body.isSuspended}`, school).send();
     } catch (error) {
         next(error);

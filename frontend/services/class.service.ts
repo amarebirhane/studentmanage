@@ -23,6 +23,16 @@ export const classService = {
         return data.data!;
     },
 
+    async getClassById(id: string): Promise<Class> {
+        const { data } = await api.get<ApiResponse<Class>>(`/classes/${id}`);
+        return data.data!;
+    },
+
+    async updateClass(id: string, classData: Partial<{ name: string; grade: string }>): Promise<Class> {
+        const { data } = await api.put<ApiResponse<Class>>(`/classes/${id}`, classData);
+        return data.data!;
+    },
+
     async deleteClass(id: string): Promise<void> {
         await api.delete(`/classes/${id}`);
     },

@@ -18,14 +18,12 @@ export const checkPermission = (module: string, action: 'view' | 'create' | 'edi
             }
 
             // 1. Super Admins bypass all permission checks
-            if (req.user.role === 'SUPER_ADMIN') {
+            if (req.user.role === 'SUPER_ADMIN' as any) {
                 return next();
             }
 
-            // 2. School Admins typically have all permissions for their school, 
-            // but we can still check the DB if we want custom role flexibility later.
-            // For now, let's treat ADMIN as having all permissions within their school.
-            if (req.user.role === 'ADMIN') {
+            // 2. School Admins typically have all permissions for their school
+            if (req.user.role === 'ADMIN' as any) {
                 return next();
             }
 

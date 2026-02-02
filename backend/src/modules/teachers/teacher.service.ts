@@ -63,6 +63,7 @@ export class TeacherService {
                     password: hashedPassword,
                     role: 'TEACHER',
                     phone,
+                    schoolId: data.schoolId,
                 },
             });
 
@@ -71,6 +72,7 @@ export class TeacherService {
                     userId: user.id,
                     bio,
                     subjects,
+                    schoolId: data.schoolId,
                 },
                 include: { user: true },
             });
@@ -102,6 +104,19 @@ export class TeacherService {
             });
 
             return updatedProfile;
+        });
+    }
+
+    static async getTeacherClasses(userId: string) {
+        return prisma.teacherProfile.findUnique({
+            where: { userId },
+            include: {
+                sections: {
+                    include: {
+                        class: true,
+                    },
+                },
+            },
         });
     }
 

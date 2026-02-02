@@ -9,6 +9,7 @@ const student_routes_1 = __importDefault(require("./modules/students/student.rou
 const class_routes_1 = __importDefault(require("./modules/classes/class.routes"));
 const user_routes_1 = __importDefault(require("./modules/users/user.routes"));
 const teacher_routes_1 = __importDefault(require("./modules/teachers/teacher.routes"));
+const parent_routes_1 = __importDefault(require("./modules/parents/parent.routes"));
 const school_routes_1 = __importDefault(require("./modules/schools/school.routes"));
 const attendance_routes_1 = __importDefault(require("./modules/attendance/attendance.routes"));
 const exam_routes_1 = __importDefault(require("./modules/exams/exam.routes"));
@@ -16,11 +17,13 @@ const result_routes_1 = __importDefault(require("./modules/results/result.routes
 const fee_routes_1 = __importDefault(require("./modules/fees/fee.routes"));
 const announcement_routes_1 = __importDefault(require("./modules/announcements/announcement.routes"));
 const router = (0, express_1.Router)();
+console.log('🛣️  Routes initializing...');
 router.use('/auth', auth_routes_1.default);
 router.use('/students', student_routes_1.default);
 router.use('/classes', class_routes_1.default);
 router.use('/admin', user_routes_1.default);
 router.use('/teachers', teacher_routes_1.default);
+router.use('/parents', parent_routes_1.default);
 // New Routes
 router.use('/schools', school_routes_1.default);
 router.use('/attendance', attendance_routes_1.default);

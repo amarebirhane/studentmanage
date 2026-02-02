@@ -35,7 +35,35 @@ class AuthService {
             throw new Error('Invalid email or password');
         }
         const token = (0, jwt_1.signToken)(user.id);
-        return { user, token };
+        const refreshToken = (0, jwt_1.signRefreshToken)(user.id);
+        // Update refresh token in db
+        await config_1.prisma.user.update({
+            where: { id: user.id },
+            data: { refreshToken },
+        });
+        return { user, token, refreshToken };
+    }
+    static async refreshToken(oldToken) {
+        try {
+            const decoded = (0, jwt_1.verifyRefreshToken)(oldToken);
+            const user = await config_1.prisma.user.findUnique({
+                where: { id: decoded.id },
+            });
+            if (!user || user.refreshToken !== oldToken) {
+                throw new Error('Invalid refresh token');
+            }
+            const token = (0, jwt_1.signToken)(user.id);
+            const refreshToken = (0, jwt_1.signRefreshToken)(user.id);
+            // Update refresh token in db (rotation)
+            await config_1.prisma.user.update({
+                where: { id: user.id },
+                data: { refreshToken },
+            });
+            return { token, refreshToken };
+        }
+        catch (error) {
+            throw new Error('Token verification failed');
+        }
     }
     static async getProfile(userId) {
         const user = await config_1.prisma.user.findUnique({

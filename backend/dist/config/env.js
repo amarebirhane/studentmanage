@@ -13,6 +13,8 @@ exports.config = {
     jwt: {
         secret: process.env.JWT_SECRET || 'your_jwt_secret',
         expire: process.env.JWT_EXPIRE || '30d',
+        refreshSecret: process.env.REFRESH_TOKEN_SECRET || 'your_refresh_token_secret',
+        refreshExpire: process.env.REFRESH_TOKEN_EXPIRE || '7d',
         cookieExpire: parseInt(process.env.JWT_COOKIE_EXPIRE || '30', 10),
     },
     db: {

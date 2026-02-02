@@ -5,12 +5,14 @@ import { protect, authorize } from '../../middlewares/auth.middleware';
 const router = Router();
 
 router.route('/')
-    .get(protect, authorize('ADMIN', 'TEACHER'), StudentController.getStudents)
-    .post(protect, authorize('ADMIN'), StudentController.createStudent);
+    .get(StudentController.getStudents) // Middleware in routes.ts handles protection
+    .post(authorize('ADMIN', 'SUPER_ADMIN' as any), StudentController.createStudent);
+
+router.post('/:id/approve', authorize('ADMIN', 'SUPER_ADMIN' as any), StudentController.approveAdmission);
 
 router.route('/:id')
-    .get(protect, authorize('ADMIN', 'TEACHER'), StudentController.getStudentById)
-    .put(protect, authorize('ADMIN'), StudentController.updateStudent)
-    .delete(protect, authorize('ADMIN'), StudentController.deleteStudent);
+    .get(authorize('ADMIN', 'TEACHER', 'PARENT', 'SUPER_ADMIN' as any), StudentController.getStudentById)
+    .put(authorize('ADMIN', 'SUPER_ADMIN' as any), StudentController.updateStudent)
+    .delete(authorize('ADMIN', 'SUPER_ADMIN' as any), StudentController.deleteStudent);
 
 export default router;

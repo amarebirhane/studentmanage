@@ -38,9 +38,12 @@ export class FeeStructureService {
         });
     }
 
-    static async getFeeStructureById(id: string) {
-        const feeStructure = await prisma.feeStructure.findUnique({
-            where: { id },
+    static async getFeeStructureById(id: string, schoolId?: string) {
+        const where: any = { id };
+        if (schoolId) where.schoolId = schoolId;
+
+        const feeStructure = await prisma.feeStructure.findFirst({
+            where,
             include: {
                 class: true,
                 school: true,

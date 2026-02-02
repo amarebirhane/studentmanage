@@ -1,69 +1,70 @@
-import { Request, Response, NextFunction } from 'express';
+import { Response, NextFunction } from 'express';
 import { FeeStructureService } from './fee-structure.service';
 import { ApiResponse } from '../../utils/apiResponse';
+import { AuthenticatedRequest } from '../../types';
 
-export const createFeeStructure = async (req: any, res: Response, next: NextFunction) => {
+export const createFeeStructure = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     try {
         const feeStructure = await FeeStructureService.createFeeStructure({
             ...req.body,
-            schoolId: req.schoolId,
+            schoolId: req.schoolId as string,
         });
-        new ApiResponse(res, 201, 'Fee structure created successfully', feeStructure).send();
+        return ApiResponse.success(res, feeStructure, 'Fee structure created successfully', 201);
     } catch (error) {
         next(error);
     }
 };
 
-export const getAllFeeStructures = async (req: any, res: Response, next: NextFunction) => {
+export const getAllFeeStructures = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     try {
         const feeStructures = await FeeStructureService.getAllFeeStructures(
             req.schoolId,
             req.query.classId as string
         );
-        new ApiResponse(res, 200, 'Fee structures retrieved', feeStructures).send();
+        return ApiResponse.success(res, feeStructures, 'Fee structures retrieved');
     } catch (error) {
         next(error);
     }
 };
 
-export const getFeeStructureById = async (req: Request, res: Response, next: NextFunction) => {
+export const getFeeStructureById = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     try {
-        const feeStructure = await FeeStructureService.getFeeStructureById(req.params.id as string);
-        new ApiResponse(res, 200, 'Fee structure details', feeStructure).send();
+        const feeStructure = await FeeStructureService.getFeeStructureById(req.params.id as string, req.schoolId);
+        return ApiResponse.success(res, feeStructure, 'Fee structure details');
     } catch (error) {
         next(error);
     }
 };
 
-export const updateFeeStructure = async (req: any, res: Response, next: NextFunction) => {
+export const updateFeeStructure = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     try {
         const feeStructure = await FeeStructureService.updateFeeStructure(
             req.params.id as string,
             req.body,
             req.schoolId
         );
-        new ApiResponse(res, 200, 'Fee structure updated successfully', feeStructure).send();
+        return ApiResponse.success(res, feeStructure, 'Fee structure updated successfully');
     } catch (error) {
         next(error);
     }
 };
 
-export const deleteFeeStructure = async (req: any, res: Response, next: NextFunction) => {
+export const deleteFeeStructure = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     try {
         await FeeStructureService.deleteFeeStructure(req.params.id as string, req.schoolId);
-        new ApiResponse(res, 200, 'Fee structure deleted successfully').send();
+        return ApiResponse.success(res, {}, 'Fee structure deleted successfully');
     } catch (error) {
         next(error);
     }
 };
 
-export const bulkGenerateInvoices = async (req: any, res: Response, next: NextFunction) => {
+export const bulkGenerateInvoices = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     try {
         const invoices = await FeeStructureService.bulkGenerateInvoices({
             ...req.body,
             schoolId: req.schoolId,
         });
-        new ApiResponse(res, 201, `${invoices.length} invoices generated successfully`, invoices).send();
+        return ApiResponse.success(res, invoices, `${invoices.length} invoices generated successfully`, 201);
     } catch (error) {
         next(error);
     }

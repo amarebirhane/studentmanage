@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, GraduationCap } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useAuthStore } from '@/store/auth.store';
 import { Button } from '@/components/ui/button';
@@ -99,16 +99,24 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="flex items-center justify-center min-h-screen bg-background">
-            <Card className="w-full max-w-md">
-                <CardHeader>
-                    <CardTitle className="text-2xl">Login</CardTitle>
-                    <CardDescription>Enter your credentials to access your account</CardDescription>
+        <div className="flex items-center justify-center min-h-screen bg-background nebula-gradient p-4">
+            <Card className="w-full max-w-md glass-card border-none overflow-hidden">
+                <div className="h-2 bg-primary w-full" />
+                <CardHeader className="pt-8 pb-6 px-8">
+                    <div className="flex justify-center mb-6">
+                        <div className="p-3 bg-primary/10 rounded-2xl">
+                            <GraduationCap className="h-10 w-10 text-primary" />
+                        </div>
+                    </div>
+                    <CardTitle className="text-3xl font-bold text-center tracking-tight">Welcome Back</CardTitle>
+                    <CardDescription className="text-center text-muted-foreground mt-2">
+                        Enter your credentials to access the dashboard
+                    </CardDescription>
                 </CardHeader>
-                <CardContent>
-                    <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+                <CardContent className="px-8 pb-10">
+                    <form onSubmit={handleSubmit} className="space-y-6" noValidate>
                         <div className="space-y-2">
-                            <Label htmlFor="email">Email</Label>
+                            <Label htmlFor="email" className="text-sm font-medium">Email Address</Label>
                             <Input
                                 id="email"
                                 type="email"
@@ -118,14 +126,23 @@ export default function LoginPage() {
                                 placeholder="you@example.com"
                                 disabled={isLoading}
                                 autoComplete="email"
+                                className="bg-background/50 border-white/20 h-11 transition-all focus:ring-2 focus:ring-primary/20"
                             />
                             {validationErrors.email && (
-                                <p className="text-sm text-destructive">{validationErrors.email}</p>
+                                <p className="text-xs font-medium text-destructive mt-1 flex items-center gap-1">
+                                    <span className="h-1 w-1 rounded-full bg-destructive" />
+                                    {validationErrors.email}
+                                </p>
                             )}
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="password">Password</Label>
+                            <div className="flex items-center justify-between">
+                                <Label htmlFor="password" className="text-sm font-medium">Password</Label>
+                                <Link href="/forgot-password" className="text-xs text-primary hover:underline font-medium">
+                                    Forgot password?
+                                </Link>
+                            </div>
                             <div className="relative">
                                 <Input
                                     id="password"
@@ -133,10 +150,10 @@ export default function LoginPage() {
                                     name="password"
                                     value={formData.password}
                                     onChange={handleChange}
-                                    placeholder="Enter your password"
+                                    placeholder="••••••••"
                                     disabled={isLoading}
                                     autoComplete="current-password"
-                                    className="pr-10"
+                                    className="bg-background/50 border-white/20 h-11 pr-10 transition-all focus:ring-2 focus:ring-primary/20"
                                 />
                                 <button
                                     type="button"
@@ -146,30 +163,38 @@ export default function LoginPage() {
                                     aria-label={showPassword ? 'Hide password' : 'Show password'}
                                 >
                                     {showPassword ? (
-                                        <EyeOff className="h-4 w-4" />
+                                        <EyeOff className="h-5 w-5" />
                                     ) : (
-                                        <Eye className="h-4 w-4" />
+                                        <Eye className="h-5 w-5" />
                                     )}
                                 </button>
                             </div>
                             {validationErrors.password && (
-                                <p className="text-sm text-destructive">{validationErrors.password}</p>
+                                <p className="text-xs font-medium text-destructive mt-1 flex items-center gap-1">
+                                    <span className="h-1 w-1 rounded-full bg-destructive" />
+                                    {validationErrors.password}
+                                </p>
                             )}
                         </div>
 
-                        <Button type="submit" className="w-full" disabled={isLoading}>
-                            {isLoading ? 'Logging in...' : 'Login'}
+                        <Button type="submit" className="w-full h-11 text-base font-semibold shadow-lg shadow-primary/20 transition-all hover:scale-[1.01] active:scale-[0.99]" disabled={isLoading}>
+                            {isLoading ? (
+                                <div className="flex items-center gap-2">
+                                    <div className="h-4 w-4 border-2 border-white/30 border-t-white animate-spin rounded-full" />
+                                    Logging in...
+                                </div>
+                            ) : 'Sign In'}
                         </Button>
                     </form>
 
-                    <p className="mt-4 text-center text-sm text-muted-foreground">
-                        Don&apos;t have an account?{' '}
-                        <Link href="/register" className="text-primary hover:underline">
-                            Register
+                    <div className="mt-8 text-center text-sm">
+                        <span className="text-muted-foreground">Don&apos;t have an account?</span>{' '}
+                        <Link href="/register" className="text-primary font-bold hover:underline">
+                            Create Account
                         </Link>
-                    </p>
+                    </div>
                 </CardContent>
             </Card>
-        </div>
+        </div >
     );
 }

@@ -14,20 +14,22 @@ import {
     Calendar,
     BookOpen,
     ClipboardList,
-    ShieldCheck
+    ShieldCheck,
+    LogOut
 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 const Sidebar = () => {
     const pathname = usePathname();
-    const { user } = useAuth();
+    const { user, logout } = useAuth();
     const { isAdmin, isTeacher, isStudent } = useRole({ userRole: user?.role });
 
     const menuGroups = [
         {
-            label: 'Main',
+            label: 'Main Menu',
             items: [
                 {
-                    title: 'Dashboard',
+                    title: 'Overview',
                     href: user?.role ? `/dashboard/${user.role.toLowerCase()}` : '/dashboard/admin',
                     icon: LayoutDashboard,
                     show: true,
@@ -35,17 +37,17 @@ const Sidebar = () => {
             ]
         },
         {
-            label: 'Academic',
+            label: 'Academic Management',
             items: [
                 {
                     title: 'Students',
-                    href: '/dashboard/admin/students', // Updated path
+                    href: '/dashboard/admin/students',
                     icon: Users,
                     show: isTeacher || isAdmin,
                 },
                 {
                     title: 'Classes',
-                    href: '/dashboard/admin/classes', // Updated path
+                    href: '/dashboard/admin/classes',
                     icon: GraduationCap,
                     show: isTeacher || isAdmin,
                 },
@@ -55,19 +57,25 @@ const Sidebar = () => {
                     icon: Calendar,
                     show: isTeacher || isAdmin || isStudent,
                 },
+                {
+                    title: 'Curriculum',
+                    href: '/dashboard/curriculum',
+                    icon: BookOpen,
+                    show: true,
+                },
             ]
         },
         ...(isAdmin ? [{
-            label: 'Administration',
+            label: 'Administrative',
             items: [
                 {
-                    title: 'Teachers',
+                    title: 'Staff Directory',
                     href: '/dashboard/admin/teachers',
                     icon: ShieldCheck,
                     show: true,
                 },
                 {
-                    title: 'Fees',
+                    title: 'Financials',
                     href: '/dashboard/admin/fees',
                     icon: ClipboardList,
                     show: true,
@@ -75,7 +83,7 @@ const Sidebar = () => {
             ]
         }] : []),
         {
-            label: 'Other',
+            label: 'System',
             items: [
                 {
                     title: 'Settings',
@@ -88,22 +96,26 @@ const Sidebar = () => {
     ];
 
     return (
-        <aside className="w-64 glass border-r min-h-screen flex flex-col p-4 z-50">
-            <div className="flex items-center space-x-3 px-4 mb-8">
-                <div className="bg-primary p-2 rounded-lg">
-                    <GraduationCap className="h-6 w-6 text-primary-foreground" />
+        <aside className="w-72 glass border-r border-white/10 min-h-screen flex flex-col fixed left-0 top-0 bottom-0 z-50">
+            <div className="h-20 flex items-center px-8 mb-6 border-b border-white/5">
+                <div className="flex items-center space-x-3">
+                    <div className="bg-primary p-2 rounded-xl shadow-lg shadow-primary/20">
+                        <GraduationCap className="h-6 w-6 text-primary-foreground" />
+                    </div>
+                    <span className="font-bold text-2xl tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">
+                        EduSmart
+                    </span>
                 </div>
-                <span className="font-bold text-xl tracking-tight">EduSmart</span>
             </div>
 
-            <nav className="flex-1 space-y-8 overflow-y-auto pr-2 custom-scrollbar">
+            <nav className="flex-1 space-y-8 overflow-y-auto px-4 custom-scrollbar pb-10">
                 {menuGroups.map((group, idx) => {
                     const visibleItems = group.items.filter(item => item.show);
                     if (visibleItems.length === 0) return null;
 
                     return (
-                        <div key={idx} className="space-y-2">
-                            <h3 className="px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                        <div key={idx} className="space-y-3">
+                            <h3 className="px-4 text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em] opacity-60">
                                 {group.label}
                             </h3>
                             <div className="space-y-1">
@@ -115,17 +127,20 @@ const Sidebar = () => {
                                             key={item.href}
                                             href={item.href}
                                             className={cn(
-                                                'flex items-center space-x-3 px-4 py-2.5 rounded-xl transition-all duration-200 group',
+                                                'flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-300 group',
                                                 isActive
-                                                    ? 'bg-primary text-primary-foreground shadow-md shadow-primary/20'
-                                                    : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                                                    ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/25 translate-x-1'
+                                                    : 'text-muted-foreground hover:bg-white/5 hover:text-foreground hover:translate-x-1'
                                             )}
                                         >
                                             <Icon className={cn(
-                                                "h-5 w-5 transition-transform duration-200 group-hover:scale-110",
-                                                isActive ? "text-primary-foreground" : "text-muted-foreground group-hover:text-accent-foreground"
+                                                "h-5 w-5 transition-all duration-300",
+                                                isActive ? "text-primary-foreground" : "text-muted-foreground group-hover:text-primary"
                                             )} />
-                                            <span className="font-medium">{item.title}</span>
+                                            <span className="font-medium text-sm">{item.title}</span>
+                                            {isActive && (
+                                                <div className="ml-auto w-1.5 h-1.5 rounded-full bg-primary-foreground animate-pulse" />
+                                            )}
                                         </Link>
                                     );
                                 })}
@@ -135,15 +150,26 @@ const Sidebar = () => {
                 })}
             </nav>
 
-            <div className="mt-auto p-4 glass-card bg-secondary/50 border-none">
-                <div className="flex items-center space-x-3">
-                    <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20">
-                        <span className="font-bold text-primary">{user?.firstName?.[0]}</span>
+            <div className="p-4 border-t border-white/5 bg-black/5">
+                <div className="glass-card bg-secondary/30 border-none p-4 rounded-2xl">
+                    <div className="flex items-center space-x-3 mb-4">
+                        <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20 shrink-0">
+                            <span className="font-bold text-primary">{user?.firstName?.[0]}</span>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                            <p className="text-sm font-bold truncate leading-none mb-1">{user?.firstName} {user?.lastName}</p>
+                            <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">{user?.role}</p>
+                        </div>
                     </div>
-                    <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold truncate">{user?.firstName} {user?.lastName}</p>
-                        <p className="text-xs text-muted-foreground truncate">{user?.role}</p>
-                    </div>
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        className="w-full justify-start text-xs font-semibold text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg group transition-all"
+                        onClick={() => logout()}
+                    >
+                        <LogOut className="h-4 w-4 mr-2 group-hover:rotate-12 transition-transform" />
+                        Sign Out
+                    </Button>
                 </div>
             </div>
         </aside>

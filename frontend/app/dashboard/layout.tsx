@@ -53,11 +53,11 @@ export default function DashboardLayout({
 
     console.log('Dashboard Layout - Rendering dashboard with user:', user.email);
     return (
-        <div className="flex min-h-screen bg-gray-100">
+        <div className="flex min-h-screen bg-background nebula-gradient">
             <Sidebar />
-            <div className="flex-1 flex flex-col ml-64">
+            <div className="flex-1 flex flex-col ml-72">
                 <Navbar />
-                <main className="p-6 flex-1 overflow-auto">
+                <main className="p-8 flex-1 overflow-auto custom-scrollbar">
                     {children}
                 </main>
             </div>

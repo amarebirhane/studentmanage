@@ -532,3 +532,47 @@ model GlobalSetting {
   key   String @unique
   value String
 }
+
+model Message {
+  id          String   @id @default(uuid())
+  senderId    String
+  sender      User     @relation("SentMessages", fields: [senderId], references: [id])
+  recipientId String
+  recipient   User     @relation("ReceivedMessages", fields: [recipientId], references: [id])
+  subject     String
+  content     String
+  readAt      DateTime?
+  createdAt   DateTime @default(now())
+  schoolId    String?
+  school      School?  @relation(fields: [schoolId], references: [id])
+}
+
+model FeeStructure {
+  id          String   @id @default(uuid())
+  name        String
+  category    String   // TUITION, TRANSPORT, LIBRARY, HOSTEL, EXAM, etc.
+  amount      Float
+  frequency   String   @default("ONE_TIME") // MONTHLY, QUARTERLY, ANNUALLY, ONE_TIME
+  classId     String?
+  class       Class?   @relation(fields: [classId], references: [id])
+  schoolId    String
+  school      School   @relation(fields: [schoolId], references: [id])
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Permission {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  module      String   // STUDENTS, CLASSES, ATTENDANCE, etc.
+  canView     Boolean  @default(false)
+  canCreate   Boolean  @default(false)
+  canEdit     Boolean  @default(false)
+  canDelete   Boolean  @default(false)
+  schoolId    String?
+  createdAt   DateTime @default(now())
+
+  @@unique([userId, module])
+}

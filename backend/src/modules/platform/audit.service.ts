@@ -9,7 +9,7 @@ export class AuditLogService {
         schoolId?: string;
     }) {
         try {
-            return await prisma.auditLog.create({
+            return await prisma.activityLog.create({
                 data: {
                     action: data.action,
                     module: data.module,
@@ -19,7 +19,7 @@ export class AuditLogService {
                 },
             });
         } catch (error) {
-            console.error('Failed to create audit log:', error);
+            console.error('Failed to create activity log:', error);
             // Don't throw error to avoid blocking the main action
         }
     }
@@ -40,7 +40,7 @@ export class AuditLogService {
         if (userId) where.userId = userId;
 
         const [logs, total] = await Promise.all([
-            prisma.auditLog.findMany({
+            prisma.activityLog.findMany({
                 where,
                 include: {
                     user: {
@@ -56,7 +56,7 @@ export class AuditLogService {
                 skip,
                 take: limit,
             }),
-            prisma.auditLog.count({ where }),
+            prisma.activityLog.count({ where }),
         ]);
 
         return {

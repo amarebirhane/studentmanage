@@ -80,6 +80,7 @@ model User {
   sentMessages    Message[]          @relation("SentMessages")
   receivedMessages Message[]         @relation("ReceivedMessages")
   permissions     Permission[]
+  activityLogs    ActivityLog[]
 }
 
 model StudentProfile {
@@ -203,10 +204,13 @@ model TimetableEntry {
   sectionId    String?
   teacher      TeacherProfile? @relation("TeacherTimetable", fields: [teacherId], references: [id])
   teacherId    String?
+  room         String?
+  schoolId     String?
+  school       School?         @relation(fields: [schoolId], references: [id])
   createdAt    DateTime        @default(now())
   updatedAt    DateTime        @updatedAt
 
-  @@unique([dayOfWeek, periodNumber, classId, sectionId], map: "timetable_unique_slot")
+  @@unique([dayOfWeek, periodNumber, classId, sectionId, schoolId], map: "timetable_unique_slot")
 }
 
 model AttendanceRecord {
@@ -506,6 +510,7 @@ model School {
   announcements Announcement[]
   messages    Message[]
   feeStructures FeeStructure[]
+  timetables  TimetableEntry[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
@@ -581,4 +586,15 @@ model Permission {
   createdAt   DateTime @default(now())
 
   @@unique([userId, module])
+}
+
+model ActivityLog {
+  id        String   @id @default(uuid())
+  action    String
+  module    String
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  details   Json?
+  schoolId  String?
+  createdAt DateTime @default(now())
 }

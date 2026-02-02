@@ -170,6 +170,7 @@ model Class {
   updatedAt   DateTime         @updatedAt
   schoolId    String?
   school      School?          @relation(fields: [schoolId], references: [id])
+  feeStructures FeeStructure[]
   onlineExams OnlineExam[]
 }
 

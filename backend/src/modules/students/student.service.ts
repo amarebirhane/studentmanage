@@ -199,4 +199,40 @@ export class StudentService {
             await tx.user.delete({ where: { id: student.userId } });
         });
     }
+
+    static async bulkPromoteStudents(data: {
+        studentIds: string[];
+        targetClassId: string;
+        targetSectionId?: string;
+        schoolId?: string;
+    }) {
+        const { studentIds, targetClassId, targetSectionId, schoolId } = data;
+
+        return await prisma.studentProfile.updateMany({
+            where: {
+                id: { in: studentIds },
+                schoolId,
+            },
+            data: {
+                classId: targetClassId,
+                sectionId: targetSectionId || null,
+            },
+        });
+    }
+
+    static async updateStudentStatus(id: string, status: string, schoolId?: string) {
+        const where: any = { id };
+        if (schoolId) where.schoolId = schoolId;
+
+        const student = await prisma.studentProfile.findFirst({ where });
+        if (!student) {
+            throw new Error('Student not found');
+        }
+
+        return await prisma.studentProfile.update({
+            where: { id },
+            data: { status },
+            include: { user: true },
+        });
+    }
 }

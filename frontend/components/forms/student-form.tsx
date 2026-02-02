@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { studentSchema, updateStudentSchema } from '@/lib/validation';
+import { studentSchema, updateStudentSchema } from '@/lib/schema';
 import toast from 'react-hot-toast';
 import { Upload, User, Phone, Mail, Hash, MapPin, Shield, BookOpen, Layers } from 'lucide-react';
 import { cn } from '@/lib/utils';

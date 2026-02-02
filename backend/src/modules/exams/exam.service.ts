@@ -153,7 +153,7 @@ export class ExamService {
                     create: {
                         studentId: entry.studentId,
                         examId: data.examId,
-                        subject: exam.subject || 'General',
+                        subject: (exam as any).subject || 'General',
                         scoredMarks: entry.scoredMarks,
                         totalMarks: exam.maxMarks,
                         grade,
@@ -178,7 +178,7 @@ export class ExamService {
             data: {
                 published: true,
                 publishedAt: new Date(),
-            },
+            } as any,
         });
     }
 

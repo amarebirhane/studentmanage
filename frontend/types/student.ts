@@ -15,7 +15,9 @@ export interface StudentProfile {
     guardianPhone?: string;
     guardianEmail?: string;
     classId?: string;
+    class?: { id: string, name: string };
     sectionId?: string;
+    section?: { id: string, name: string };
     avatarUrl?: string;
     createdAt: string;
     updatedAt: string;

@@ -58,11 +58,11 @@ const StudentForm = ({ studentId, initialData }: StudentFormProps) => {
   const fetchMetadata = async () => {
     try {
       const [classesRes, sectionsRes] = await Promise.all([
-        api.get('/admin/classes'),
-        api.get('/admin/sections')
+        api.get('/classes'),
+        api.get('/classes/sections')
       ]);
-      setClasses(classesRes.data || []);
-      setSections(sectionsRes.data || []);
+      setClasses(classesRes.data.data || []);
+      setSections(sectionsRes.data.data || []);
     } catch (error) {
       console.error('Failed to fetch classes/sections');
     }
@@ -77,7 +77,7 @@ const StudentForm = ({ studentId, initialData }: StudentFormProps) => {
         email: user?.email || '',
         phone: user?.phone || '',
         enrollmentNo: profile.enrollmentNo || '',
-        age: profile.age || '',
+        age: profile.age?.toString() || '',
         gender: profile.gender || 'MALE',
         dateOfBirth: profile.dateOfBirth ? new Date(profile.dateOfBirth).toISOString().split('T')[0] : '',
         contactAddress: profile.contactAddress || '',
@@ -153,7 +153,13 @@ const StudentForm = ({ studentId, initialData }: StudentFormProps) => {
       avatarUrl = uploaded;
     }
 
-    const submitData = { ...formData, avatarUrl };
+    const { age, ...rest } = formData;
+    const submitData = {
+      ...rest,
+      age: age ? parseInt(age) : undefined,
+      avatarUrl
+    };
+
     const schema = studentId ? updateStudentSchema : studentSchema;
     const result = schema.safeParse(submitData);
 
@@ -177,7 +183,7 @@ const StudentForm = ({ studentId, initialData }: StudentFormProps) => {
         await api.post('/students', submitData);
         toast.success('New student added successfully');
       }
-      router.push('/dashboard/students');
+      router.push('/dashboard/admin/students');
     } catch (error: any) {
       toast.error(error.response?.data?.message || 'Operation failed');
     } finally {

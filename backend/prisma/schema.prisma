@@ -69,6 +69,7 @@ model User {
   school          School?            @relation(fields: [schoolId], references: [id])
   createdAt       DateTime           @default(now())
   updatedAt       DateTime           @updatedAt
+  deletedAt       DateTime?
   studentProfile  StudentProfile?
   teacherProfile  TeacherProfile?
   parentProfiles  ParentProfile[]
@@ -115,13 +116,54 @@ model StudentProfile {
   hostelAssignment      HostelAssignment?
   analytics             PerformanceInsight[]
   generatedDocuments    GeneratedDocument[]
+  enrollments           Enrollment[]
   createdAt             DateTime               @default(now())
   updatedAt             DateTime               @updatedAt
+  deletedAt             DateTime?
   status                String                 @default("PENDING") // PENDING, ADMITTED, GRADUATED, DROPPED_OUT
   schoolId              String?
   school                School?                @relation(fields: [schoolId], references: [id])
   examResponses         ExamResponse[]
   transcriptRequests    TranscriptRequest[]
+}
+
+model Subject {
+  id          String   @id @default(uuid())
+  name        String
+  code        String?
+  description String?
+  class       Class    @relation(fields: [classId], references: [id])
+  classId     String
+  teacher     TeacherProfile? @relation(fields: [teacherId], references: [id])
+  teacherId   String?
+  exams       Exam[]
+  timetables  TimetableEntry[]
+  assignments Assignment[]
+  schoolId    String
+  school      School   @relation(fields: [schoolId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  deletedAt   DateTime?
+
+  @@unique([name, classId, schoolId])
+}
+
+model Enrollment {
+  id           String         @id @default(uuid())
+  student      StudentProfile @relation(fields: [studentId], references: [id])
+  studentId    String
+  class        Class          @relation(fields: [classId], references: [id])
+  classId      String
+  section      Section?       @relation(fields: [sectionId], references: [id])
+  sectionId    String?
+  academicYear String
+  status       String         @default("ACTIVE") // ACTIVE, PROMOTED, WITHDRAWN
+  schoolId     String
+  school       School         @relation(fields: [schoolId], references: [id])
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  @@unique([studentId, academicYear, schoolId])
 }
 
 model TeacherProfile {
@@ -199,7 +241,8 @@ model TimetableEntry {
   id           String          @id @default(uuid())
   dayOfWeek    Int
   periodNumber Int
-  subject      String
+  subject      Subject         @relation(fields: [subjectId], references: [id])
+  subjectId    String
   class        Class?          @relation(fields: [classId], references: [id])
   classId      String?
   section      Section?        @relation(fields: [sectionId], references: [id])
@@ -211,6 +254,7 @@ model TimetableEntry {
   school       School?         @relation(fields: [schoolId], references: [id])
   createdAt    DateTime        @default(now())
   updatedAt    DateTime        @updatedAt
+  deletedAt    DateTime?
 
   @@unique([dayOfWeek, periodNumber, classId, sectionId, schoolId], map: "timetable_unique_slot")
 }
@@ -315,7 +359,8 @@ model Assignment {
   classId      String?
   section      Section?               @relation(fields: [sectionId], references: [id])
   sectionId    String?
-  subject      String?
+  subject      Subject?               @relation(fields: [subjectId], references: [id])
+  subjectId    String?
   teacher      TeacherProfile?        @relation(fields: [teacherId], references: [id])
   teacherId    String?
   status       AssignmentStatus       @default(DRAFT)
@@ -324,6 +369,7 @@ model Assignment {
   submissions  AssignmentSubmission[]
   createdAt    DateTime               @default(now())
   updatedAt    DateTime               @updatedAt
+  deletedAt    DateTime?
   schoolId     String?
   school       School?                @relation(fields: [schoolId], references: [id])
   user         User?                  @relation(fields: [userId], references: [id])
@@ -421,7 +467,11 @@ model LibraryBook {
   totalCopies     Int
   availableCopies Int
   transactions    LibraryTransaction[]
+  schoolId        String
+  school          School               @relation(fields: [schoolId], references: [id])
   createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+  deletedAt       DateTime?
 }
 
 model LibraryTransaction {
@@ -433,6 +483,8 @@ model LibraryTransaction {
   issueDate  DateTime        @default(now())
   dueDate    DateTime?
   returnDate DateTime?
+  schoolId   String
+  school     School          @relation(fields: [schoolId], references: [id])
 }
 
 model TransportRoute {
@@ -443,6 +495,11 @@ model TransportRoute {
   driverPhone String?
   stops       Json?
   assignments TransportAssignment[]
+  schoolId    String
+  school      School                @relation(fields: [schoolId], references: [id])
+  createdAt   DateTime              @default(now())
+  updatedAt   DateTime              @updatedAt
+  deletedAt   DateTime?
 }
 
 model TransportAssignment {
@@ -452,6 +509,8 @@ model TransportAssignment {
   student     StudentProfile @relation(fields: [studentId], references: [id])
   studentId   String         @unique
   pickupPoint String?
+  schoolId    String
+  school      School         @relation(fields: [schoolId], references: [id])
 }
 
 model HostelRoom {
@@ -460,6 +519,11 @@ model HostelRoom {
   capacity    Int
   gender      HostelGender
   assignments HostelAssignment[]
+  schoolId    String
+  school      School             @relation(fields: [schoolId], references: [id])
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+  deletedAt   DateTime?
 }
 
 model HostelAssignment {
@@ -470,6 +534,8 @@ model HostelAssignment {
   studentId String         @unique
   startDate DateTime       @default(now())
   endDate   DateTime?
+  schoolId  String
+  school    School         @relation(fields: [schoolId], references: [id])
 }
 
 model PerformanceInsight {

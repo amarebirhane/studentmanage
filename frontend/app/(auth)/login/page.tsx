@@ -163,14 +163,14 @@ export default function LoginPage() {
                 <div className="flex-1 flex flex-col justify-center items-center p-8 lg:p-24">
                     <div className="max-w-md w-full space-y-12 animate-in slide-in-from-right duration-1000 delay-200 fill-mode-both">
                         <div className="space-y-4 text-center md:text-left">
-                            <h1 className="text-5xl font-black tracking-tight text-foreground">Sign In</h1>
+                            <h1 className="text-5xl font-black tracking-tight text-foreground">Welcome Back </h1>
                             <p className="text-muted-foreground font-medium text-xl leading-relaxed opacity-60">
                                 Authenticate your identity to proceed to your secure dashboard.
                             </p>
                         </div>
 
                         {/* Social Auth Placeholders */}
-                        <div className="grid grid-cols-2 gap-5">
+                        {/* <div className="grid grid-cols-2 gap-5">
                             <Button variant="outline" className="h-16 border-border/40 bg-muted/20 hover:bg-muted/40 gap-3 font-bold rounded-[1.25rem] transition-all border-2 text-base" onClick={() => toast.success('Coming soon!')}>
                                 <svg className="h-6 w-6 text-[#4285F4]" viewBox="0 0 24 24">
                                     <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -183,7 +183,7 @@ export default function LoginPage() {
                             <Button variant="outline" className="h-16 border-border/40 bg-muted/20 hover:bg-muted/40 gap-3 font-bold rounded-[1.25rem] transition-all border-2 text-base" onClick={() => toast.success('Coming soon!')}>
                                 <Github className="h-6 w-6 text-foreground" /> Github
                             </Button>
-                        </div>
+                        </div> */}
 
                         <div className="relative py-4">
                             <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-border/50"></span></div>
@@ -266,7 +266,7 @@ export default function LoginPage() {
                                     </span>
                                 ) : (
                                     <span className="flex items-center gap-3">
-                                        Initiate Authentication <ArrowLeft className="h-8 w-8 rotate-180 group-hover:translate-x-3 transition-transform" />
+                                        login <ArrowLeft className="h-8 w-8 rotate-180 group-hover:translate-x-3 transition-transform" />
                                     </span>
                                 )}
                             </Button>

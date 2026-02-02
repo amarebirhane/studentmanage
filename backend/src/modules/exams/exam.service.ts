@@ -178,7 +178,7 @@ export class ExamService {
             data: {
                 published: true,
                 publishedAt: new Date(),
-            } as any,
+            },
         });
     }
 

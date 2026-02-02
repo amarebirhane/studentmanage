@@ -32,7 +32,7 @@ export const getAllExams = async (req: AuthenticatedRequest, res: Response, next
 
 export const getExam = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     try {
-        const exam = await ExamService.getExamById(req.params.id, req.schoolId);
+        const exam = await ExamService.getExamById(req.params.id as string, req.schoolId);
         new ApiResponse(res, 200, 'Exam details', exam).send();
     } catch (error) {
         next(error);
@@ -54,7 +54,7 @@ export const enterMarks = async (req: AuthenticatedRequest, res: Response, next:
 
 export const publishResults = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     try {
-        const exam = await ExamService.publishResults(req.params.id, req.schoolId);
+        const exam = await ExamService.publishResults(req.params.id as string, req.schoolId);
         new ApiResponse(res, 200, 'Results published successfully', exam).send();
     } catch (error) {
         next(error);
@@ -87,7 +87,7 @@ export const getMyResults = async (req: AuthenticatedRequest, res: Response, nex
 // Legacy exports
 export const updateExam = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     try {
-        const exam = await ExamService.updateExam(req.params.id, req.body, req.schoolId);
+        const exam = await ExamService.updateExam(req.params.id as string, req.body, req.schoolId);
         new ApiResponse(res, 200, 'Exam updated successfully', exam).send();
     } catch (error) {
         next(error);
@@ -96,7 +96,7 @@ export const updateExam = async (req: AuthenticatedRequest, res: Response, next:
 
 export const deleteExam = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     try {
-        await ExamService.deleteExam(req.params.id, req.schoolId);
+        await ExamService.deleteExam(req.params.id as string, req.schoolId);
         new ApiResponse(res, 200, 'Exam deleted successfully').send();
     } catch (error) {
         next(error);

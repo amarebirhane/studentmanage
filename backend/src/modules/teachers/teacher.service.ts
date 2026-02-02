@@ -117,9 +117,12 @@ export class TeacherService {
         });
     }
 
-    static async getTeacherClasses(userId: string) {
-        return prisma.teacherProfile.findUnique({
-            where: { userId },
+    static async getTeacherClasses(userId: string, schoolId?: string) {
+        const where: any = { userId };
+        if (schoolId) where.schoolId = schoolId;
+
+        return prisma.teacherProfile.findFirst({
+            where,
             include: {
                 sections: {
                     include: {
@@ -145,9 +148,12 @@ export class TeacherService {
         });
     }
 
-    static async getDashboardStats(userId: string) {
-        const teacher = await prisma.teacherProfile.findUnique({
-            where: { userId },
+    static async getDashboardStats(userId: string, schoolId?: string) {
+        const where: any = { userId };
+        if (schoolId) where.schoolId = schoolId;
+
+        const teacher = await prisma.teacherProfile.findFirst({
+            where,
             include: {
                 sections: {
                     include: {

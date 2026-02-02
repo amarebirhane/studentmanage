@@ -49,9 +49,9 @@ export class TeacherController {
         }
     }
 
-    static async getDashboardStats(req: any, res: Response) {
+    static async getDashboardStats(req: AuthenticatedRequest, res: Response) {
         try {
-            const stats = await TeacherService.getDashboardStats(req.user.id);
+            const stats = await TeacherService.getDashboardStats(req.user?.id as string, req.schoolId);
             return ApiResponse.success(res, stats, 'Dashboard stats retrieved');
         } catch (error: any) {
             return ApiResponse.error(res, error.message);

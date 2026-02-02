@@ -12,6 +12,7 @@ router.post('/', authorize('ADMIN', 'ACCOUNTANT'), feeController.createFeeInvoic
 router.get('/', authorize('ADMIN', 'ACCOUNTANT', 'PARENT', 'STUDENT'), feeController.getAllFeeInvoices);
 router.get('/:id', authorize('ADMIN', 'ACCOUNTANT', 'PARENT', 'STUDENT'), feeController.getFeeInvoice);
 router.patch('/:id', authorize('ADMIN', 'ACCOUNTANT'), feeController.updateFeeInvoice);
+router.patch('/:id/adjustment', authorize('ADMIN', 'ACCOUNTANT'), feeController.applyAdjustment);
 router.delete('/:id', authorize('ADMIN', 'ACCOUNTANT'), feeController.deleteFeeInvoice);
 
 export default router;

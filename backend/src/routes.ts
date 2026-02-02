@@ -12,6 +12,8 @@ import resultRoutes from './modules/results/result.routes';
 import feeRoutes from './modules/fees/fee.routes';
 import announcementRoutes from './modules/announcements/announcement.routes';
 import platformRoutes from './modules/platform/platform.routes';
+import messageRoutes from './modules/messages/message.routes';
+import feeStructureRoutes from './modules/fee-structures/fee-structure.routes';
 
 import { protect } from './middlewares/auth.middleware';
 import { tenantMiddleware } from './middlewares/tenant.middleware';
@@ -36,6 +38,8 @@ router.use('/attendance', attendanceRoutes);
 router.use('/exams', examRoutes);
 router.use('/results', resultRoutes);
 router.use('/fees', feeRoutes);
+router.use('/fee-structures', feeStructureRoutes);
 router.use('/announcements', announcementRoutes);
+router.use('/messages', messageRoutes);
 
 export default router;

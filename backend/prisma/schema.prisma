@@ -229,6 +229,7 @@ model AttendanceRecord {
 model Exam {
   id          String        @id @default(uuid())
   name        String
+  subject     String?       // Subject name (Math, Science, etc.)
   term        String?
   examDate    DateTime
   class       Class?        @relation(fields: [classId], references: [id])
@@ -236,6 +237,8 @@ model Exam {
   section     Section?      @relation(fields: [sectionId], references: [id])
   sectionId   String?
   maxMarks    Int           @default(100)
+  published   Boolean       @default(false) // Results visible to students/parents when true
+  publishedAt DateTime?     // When results were published
   createdBy   User          @relation("ExamCreator", fields: [createdById], references: [id])
   createdById String
   grades      GradeRecord[]

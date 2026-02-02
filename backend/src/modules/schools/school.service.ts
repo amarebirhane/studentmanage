@@ -33,3 +33,15 @@ export const deleteSchool = async (id: string) => {
 export const getAllSchools = async () => {
     return schoolRepository.findAllSchools();
 };
+
+export const setSuspensionStatus = async (id: string, isSuspended: boolean) => {
+    return schoolRepository.updateSchool(id, { isSuspended });
+};
+
+export const configureAcademicYear = async (id: string, academicYear: string) => {
+    return schoolRepository.updateSchool(id, { academicYear });
+};
+
+export const updateGradingSystem = async (id: string, gradingSystem: any) => {
+    return schoolRepository.updateSchool(id, { gradingSystem });
+};

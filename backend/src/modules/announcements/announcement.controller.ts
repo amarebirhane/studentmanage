@@ -20,7 +20,7 @@ export const createAnnouncement = async (req: AuthenticatedRequest, res: Respons
 
 export const getAnnouncement = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     try {
-        const announcement = await AnnouncementService.getAnnouncementById(req.params.id, req.schoolId);
+        const announcement = await AnnouncementService.getAnnouncementById(req.params.id as string, req.schoolId);
         new ApiResponse(res, 200, 'Announcement details', announcement).send();
     } catch (error) {
         next(error);
@@ -30,7 +30,7 @@ export const getAnnouncement = async (req: AuthenticatedRequest, res: Response, 
 export const updateAnnouncement = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     try {
         const announcement = await AnnouncementService.updateAnnouncement(
-            req.params.id,
+            req.params.id as string,
             req.body,
             req.user?.id as string,
             req.schoolId
@@ -43,18 +43,18 @@ export const updateAnnouncement = async (req: AuthenticatedRequest, res: Respons
 
 export const deleteAnnouncement = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     try {
-        await AnnouncementService.deleteAnnouncement(req.params.id, req.user?.id as string, req.schoolId);
+        await AnnouncementService.deleteAnnouncement(req.params.id as string, req.user?.id as string, req.schoolId);
         new ApiResponse(res, 200, 'Announcement deleted successfully').send();
     } catch (error) {
         next(error);
     }
 };
 
-export const getAnnouncements = async (req: any, res: Response, next: NextFunction) => {
+export const getAnnouncements = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     try {
         const announcements = await AnnouncementService.getAnnouncements(
             req.schoolId,
-            req.user.role
+            req.user?.role
         );
         new ApiResponse(res, 200, 'Announcements retrieved', announcements).send();
     } catch (error) {

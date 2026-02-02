@@ -37,8 +37,11 @@ export class AuthService {
     static async login(data: any) {
         const { email, password } = data;
 
-        const user = await prisma.user.findUnique({
-            where: { email },
+        const user = await prisma.user.findFirst({
+            where: {
+                email,
+                deletedAt: null
+            },
         });
 
         if (!user || !(await comparePassword(password, user.password))) {
@@ -49,7 +52,7 @@ export class AuthService {
         const refreshToken = signRefreshToken(user.id);
 
         // Update refresh token in db
-        await (prisma.user as any).update({
+        await prisma.user.update({
             where: { id: user.id },
             data: { refreshToken },
         });
@@ -72,7 +75,7 @@ export class AuthService {
             const refreshToken = signRefreshToken(user.id);
 
             // Update refresh token in db (rotation)
-            await (prisma.user as any).update({
+            await prisma.user.update({
                 where: { id: user.id },
                 data: { refreshToken },
             });

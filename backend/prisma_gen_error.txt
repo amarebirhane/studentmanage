@@ -1,0 +1,39 @@
+Loaded Prisma config from prisma.config.ts.
+
+Prisma config detected, skipping environment variable loading.
+Prisma schema loaded from prisma\schema.prisma
+Error: Prisma schema validation - (get-dmmf wasm)
+Error code: P1012
+[1;91merror[0m: [1mError validating field `subject` in model `GradeRecord`: The relation field `subject` on model `GradeRecord` is missing an opposite relation field on the model `Subject`. Either run `prisma format` or add it manually.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:315[0m
+[1;94m   | [0m
+[1;94m314 | [0m  examId      String
+[1;94m315 | [0m  [1;91msubject     Subject        @relation(fields: [subjectId], references: [id])[0m
+[1;94m316 | [0m  subjectId   String
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating field `school` in model `LibraryTransaction`: The relation field `school` on model `LibraryTransaction` is missing an opposite relation field on the model `School`. Either run `prisma format` or add it manually.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:498[0m
+[1;94m   | [0m
+[1;94m497 | [0m  schoolId   String
+[1;94m498 | [0m  [1;91mschool     School          @relation(fields: [schoolId], references: [id])[0m
+[1;94m499 | [0m}
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating field `school` in model `TransportAssignment`: The relation field `school` on model `TransportAssignment` is missing an opposite relation field on the model `School`. Either run `prisma format` or add it manually.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:524[0m
+[1;94m   | [0m
+[1;94m523 | [0m  schoolId    String
+[1;94m524 | [0m  [1;91mschool      School         @relation(fields: [schoolId], references: [id])[0m
+[1;94m525 | [0m}
+[1;94m   | [0m
+[1;91merror[0m: [1mError validating field `school` in model `HostelAssignment`: The relation field `school` on model `HostelAssignment` is missing an opposite relation field on the model `School`. Either run `prisma format` or add it manually.[0m
+  [1;94m-->[0m  [4mprisma\schema.prisma:549[0m
+[1;94m   | [0m
+[1;94m548 | [0m  schoolId  String
+[1;94m549 | [0m  [1;91mschool    School         @relation(fields: [schoolId], references: [id])[0m
+[1;94m550 | [0m}
+[1;94m   | [0m
+
+Validation Error Count: 4
+[Context: getDmmf]
+
+Prisma CLI Version : 6.19.0

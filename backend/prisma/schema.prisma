@@ -111,6 +111,7 @@ model StudentProfile {
   generatedDocuments    GeneratedDocument[]
   createdAt             DateTime               @default(now())
   updatedAt             DateTime               @updatedAt
+  status                String                 @default("PENDING") // PENDING, ADMITTED, GRADUATED, DROPPED_OUT
   schoolId              String?
   school                School?                @relation(fields: [schoolId], references: [id])
   examResponses         ExamResponse[]
@@ -267,6 +268,8 @@ model FeeInvoice {
   student     StudentProfile @relation(fields: [studentId], references: [id])
   studentId   String
   amount      Float
+  discount    Float          @default(0)
+  scholarship Float          @default(0)
   dueDate     DateTime
   status      FeeStatus      @default(PENDING)
   description String?
@@ -472,6 +475,9 @@ model School {
   phone       String?
   email       String?
   logoUrl     String?
+  isSuspended Boolean  @default(false)
+  academicYear String?
+  gradingSystem Json?
   users       User[]
   students    StudentProfile[]
   teachers    TeacherProfile[]
@@ -495,4 +501,21 @@ model Announcement {
   updatedAt   DateTime @updatedAt
   schoolId    String?
   school      School?  @relation(fields: [schoolId], references: [id])
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  action    String
+  module    String
+  userId    String
+  userName  String
+  schoolId  String?
+  details   Json?
+  timestamp DateTime @default(now())
+}
+
+model GlobalSetting {
+  id    String @id @default(uuid())
+  key   String @unique
+  value String
 }

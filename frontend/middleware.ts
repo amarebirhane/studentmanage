@@ -18,13 +18,8 @@ export function middleware(request: NextRequest) {
         return NextResponse.redirect(loginUrl);
     }
 
-    // If user is authenticated and trying to access auth pages, redirect to their dashboard
-    // Note: We can't easily decode JWT in middleware, so we redirect to a generic dashboard
-    // The actual role-based redirect happens in the login page after authentication
-    if (token && isPublicRoute) {
-        // Redirect to admin dashboard as default - the app will handle role-based routing
-        return NextResponse.redirect(new URL('/dashboard/admin', request.url));
-    }
+    // Let the application handle redirects from public auth pages to dashboard
+    // to avoid loops if token is present but invalid/expired in the store.
 
     return NextResponse.next();
 }

@@ -1,4 +1,5 @@
 import { Bell, LogOut, Search, User } from 'lucide-react';
+import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import {
@@ -49,9 +50,11 @@ export default function Navbar() {
                     <DropdownMenuContent align="end" className="w-56 glass-card border-none mt-2">
                         <DropdownMenuLabel>My Account</DropdownMenuLabel>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem className="cursor-pointer">
-                            <User className="mr-2 h-4 w-4" />
-                            <span>Profile</span>
+                        <DropdownMenuItem asChild>
+                            <Link href="/profile" className="flex items-center cursor-pointer">
+                                <User className="mr-2 h-4 w-4" />
+                                <span>Profile</span>
+                            </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem className="cursor-pointer">
                             <Bell className="mr-2 h-4 w-4" />

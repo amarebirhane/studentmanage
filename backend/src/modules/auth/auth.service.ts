@@ -48,7 +48,7 @@ export class AuthService {
         const refreshToken = signRefreshToken(user.id);
 
         // Update refresh token in db
-        await prisma.user.update({
+        await (prisma.user as any).update({
             where: { id: user.id },
             data: { refreshToken },
         });
@@ -71,7 +71,7 @@ export class AuthService {
             const refreshToken = signRefreshToken(user.id);
 
             // Update refresh token in db (rotation)
-            await prisma.user.update({
+            await (prisma.user as any).update({
                 where: { id: user.id },
                 data: { refreshToken },
             });

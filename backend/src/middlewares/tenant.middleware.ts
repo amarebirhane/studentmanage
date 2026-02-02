@@ -11,7 +11,7 @@ export const tenantMiddleware = (req: AuthenticatedRequest, res: Response, next:
         return next(new ApiError(401, 'Authentication required for tenant context'));
     }
 
-    const { role, schoolId: userSchoolId } = req.user;
+    const { role, schoolId: userSchoolId } = req.user as any;
 
     // 1. Super Admin: Can access any school. Can specify 'X-School-ID' header to switch context.
     if (role === 'SUPER_ADMIN') {

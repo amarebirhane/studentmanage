@@ -1,6 +1,6 @@
 import { prisma } from '../../config';
 import { hashPassword, comparePassword } from '../../utils/password';
-import { signToken } from '../../utils/jwt';
+import { signToken, signRefreshToken, verifyRefreshToken } from '../../utils/jwt';
 import { UserRole } from './auth.types';
 
 export class AuthService {

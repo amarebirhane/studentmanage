@@ -2,7 +2,7 @@ import { Response } from 'express';
 import { AuthenticatedRequest } from '../../types';
 import { AuthService } from './auth.service';
 import { ApiResponse } from '../../utils/apiResponse';
-import { config } from '../../config';
+import { config, prisma } from '../../config';
 
 export class AuthController {
     static async register(req: AuthenticatedRequest, res: Response) {

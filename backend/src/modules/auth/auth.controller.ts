@@ -16,32 +16,83 @@ export class AuthController {
 
     static async login(req: AuthenticatedRequest, res: Response) {
         try {
-            const { user, token } = await AuthService.login(req.body);
+            const { user, token, refreshToken } = await AuthService.login(req.body);
 
-            // Set cookie
-            res.cookie('token', token, {
+            // Set cookies
+            const cookieOptions = {
                 httpOnly: true,
-                expires: new Date(Date.now() + config.jwt.cookieExpire * 24 * 60 * 60 * 1000),
                 secure: config.env === 'production',
-                sameSite: 'lax',
+                sameSite: 'lax' as const,
                 path: '/',
+            };
+
+            res.cookie('token', token, {
+                ...cookieOptions,
+                expires: new Date(Date.now() + config.jwt.cookieExpire * 24 * 60 * 60 * 1000),
+            });
+
+            res.cookie('refreshToken', refreshToken, {
+                ...cookieOptions,
+                expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
             });
 
             const { password, ...userWithoutPassword } = user;
-            return ApiResponse.success(res, { ...userWithoutPassword, token }, 'Login successful');
+            return ApiResponse.success(res, { ...userWithoutPassword, token, refreshToken }, 'Login successful');
         } catch (error: any) {
             return ApiResponse.error(res, error.message, 401);
         }
     }
 
+    static async refresh(req: AuthenticatedRequest, res: Response) {
+        try {
+            const oldToken = req.cookies.refreshToken || req.body.refreshToken;
+            if (!oldToken) {
+                return ApiResponse.error(res, 'Refresh token required', 400);
+            }
+
+            const { token, refreshToken } = await AuthService.refreshToken(oldToken);
+
+            const cookieOptions = {
+                httpOnly: true,
+                secure: config.env === 'production',
+                sameSite: 'lax' as const,
+                path: '/',
+            };
+
+            res.cookie('token', token, {
+                ...cookieOptions,
+                expires: new Date(Date.now() + config.jwt.cookieExpire * 24 * 60 * 60 * 1000),
+            });
+
+            res.cookie('refreshToken', refreshToken, {
+                ...cookieOptions,
+                expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+            });
+
+            return ApiResponse.success(res, { token, refreshToken }, 'Token refreshed');
+        } catch (error: any) {
+            return ApiResponse.error(res, 'Invalid refresh token', 401);
+        }
+    }
+
     static async logout(req: AuthenticatedRequest, res: Response) {
-        res.cookie('token', '', {
+        // Clear refresh token in DB if user is found
+        if (req.user) {
+            await prisma.user.update({
+                where: { id: req.user.id },
+                data: { refreshToken: null },
+            });
+        }
+
+        const cookieOptions = {
             httpOnly: true,
             expires: new Date(0),
             secure: config.env === 'production',
-            sameSite: 'strict',
+            sameSite: 'strict' as const,
             path: '/'
-        });
+        };
+        res.cookie('token', '', cookieOptions);
+        res.cookie('refreshToken', '', cookieOptions);
         return ApiResponse.success(res, {}, 'Logged out successfully');
     }
 

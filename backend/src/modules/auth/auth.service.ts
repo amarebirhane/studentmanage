@@ -43,8 +43,41 @@ export class AuthService {
         }
 
         const token = signToken(user.id);
+        const refreshToken = signRefreshToken(user.id);
 
-        return { user, token };
+        // Update refresh token in db
+        await prisma.user.update({
+            where: { id: user.id },
+            data: { refreshToken },
+        });
+
+        return { user, token, refreshToken };
+    }
+
+    static async refreshToken(oldToken: string) {
+        try {
+            const decoded = verifyRefreshToken(oldToken);
+            const user = await prisma.user.findUnique({
+                where: { id: decoded.id },
+            });
+
+            if (!user || user.refreshToken !== oldToken) {
+                throw new Error('Invalid refresh token');
+            }
+
+            const token = signToken(user.id);
+            const refreshToken = signRefreshToken(user.id);
+
+            // Update refresh token in db (rotation)
+            await prisma.user.update({
+                where: { id: user.id },
+                data: { refreshToken },
+            });
+
+            return { token, refreshToken };
+        } catch (error) {
+            throw new Error('Token verification failed');
+        }
     }
 
     static async getProfile(userId: string) {

@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { loginSchema } from '@/lib/validation';
+import { getDashboardRoute } from '@/lib/utils/routes';
 import toast from 'react-hot-toast';
 
 export default function LoginPage() {
@@ -17,7 +18,7 @@ export default function LoginPage() {
     const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
     const [showPassword, setShowPassword] = useState(false);
 
-    const { login, isLoading } = useAuth();
+    const { login, isLoading, user } = useAuth();
     const router = useRouter();
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -58,8 +59,20 @@ export default function LoginPage() {
 
         try {
             await login(formData);
-            toast.success('Login successful!');
-            router.push('/dashboard');
+
+            // Get the updated user from the auth hook
+            // Note: We need to use the store directly since state updates are async
+            const { user: loggedInUser } = useAuth();
+
+            if (loggedInUser) {
+                const dashboardRoute = getDashboardRoute(loggedInUser.role);
+                toast.success(`Welcome back, ${loggedInUser.firstName}!`);
+                router.push(dashboardRoute);
+            } else {
+                // Fallback to admin dashboard if user is not available
+                toast.success('Login successful!');
+                router.push('/dashboard/admin');
+            }
         } catch (err: any) {
             const errorMessage = err.response?.data?.message || err.message || 'Login failed';
             toast.error(errorMessage);

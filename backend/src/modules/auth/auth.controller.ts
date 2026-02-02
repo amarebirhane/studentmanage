@@ -23,6 +23,8 @@ export class AuthController {
                 httpOnly: true,
                 expires: new Date(Date.now() + config.jwt.cookieExpire * 24 * 60 * 60 * 1000),
                 secure: config.env === 'production',
+                sameSite: 'lax',
+                path: '/',
             });
 
             const { password, ...userWithoutPassword } = user;

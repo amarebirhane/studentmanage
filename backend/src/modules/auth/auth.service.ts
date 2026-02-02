@@ -2,20 +2,21 @@ import { prisma } from '../../config';
 import { hashPassword, comparePassword } from '../../utils/password';
 import { signToken, signRefreshToken, verifyRefreshToken } from '../../utils/jwt';
 import { UserRole } from './auth.types';
+import { ApiError } from '../../utils/apiResponse';
 
 export class AuthService {
     static async register(data: any) {
-        const { firstName, lastName, email, password, role, phone } = data;
+        const { firstName, lastName, email, password, role, phone, schoolId } = data;
 
         const userExists = await prisma.user.findUnique({ where: { email } });
         if (userExists) {
-            throw new Error('User already exists');
+            throw new ApiError(400, 'User already exists');
         }
 
         const hashedPassword = await hashPassword(password);
 
         // Default role logic if not provided or valid
-        const formattedRole = (role?.toUpperCase() as UserRole) || 'TEACHER';
+        const formattedRole = (role?.toUpperCase() as UserRole) || 'STUDENT';
 
         const user = await prisma.user.create({
             data: {
@@ -23,8 +24,9 @@ export class AuthService {
                 lastName,
                 email,
                 password: hashedPassword,
-                role: formattedRole,
+                role: formattedRole as any, // Cast to any until prisma client is regenerated
                 phone,
+                schoolId,
             },
         });
 
@@ -97,7 +99,7 @@ export class AuthService {
         return userWithoutPassword;
     }
     static async updateProfile(userId: string, data: any) {
-        const { firstName, lastName, phone } = data;
+        const { firstName, lastName, phone, avatarUrl } = data;
 
         const user = await prisma.user.update({
             where: { id: userId },
@@ -105,10 +107,11 @@ export class AuthService {
                 firstName,
                 lastName,
                 phone,
+                avatarUrl,
             },
         });
 
-        const { password, ...userWithoutPassword } = user;
+        const { password, ...userWithoutPassword } = user as any;
         return userWithoutPassword;
     }
 }

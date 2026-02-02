@@ -16,6 +16,7 @@ import messageRoutes from './modules/messages/message.routes';
 import feeStructureRoutes from './modules/fee-structures/fee-structure.routes';
 import assignmentRoutes from './modules/assignments/assignment.routes';
 import permissionRoutes from './modules/permissions/permission.routes';
+import reportRoutes from './modules/reports/report.routes';
 
 import { protect } from './middlewares/auth.middleware';
 import { tenantMiddleware } from './middlewares/tenant.middleware';
@@ -45,5 +46,6 @@ router.use('/announcements', announcementRoutes);
 router.use('/messages', messageRoutes);
 router.use('/assignments', assignmentRoutes);
 router.use('/permissions', permissionRoutes);
+router.use('/reports', reportRoutes);
 
 export default router;

@@ -1,4 +1,5 @@
 import { prisma } from '../../config';
+import { AuditLogService } from '../platform/audit.service';
 
 export class TimetableService {
     static async createEntry(data: {
@@ -21,6 +22,7 @@ export class TimetableService {
                     periodNumber,
                     teacherId,
                     schoolId,
+                    deletedAt: null,
                 }
             });
             if (teacherConflict) {
@@ -36,6 +38,7 @@ export class TimetableService {
                     periodNumber,
                     room,
                     schoolId,
+                    deletedAt: null,
                 }
             });
             if (roomConflict) {
@@ -43,7 +46,7 @@ export class TimetableService {
             }
         }
 
-        return prisma.timetableEntry.create({
+        const entry = await prisma.timetableEntry.create({
             data: {
                 dayOfWeek,
                 periodNumber,
@@ -55,6 +58,16 @@ export class TimetableService {
                 schoolId,
             }
         });
+
+        await AuditLogService.log({
+            action: 'CREATE_TIMETABLE_ENTRY',
+            module: 'TIMETABLE',
+            userId: teacherId || '',
+            schoolId,
+            details: { entryId: entry.id }
+        });
+
+        return entry;
     }
 
     static async getTimetable(filters: {
@@ -63,7 +76,7 @@ export class TimetableService {
         teacherId?: string;
         schoolId?: string;
     }) {
-        const where: any = {};
+        const where: any = { deletedAt: null };
         if (filters.schoolId) where.schoolId = filters.schoolId;
         if (filters.classId) where.classId = filters.classId;
         if (filters.sectionId) where.sectionId = filters.sectionId;
@@ -93,13 +106,24 @@ export class TimetableService {
     }
 
     static async deleteEntry(id: string, schoolId?: string) {
-        const where: any = { id };
+        const where: any = { id, deletedAt: null };
         if (schoolId) where.schoolId = schoolId;
 
         const entry = await prisma.timetableEntry.findFirst({ where });
         if (!entry) throw new Error('Timetable entry not found');
 
-        return prisma.timetableEntry.delete({ where: { id } });
+        await prisma.timetableEntry.update({
+            where: { id },
+            data: { deletedAt: new Date() }
+        });
+
+        await AuditLogService.log({
+            action: 'DELETE_TIMETABLE_ENTRY',
+            module: 'TIMETABLE',
+            userId: entry.teacherId || '',
+            schoolId,
+            details: { entryId: id }
+        });
     }
 
     static async updateEntry(id: string, data: any, schoolId?: string) {

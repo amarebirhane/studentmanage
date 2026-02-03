@@ -1,4 +1,5 @@
 import { prisma } from '../../config';
+import { AuditLogService } from '../platform/audit.service';
 
 export class AssignmentService {
     static async createAssignment(data: {
@@ -14,7 +15,7 @@ export class AssignmentService {
         schoolId?: string;
         userId: string;
     }) {
-        return prisma.assignment.create({
+        const assignment = await prisma.assignment.create({
             data: {
                 title: data.title,
                 description: data.description,
@@ -45,6 +46,16 @@ export class AssignmentService {
                 },
             },
         });
+
+        await AuditLogService.log({
+            action: 'CREATE_ASSIGNMENT',
+            module: 'ASSIGNMENTS',
+            userId: data.userId,
+            schoolId: data.schoolId,
+            details: { assignmentId: assignment.id }
+        });
+
+        return assignment;
     }
 
     static async getAssignments(filters: {
@@ -53,7 +64,7 @@ export class AssignmentService {
         teacherId?: string;
         status?: string;
     }, schoolId?: string, userId?: string, role?: string) {
-        const where: any = {};
+        const where: any = { deletedAt: null };
 
         if (schoolId) where.schoolId = schoolId;
         if (filters.classId) where.classId = filters.classId;

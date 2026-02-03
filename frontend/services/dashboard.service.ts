@@ -21,8 +21,18 @@ export interface TeacherData {
     upcomingExams: any[]; // Define Exam type properly if possible
 }
 
+export interface SuperAdminData {
+    stats: {
+        totalSchools: number;
+        totalUsers: number;
+        totalRevenue: number;
+        activeSchools: number;
+    };
+    recentActivity: any[];
+}
+
 export const dashboardService = {
-    async getDashboardStats<T = SchoolAdminData | TeacherData>(): Promise<T> {
+    async getDashboardStats<T = SchoolAdminData | TeacherData | SuperAdminData>(): Promise<T> {
         const { data } = await api.get<ApiResponse<T>>('/dashboard');
         return data.data!;
     },

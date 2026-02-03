@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 const roleRoutes = {
+    SUPER_ADMIN: '/dashboard/super-admin',
     ADMIN: '/dashboard/admin',
     TEACHER: '/dashboard/teacher',
     STUDENT: '/dashboard/student',
@@ -37,6 +38,9 @@ export function middleware(request: NextRequest) {
     if (pathname.startsWith('/dashboard')) {
         // Enforce role boundaries
         if (userRole) {
+            if (pathname.startsWith('/dashboard/super-admin') && userRole !== 'SUPER_ADMIN') {
+                return NextResponse.redirect(new URL(roleRoutes[userRole], request.url));
+            }
             if (pathname.startsWith('/dashboard/admin') && userRole !== 'ADMIN') {
                 return NextResponse.redirect(new URL(roleRoutes[userRole], request.url));
             }

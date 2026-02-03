@@ -4,7 +4,7 @@ export class TimetableService {
     static async createEntry(data: {
         dayOfWeek: number;
         periodNumber: number;
-        subject: string;
+        subjectId: string;
         classId?: string;
         sectionId?: string;
         teacherId?: string;

@@ -20,7 +20,7 @@ export const getTimetable = async (req: Request, res: Response, next: NextFuncti
             classId: classId as string,
             sectionId: sectionId as string,
             teacherId: teacherId as string,
-            schoolId,
+            schoolId: schoolId as string,
         });
         new ApiResponse(res, 200, 'Timetable retrieved', timetable).send();
     } catch (error) {
@@ -31,7 +31,7 @@ export const getTimetable = async (req: Request, res: Response, next: NextFuncti
 export const updateEntry = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const schoolId = (req as any).schoolId;
-        const entry = await TimetableService.updateEntry(req.params.id, req.body, schoolId);
+        const entry = await TimetableService.updateEntry(req.params.id as string, req.body, schoolId as string);
         new ApiResponse(res, 200, 'Timetable entry updated', entry).send();
     } catch (error) {
         next(error);
@@ -41,7 +41,7 @@ export const updateEntry = async (req: Request, res: Response, next: NextFunctio
 export const deleteEntry = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const schoolId = (req as any).schoolId;
-        await TimetableService.deleteEntry(req.params.id, schoolId);
+        await TimetableService.deleteEntry(req.params.id as string, schoolId as string);
         new ApiResponse(res, 200, 'Timetable entry deleted').send();
     } catch (error) {
         next(error);

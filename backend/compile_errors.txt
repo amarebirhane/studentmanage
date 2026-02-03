@@ -1,0 +1,16 @@
+src/modules/assignments/assignment.service.ts(18,13): error TS2322: Type '{ status: "PUBLISHED"; title: string; description?: string; subject?: string; dueDate?: Date; classId?: string; sectionId?: string; attachmentUrl?: string; resourcesUrl?: string; teacherId: string; schoolId?: string; userId: string; }' is not assignable to type '(Without<AssignmentCreateInput, AssignmentUncheckedCreateInput> & AssignmentUncheckedCreateInput) | (Without<...> & AssignmentCreateInput)'.
+  Type '{ status: "PUBLISHED"; title: string; description?: string; subject?: string; dueDate?: Date; classId?: string; sectionId?: string; attachmentUrl?: string; resourcesUrl?: string; teacherId: string; schoolId?: string; userId: string; }' is not assignable to type 'Without<AssignmentCreateInput, AssignmentUncheckedCreateInput> & AssignmentUncheckedCreateInput'.
+    Type '{ status: "PUBLISHED"; title: string; description?: string; subject?: string; dueDate?: Date; classId?: string; sectionId?: string; attachmentUrl?: string; resourcesUrl?: string; teacherId: string; schoolId?: string; userId: string; }' is not assignable to type 'Without<AssignmentCreateInput, AssignmentUncheckedCreateInput>'.
+      Types of property 'subject' are incompatible.
+        Type 'string | undefined' is not assignable to type 'undefined'.
+          Type 'string' is not assignable to type 'undefined'.
+src/modules/timetables/timetable.controller.ts(34,58): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'string'.
+  Type 'string[]' is not assignable to type 'string'.
+src/modules/timetables/timetable.controller.ts(44,44): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'string'.
+  Type 'string[]' is not assignable to type 'string'.
+src/modules/timetables/timetable.service.ts(47,13): error TS2322: Type '{ dayOfWeek: number; periodNumber: number; subject: string; classId?: string; sectionId?: string; teacherId?: string; room?: string; schoolId?: string; }' is not assignable to type '(Without<TimetableEntryCreateInput, TimetableEntryUncheckedCreateInput> & TimetableEntryUncheckedCreateInput) | (Without<...> & TimetableEntryCreateInput)'.
+  Type '{ dayOfWeek: number; periodNumber: number; subject: string; classId?: string; sectionId?: string; teacherId?: string; room?: string; schoolId?: string; }' is not assignable to type 'Without<TimetableEntryUncheckedCreateInput, TimetableEntryCreateInput> & TimetableEntryCreateInput'.
+    Type '{ dayOfWeek: number; periodNumber: number; subject: string; classId?: string; sectionId?: string; teacherId?: string; room?: string; schoolId?: string; }' is not assignable to type 'Without<TimetableEntryUncheckedCreateInput, TimetableEntryCreateInput>'.
+      Types of property 'schoolId' are incompatible.
+        Type 'string | undefined' is not assignable to type 'undefined'.
+          Type 'string' is not assignable to type 'undefined'.

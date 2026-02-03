@@ -4,7 +4,7 @@ export class AssignmentService {
     static async createAssignment(data: {
         title: string;
         description?: string;
-        subject?: string;
+        subjectId?: string;
         dueDate?: Date;
         classId?: string;
         sectionId?: string;

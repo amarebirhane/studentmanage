@@ -58,3 +58,12 @@ export const applyAdjustment = async (req: AuthenticatedRequest, res: Response, 
         next(error);
     }
 };
+
+export const recordPayment = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    try {
+        const payment = await feeService.recordPayment(req.params.id as string, req.body, req.schoolId);
+        new ApiResponse(res, 201, 'Payment recorded successfully', payment).send();
+    } catch (error) {
+        next(error);
+    }
+};

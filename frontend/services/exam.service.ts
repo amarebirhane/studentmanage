@@ -9,6 +9,11 @@ export const examService = {
         return data.data;
     },
 
+    async getMyResults(params?: any) {
+        const { data } = await api.get<ApiResponse<any[]>>(`${ENDPOINT}/my-results`, { params });
+        return data.data;
+    },
+
     async getExamById(id: string) {
         const { data } = await api.get<ApiResponse<any>>(`${ENDPOINT}/${id}`);
         return data.data;

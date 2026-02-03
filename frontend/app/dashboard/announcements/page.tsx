@@ -14,7 +14,7 @@ import {
     User,
     Tag,
     Trash2,
-    megaphone
+    Megaphone
 } from 'lucide-react';
 import { announcementService } from '@/services/announcement.service';
 import { toast } from 'react-hot-toast';

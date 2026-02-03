@@ -119,7 +119,7 @@ const Sidebar = () => {
                 },
                 {
                     title: 'Attendance',
-                    href: '/dashboard/attendance',
+                    href: isStudent ? '/dashboard/student/attendance' : '/dashboard/attendance',
                     icon: ClipboardCheck,
                     show: (isTeacher || isAdmin || isStudent) && !isSuperAdmin,
                 },

@@ -6,6 +6,7 @@ export const createResult = async (data: Prisma.GradeRecordCreateInput): Promise
     const result = await prisma.gradeRecord.create({
         data,
     });
+    return result;
 };
 
 export const findResultById = async (id: string): Promise<GradeRecord | null> => {

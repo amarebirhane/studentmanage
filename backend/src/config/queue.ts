@@ -5,7 +5,9 @@ import { logger } from './logger';
 let emailQueue: Queue | null = null;
 let emailWorker: Worker | null = null;
 
-// Only initialize BullMQ if Redis is available
+// Temporarily disable BullMQ to prevent Redis connection errors
+// Uncomment when Redis is properly configured and running
+/*
 try {
     emailQueue = new Queue('emailQueue', {
         connection: redisClient,
@@ -33,5 +35,8 @@ try {
 } catch (error) {
     logger.warn('⚠️  BullMQ not available. Background jobs will be disabled.');
 }
+*/
+
+logger.warn('⚠️  BullMQ disabled. Background jobs unavailable until Redis is configured.');
 
 export { emailQueue, emailWorker };

@@ -7,14 +7,24 @@ let useRedis = false;
 try {
     const { RedisStore } = require('rate-limit-redis');
     redisClient = require('../config/redis').default;
-    useRedis = true;
+
+    // Only use Redis if it's actually connected
+    if (redisClient.status === 'ready' || redisClient.status === 'connecting') {
+        useRedis = true;
+        console.log('✅ Using Redis for rate limiting');
+    } else {
+        console.log('⚠️  Redis not connected, using memory store for rate limiting');
+    }
 } catch (error) {
     console.log('⚠️  Redis unavailable, using memory store for rate limiting');
 }
 
 // Factory function to create a unique RedisStore for each limiter
 const createStore = (prefix: string) => {
-    if (!useRedis) return undefined;
+    // Don't use Redis if it wasn't successfully initialized
+    if (!useRedis || !redisClient) {
+        return undefined; // Will use default memory store
+    }
 
     try {
         const { RedisStore } = require('rate-limit-redis');
@@ -23,6 +33,7 @@ const createStore = (prefix: string) => {
             prefix: `rl:${prefix}:`, // Unique prefix for each limiter
         });
     } catch (error) {
+        console.log(`⚠️  Failed to create RedisStore for ${prefix}, using memory store`);
         return undefined;
     }
 };

@@ -1,13 +1,14 @@
 import { prisma } from '../../config';
 import { hashPassword } from '../../utils/password';
 import { StudentFilters } from './student.types';
+import { AuditLogService } from '../platform/audit.service';
 
 export class StudentService {
     static async getStudents(filters: any, schoolId?: string, userId?: string, role?: string) {
         const { search, classId, sectionId, page = 1, limit = 10 } = filters;
         const skip = (page - 1) * limit;
 
-        const where: any = {};
+        const where: any = { deletedAt: null };
         if (schoolId) where.schoolId = schoolId;
 
         // Role-based filtering
@@ -62,7 +63,7 @@ export class StudentService {
     }
 
     static async getStudentById(id: string, schoolId?: string) {
-        const where: any = { id };
+        const where: any = { id, deletedAt: null };
         if (schoolId) where.schoolId = schoolId;
 
         const student = await prisma.studentProfile.findUnique({
@@ -132,6 +133,14 @@ export class StudentService {
                 include: { user: true },
             });
 
+            await AuditLogService.log({
+                action: 'CREATE_STUDENT',
+                module: 'STUDENTS',
+                userId: user.id,
+                schoolId,
+                details: { profileId: profile.id }
+            });
+
             return profile;
         });
     }
@@ -165,12 +174,20 @@ export class StudentService {
                 include: { user: true },
             });
 
+            await AuditLogService.log({
+                action: 'UPDATE_STUDENT',
+                module: 'STUDENTS',
+                userId: student.userId,
+                schoolId,
+                details: { profileId: updatedProfile.id, updatedFields: Object.keys(data) }
+            });
+
             return updatedProfile;
         });
     }
 
     static async approveAdmission(id: string, schoolId?: string) {
-        const where: any = { id };
+        const where: any = { id, deletedAt: null };
         if (schoolId) where.schoolId = schoolId;
 
         const student = await prisma.studentProfile.findFirst({ where });
@@ -186,7 +203,7 @@ export class StudentService {
     }
 
     static async deleteStudent(id: string, schoolId?: string) {
-        const where: any = { id };
+        const where: any = { id, deletedAt: null };
         if (schoolId) where.schoolId = schoolId;
 
         const student = await prisma.studentProfile.findFirst({ where });
@@ -195,8 +212,22 @@ export class StudentService {
         }
 
         return await prisma.$transaction(async (tx) => {
-            await tx.studentProfile.delete({ where: { id } });
-            await tx.user.delete({ where: { id: student.userId } });
+            await tx.studentProfile.update({
+                where: { id },
+                data: { deletedAt: new Date() }
+            });
+            await tx.user.update({
+                where: { id: student.userId },
+                data: { deletedAt: new Date() }
+            });
+
+            await AuditLogService.log({
+                action: 'DELETE_STUDENT',
+                module: 'STUDENTS',
+                userId: student.userId,
+                schoolId,
+                details: { profileId: id }
+            });
         });
     }
 
@@ -212,6 +243,7 @@ export class StudentService {
             where: {
                 id: { in: studentIds },
                 schoolId,
+                deletedAt: null,
             },
             data: {
                 classId: targetClassId,
@@ -221,7 +253,7 @@ export class StudentService {
     }
 
     static async updateStudentStatus(id: string, status: string, schoolId?: string) {
-        const where: any = { id };
+        const where: any = { id, deletedAt: null };
         if (schoolId) where.schoolId = schoolId;
 
         const student = await prisma.studentProfile.findFirst({ where });

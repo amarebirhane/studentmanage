@@ -1,9 +1,10 @@
 import { prisma } from '../../config';
 import { hashPassword } from '../../utils/password';
+import { AuditLogService } from '../platform/audit.service';
 
 export class TeacherService {
     static async getTeachers(schoolId?: string) {
-        const where: any = {};
+        const where: any = { deletedAt: null };
         if (schoolId) where.schoolId = schoolId;
 
         return prisma.teacherProfile.findMany({
@@ -29,7 +30,7 @@ export class TeacherService {
     }
 
     static async getTeacherById(id: string, schoolId?: string) {
-        const where: any = { id };
+        const where: any = { id, deletedAt: null };
         if (schoolId) where.schoolId = schoolId;
 
         const teacher = await prisma.teacherProfile.findFirst({
@@ -84,6 +85,14 @@ export class TeacherService {
                 include: { user: true },
             });
 
+            await AuditLogService.log({
+                action: 'CREATE_TEACHER',
+                module: 'TEACHERS',
+                userId: user.id,
+                schoolId,
+                details: { profileId: profile.id }
+            });
+
             return profile;
         });
     }
@@ -111,6 +120,14 @@ export class TeacherService {
                 where: { id },
                 data: { bio, subjects },
                 include: { user: true },
+            });
+
+            await AuditLogService.log({
+                action: 'UPDATE_TEACHER',
+                module: 'TEACHERS',
+                userId: teacher.userId,
+                schoolId,
+                details: { profileId: updatedProfile.id, updatedFields: Object.keys(data) }
             });
 
             return updatedProfile;
@@ -143,8 +160,22 @@ export class TeacherService {
         }
 
         return await prisma.$transaction(async (tx) => {
-            await tx.teacherProfile.delete({ where: { id } });
-            await tx.user.delete({ where: { id: teacher.userId } });
+            await tx.teacherProfile.update({
+                where: { id },
+                data: { deletedAt: new Date() }
+            });
+            await tx.user.update({
+                where: { id: teacher.userId },
+                data: { deletedAt: new Date() }
+            });
+
+            await AuditLogService.log({
+                action: 'DELETE_TEACHER',
+                module: 'TEACHERS',
+                userId: teacher.userId,
+                schoolId,
+                details: { profileId: id }
+            });
         });
     }
 

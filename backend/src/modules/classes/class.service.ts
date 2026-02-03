@@ -21,12 +21,11 @@ export class ClassService {
 
     static async getSections(schoolId?: string) {
         const where: any = { deletedAt: null };
-        if (schoolId) where.schoolId = schoolId;
 
         return prisma.section.findMany({
             where: {
                 ...where,
-                class: { schoolId }
+                class: schoolId ? { schoolId, deletedAt: null } : { deletedAt: null }
             },
             include: {
                 class: true,

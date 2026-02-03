@@ -54,9 +54,24 @@ export default function TeachersPage() {
             cell: ({ row }) => row.original.user?.lastName,
         },
         {
-            accessorKey: 'id',
-            header: 'Teacher ID',
-            cell: ({ row }) => <span className="text-xs font-mono">{row.original.id.split('-')[0].toUpperCase()}</span>,
+            accessorKey: 'employeeId',
+            header: 'Emp ID',
+            cell: ({ row }) => <span className="font-mono font-bold text-xs uppercase">{row.original.employeeId || 'N/A'}</span>,
+        },
+        {
+            accessorKey: 'joiningDate',
+            header: 'Joined',
+            cell: ({ row }) => <span className="text-xs">{row.original.joiningDate ? new Date(row.original.joiningDate).toLocaleDateString() : 'N/A'}</span>,
+        },
+        {
+            accessorKey: 'specialization',
+            header: 'Specialization',
+            cell: ({ row }) => <span className="text-xs font-semibold text-primary">{row.original.specialization || 'N/A'}</span>,
+        },
+        {
+            accessorKey: 'qualification',
+            header: 'Qualification',
+            cell: ({ row }) => <span className="text-xs">{row.original.qualification || 'N/A'}</span>,
         },
         {
             header: 'Assignments',

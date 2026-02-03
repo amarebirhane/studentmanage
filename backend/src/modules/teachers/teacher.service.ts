@@ -54,7 +54,7 @@ export class TeacherService {
     }
 
     static async createTeacher(data: any, schoolId?: string) {
-        const { firstName, lastName, email, password, phone, bio, subjects } = data;
+        const { firstName, lastName, email, password, phone, bio, subjects, employeeId, specialization, qualification, experience, joiningDate } = data;
 
         const userExists = await prisma.user.findUnique({ where: { email } });
         if (userExists) {
@@ -80,7 +80,11 @@ export class TeacherService {
                 data: {
                     userId: user.id,
                     bio,
-                    subjects,
+                    employeeId,
+                    specialization,
+                    qualification,
+                    experience: experience ? parseInt(experience) : 0,
+                    joiningDate: joiningDate ? new Date(joiningDate) : null,
                     schoolId,
                 },
                 include: { user: true },
@@ -99,7 +103,7 @@ export class TeacherService {
     }
 
     static async updateTeacher(id: string, data: any, schoolId?: string) {
-        const { firstName, lastName, phone, email, bio, subjects } = data;
+        const { firstName, lastName, phone, email, bio, subjects, employeeId, specialization, qualification, experience, joiningDate } = data;
 
         const where: any = { id };
         if (schoolId) where.schoolId = schoolId;
@@ -119,7 +123,14 @@ export class TeacherService {
 
             const updatedProfile = await tx.teacherProfile.update({
                 where: { id },
-                data: { bio, subjects },
+                data: {
+                    bio,
+                    employeeId,
+                    specialization,
+                    qualification,
+                    experience: experience ? parseInt(experience) : undefined,
+                    joiningDate: joiningDate ? new Date(joiningDate) : undefined,
+                },
                 include: { user: true },
             });
 

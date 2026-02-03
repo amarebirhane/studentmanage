@@ -14,7 +14,7 @@ export class ExamService {
         schoolId?: string;
         term?: string;
     }) {
-        return prisma.exam.create({
+        const exam = await prisma.exam.create({
             data: {
                 ...data,
                 published: false,

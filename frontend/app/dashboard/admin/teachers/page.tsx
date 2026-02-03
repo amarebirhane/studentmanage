@@ -53,11 +53,11 @@ export default function TeachersPage() {
             header: 'Last Name',
             cell: ({ row }) => row.original.user?.lastName,
         },
-        {
-            accessorKey: 'employeeId',
-            header: 'Emp ID',
-            cell: ({ row }) => <span className="font-mono font-bold text-xs uppercase">{row.original.employeeId || 'N/A'}</span>,
-        },
+        // {
+        //     accessorKey: 'employeeId',
+        //     header: 'Emp ID',
+        //     cell: ({ row }) => <span className="font-mono font-bold text-xs uppercase">{row.original.employeeId || 'N/A'}</span>,
+        // },
         {
             accessorKey: 'joiningDate',
             header: 'Joined',
@@ -68,11 +68,11 @@ export default function TeachersPage() {
             header: 'Specialization',
             cell: ({ row }) => <span className="text-xs font-semibold text-primary">{row.original.specialization || 'N/A'}</span>,
         },
-        {
-            accessorKey: 'qualification',
-            header: 'Qualification',
-            cell: ({ row }) => <span className="text-xs">{row.original.qualification || 'N/A'}</span>,
-        },
+        // {
+        //     accessorKey: 'qualification',
+        //     header: 'Qualification',
+        //     cell: ({ row }) => <span className="text-xs">{row.original.qualification || 'N/A'}</span>,
+        // },
         {
             header: 'Assignments',
             cell: ({ row }) => {

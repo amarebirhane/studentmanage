@@ -1,5 +1,6 @@
 import { prisma } from '../../config';
 import { Prisma } from '@prisma/client';
+import { AuditLogService } from '../platform/audit.service';
 
 export class ExamService {
     static async createExam(data: {
@@ -23,27 +24,34 @@ export class ExamService {
                 section: true,
             },
         });
+
+        await AuditLogService.log({
+            action: 'CREATE_EXAM',
+            module: 'EXAMS',
+            userId: data.createdById,
+            schoolId: data.schoolId,
+            details: { examId: exam.id }
+        });
+
+        return exam;
     }
 
-    static async getExams(filters: {
-        classId?: string;
-        sectionId?: string;
-        term?: string;
-        schoolId?: string;
-        teacherId?: string;
-    }) {
-        const where: any = {};
-        if (filters.schoolId) where.schoolId = filters.schoolId;
-        if (filters.classId) where.classId = filters.classId;
-        if (filters.sectionId) where.sectionId = filters.sectionId;
-        if (filters.term) where.term = filters.term;
-        if (filters.teacherId) where.createdById = filters.teacherId;
+    static async getExams(filters: any, schoolId?: string) {
+        const { classId, sectionId, subjectId, term, teacherId } = filters;
+        const where: any = { deletedAt: null };
+        if (schoolId) where.schoolId = schoolId;
+        if (classId) where.classId = classId;
+        if (sectionId) where.sectionId = sectionId;
+        if (subjectId) where.subjectId = subjectId;
+        if (term) where.term = term;
+        if (teacherId) where.createdById = teacherId;
 
         return prisma.exam.findMany({
             where,
             include: {
                 class: true,
                 section: true,
+                subject: true,
                 _count: {
                     select: { grades: true },
                 },
@@ -53,25 +61,26 @@ export class ExamService {
     }
 
     static async getExamById(id: string, schoolId?: string) {
-        const where: any = { id };
+        const where: any = { id, deletedAt: null };
         if (schoolId) where.schoolId = schoolId;
 
-        const exam = await prisma.exam.findFirst({
+        const exam = await prisma.exam.findUnique({
             where,
             include: {
                 class: true,
                 section: true,
+                subject: true,
                 grades: {
                     include: {
                         student: {
                             include: {
                                 user: {
-                                    select: { firstName: true, lastName: true },
-                                },
-                            },
-                        },
-                    },
-                },
+                                    select: { firstName: true, lastName: true }
+                                }
+                            }
+                        }
+                    }
+                }
             },
         });
 
@@ -80,27 +89,43 @@ export class ExamService {
     }
 
     static async updateExam(id: string, data: any, schoolId?: string) {
-        const where: any = { id };
+        const where: any = { id, deletedAt: null };
         if (schoolId) where.schoolId = schoolId;
 
-        const exam = await prisma.exam.findFirst({ where });
-        if (!exam) throw new Error('Exam not found');
-
-        return prisma.exam.update({
+        const exam = await prisma.exam.update({
             where: { id },
             data,
         });
+
+        await AuditLogService.log({
+            action: 'UPDATE_EXAM',
+            module: 'EXAMS',
+            userId: exam.createdById,
+            schoolId,
+            details: { examId: id, updatedFields: Object.keys(data) }
+        });
+
+        return exam;
     }
 
     static async deleteExam(id: string, schoolId?: string) {
-        const where: any = { id };
+        const where: any = { id, deletedAt: null };
         if (schoolId) where.schoolId = schoolId;
 
         const exam = await prisma.exam.findFirst({ where });
         if (!exam) throw new Error('Exam not found');
 
-        return prisma.exam.delete({
+        await prisma.exam.update({
             where: { id },
+            data: { deletedAt: new Date() }
+        });
+
+        await AuditLogService.log({
+            action: 'DELETE_EXAM',
+            module: 'EXAMS',
+            userId: exam.createdById,
+            schoolId,
+            details: { examId: id }
         });
     }
 
@@ -122,7 +147,7 @@ export class ExamService {
         }>;
         schoolId?: string;
     }) {
-        const where: any = { id: data.examId };
+        const where: any = { id: data.examId, deletedAt: null };
         if (data.schoolId) where.schoolId = data.schoolId;
 
         const exam = await prisma.exam.findFirst({
@@ -163,23 +188,41 @@ export class ExamService {
             })
         );
 
+        await AuditLogService.log({
+            action: 'ENTER_MARKS',
+            module: 'EXAMS',
+            userId: exam.createdById,
+            schoolId: data.schoolId,
+            details: { examId: data.examId, studentCount: data.marks.length }
+        });
+
         return results;
     }
 
     static async publishResults(examId: string, schoolId?: string) {
-        const where: any = { id: examId };
+        const where: any = { id: examId, deletedAt: null };
         if (schoolId) where.schoolId = schoolId;
 
         const exam = await prisma.exam.findFirst({ where });
         if (!exam) throw new Error('Exam not found');
 
-        return prisma.exam.update({
+        const updatedExam = await prisma.exam.update({
             where: { id: examId },
             data: {
                 published: true,
                 publishedAt: new Date(),
             },
         });
+
+        await AuditLogService.log({
+            action: 'PUBLISH_RESULTS',
+            module: 'EXAMS',
+            userId: exam.createdById,
+            schoolId,
+            details: { examId }
+        });
+
+        return updatedExam;
     }
 
     static async getMyResults(studentId: string, filters: { term?: string, schoolId?: string } = {}) {
@@ -187,6 +230,7 @@ export class ExamService {
             studentId,
             exam: {
                 published: true,
+                deletedAt: null,
                 ...(filters.term ? { term: filters.term } : {}),
             },
         };
@@ -198,7 +242,9 @@ export class ExamService {
         return prisma.gradeRecord.findMany({
             where,
             include: {
-                exam: true,
+                exam: {
+                    include: { subject: true }
+                },
             },
             orderBy: { exam: { examDate: 'desc' } },
         });

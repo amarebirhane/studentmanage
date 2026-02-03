@@ -57,4 +57,13 @@ export class TeacherController {
             return ApiResponse.error(res, error.message);
         }
     }
+
+    static async getTeacherClasses(req: AuthenticatedRequest, res: Response) {
+        try {
+            const result = await TeacherService.getTeacherClasses(req.user?.id as string, req.schoolId);
+            return ApiResponse.success(res, result?.sections || [], 'Teacher classes retrieved');
+        } catch (error: any) {
+            return ApiResponse.error(res, error.message);
+        }
+    }
 }

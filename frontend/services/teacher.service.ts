@@ -22,4 +22,12 @@ export const teacherService = {
     async deleteTeacher(id: string) {
         await api.delete(`${ENDPOINT}/${id}`);
     },
+    async getTeacherClasses() {
+        const { data } = await api.get(`${ENDPOINT}/my-classes`);
+        return data.data;
+    },
+    async getTeacherDashboardStats() {
+        const { data } = await api.get(`${ENDPOINT}/dashboard`);
+        return data.data;
+    }
 };

@@ -13,12 +13,16 @@ import {
     Calendar,
     BookOpen,
     ClipboardList,
+    ClipboardCheck,
     ShieldCheck,
     LogOut,
     DollarSign,
     BarChart3,
     CreditCard,
-    UserPlus
+    UserPlus,
+    Bell,
+    MessageSquare,
+    Clock
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -91,13 +95,19 @@ const Sidebar = () => {
             items: [
                 {
                     title: 'Students',
-                    href: '/dashboard/admin/students',
+                    href: isAdmin ? '/dashboard/admin/students' : '/dashboard/teacher/students',
                     icon: Users,
                     show: (isTeacher || isAdmin) && !isSuperAdmin,
                 },
                 {
+                    title: 'My Classes',
+                    href: '/dashboard/teacher/classes',
+                    icon: GraduationCap,
+                    show: isTeacher && !isSuperAdmin,
+                },
+                {
                     title: 'Parents',
-                    href: '/dashboard/admin/parents',
+                    href: isAdmin ? '/dashboard/admin/parents' : '/dashboard/teacher/parents',
                     icon: Users,
                     show: (isTeacher || isAdmin) && !isSuperAdmin,
                 },
@@ -105,13 +115,48 @@ const Sidebar = () => {
                     title: 'Classes',
                     href: '/dashboard/admin/classes',
                     icon: GraduationCap,
-                    show: (isTeacher || isAdmin) && !isSuperAdmin,
+                    show: isAdmin && !isSuperAdmin,
                 },
                 {
                     title: 'Attendance',
                     href: '/dashboard/attendance',
-                    icon: Calendar,
+                    icon: ClipboardCheck,
                     show: (isTeacher || isAdmin || isStudent) && !isSuperAdmin,
+                },
+                {
+                    title: 'Timetable',
+                    href: isTeacher ? '/dashboard/teacher/timetable' : '/dashboard/timetable',
+                    icon: Clock,
+                    show: (isTeacher || isStudent) && !isSuperAdmin,
+                },
+                {
+                    title: 'Assignments',
+                    href: isTeacher ? '/dashboard/teacher/assignments' : '/dashboard/assignments',
+                    icon: BookOpen,
+                    show: (isTeacher || isStudent) && !isSuperAdmin,
+                },
+                {
+                    title: 'Exams & Results',
+                    href: isTeacher ? '/dashboard/teacher/exams' : '/dashboard/exams',
+                    icon: ClipboardList,
+                    show: (isTeacher || isStudent) && !isSuperAdmin,
+                },
+            ]
+        },
+        {
+            label: 'Communication',
+            items: [
+                {
+                    title: 'Announcements',
+                    href: '/dashboard/announcements',
+                    icon: Bell,
+                    show: !isSuperAdmin,
+                },
+                {
+                    title: 'Messages',
+                    href: '/dashboard/messages',
+                    icon: MessageSquare,
+                    show: !isSuperAdmin,
                 },
             ]
         },
@@ -119,22 +164,22 @@ const Sidebar = () => {
             label: 'Financial Management',
             items: [
                 {
-                    title: 'Fee Invoices',
+                    title: 'Fee Management',
                     href: '/dashboard/admin/fees',
-                    icon: ClipboardList,
-                    show: (isAdmin || isAccountant || isStudent || isParent) && !isSuperAdmin,
+                    icon: DollarSign,
+                    show: (isAdmin || isAccountant) && !isSuperAdmin,
+                },
+                {
+                    title: 'My Fees',
+                    href: '/dashboard/student/fees',
+                    icon: DollarSign,
+                    show: (isStudent || isParent) && !isSuperAdmin,
                 },
                 {
                     title: 'Reports',
                     href: '/dashboard/admin/reports',
                     icon: BookOpen,
                     show: (isAdmin || isAccountant) && !isSuperAdmin,
-                },
-                {
-                    title: 'My Profile',
-                    href: '/dashboard/settings',
-                    icon: UserPlus,
-                    show: (isStudent || isParent) && !isSuperAdmin,
                 },
             ]
         },

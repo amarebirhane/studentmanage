@@ -14,6 +14,7 @@ router.route('/')
     .post(checkPermission('teachers', 'create'), TeacherController.createTeacher);
 
 router.get('/dashboard', TeacherController.getDashboardStats); // Role-specific view
+router.get('/my-classes', TeacherController.getTeacherClasses);
 
 router.route('/:id')
     .get(checkPermission('teachers', 'view'), TeacherController.getTeacherById)

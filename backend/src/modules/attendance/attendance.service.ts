@@ -1,5 +1,6 @@
 import { prisma } from '../../config';
 import { AttendanceStatus } from '@prisma/client';
+import { AuditLogService } from '../platform/audit.service';
 
 export class AttendanceService {
     /**
@@ -25,7 +26,7 @@ export class AttendanceService {
 
         if (existing) {
             // Update existing record
-            return prisma.attendanceRecord.update({
+            const updated = await prisma.attendanceRecord.update({
                 where: { id: existing.id },
                 data: {
                     status: data.status,
@@ -33,12 +34,26 @@ export class AttendanceService {
                     recordedById: data.recordedById,
                 },
             });
+            return updated;
         }
 
         // Create new record
-        return prisma.attendanceRecord.create({
-            data,
+        const record = await prisma.attendanceRecord.create({
+            data: {
+                ...data,
+                date: data.date,
+            },
         });
+
+        await AuditLogService.log({
+            action: 'MARK_ATTENDANCE',
+            module: 'ATTENDANCE',
+            userId: data.recordedById,
+            schoolId: data.schoolId,
+            details: { studentId: data.studentId, date: data.date, status: data.status }
+        });
+
+        return record;
     }
 
     /**
@@ -264,6 +279,15 @@ export const updateAttendance = async (id: string, data: any) => {
     return prisma.attendanceRecord.update({ where: { id }, data });
 };
 
-export const deleteAttendance = async (id: string) => {
-    return prisma.attendanceRecord.delete({ where: { id } });
+export const deleteAttendance = async (id: string, schoolId?: string) => {
+    const where: any = { id, deletedAt: null };
+    if (schoolId) where.schoolId = schoolId;
+
+    const record = await prisma.attendanceRecord.findFirst({ where });
+    if (!record) throw new Error('Attendance record not found');
+
+    return prisma.attendanceRecord.update({
+        where: { id },
+        data: { deletedAt: new Date() }
+    });
 };

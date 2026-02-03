@@ -163,6 +163,7 @@ model Enrollment {
   school       School         @relation(fields: [schoolId], references: [id])
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
+  deletedAt    DateTime?
 
   @@unique([studentId, academicYear, schoolId])
 }
@@ -192,6 +193,10 @@ model ParentProfile {
   studentId    String
   relationship String?
   createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  deletedAt    DateTime?
+  schoolId     String?
+  school       School?        @relation(fields: [schoolId], references: [id])
 }
 
 model Document {
@@ -277,6 +282,8 @@ model AttendanceRecord {
   recordedBy   User             @relation("AttendanceTaken", fields: [recordedById], references: [id])
   recordedById String
   createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+  deletedAt    DateTime?
   schoolId     String?
   school       School?          @relation(fields: [schoolId], references: [id])
 
@@ -322,6 +329,7 @@ model GradeRecord {
   remarks     String?
   createdAt   DateTime       @default(now())
   updatedAt   DateTime       @updatedAt
+  deletedAt   DateTime?
 
   @@unique([studentId, examId, subjectId], map: "grade_unique_student_exam_subject")
 }
@@ -348,6 +356,8 @@ model FeeInvoice {
   description String?
   payments    FeePayment[]
   createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  deletedAt   DateTime?
   schoolId    String?
   school      School?        @relation(fields: [schoolId], references: [id])
 }
@@ -360,6 +370,11 @@ model FeePayment {
   paymentDate DateTime   @default(now())
   method      String?
   reference   String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  deletedAt   DateTime?
+  schoolId    String?
+  school      School?    @relation(fields: [schoolId], references: [id])
 }
 
 model Assignment {
@@ -588,7 +603,9 @@ model School {
   attendance           AttendanceRecord[]
   exams                Exam[]
   fees                 FeeInvoice[]
+  feePayments          FeePayment[]
   assignments          Assignment[]
+  parentProfiles       ParentProfile[]
   libraryBooks         LibraryBook[]
   transportRoutes      TransportRoute[]
   hostelRooms          HostelRoom[]
@@ -614,6 +631,7 @@ model Announcement {
   updatedAt   DateTime @updatedAt
   schoolId    String?
   school      School?  @relation(fields: [schoolId], references: [id])
+  deletedAt   DateTime?
 }
 
 model AuditLog {
@@ -643,6 +661,8 @@ model Message {
   content     String
   readAt      DateTime?
   createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
   schoolId    String?
   school      School?   @relation(fields: [schoolId], references: [id])
 }
@@ -660,6 +680,7 @@ model FeeStructure {
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  deletedAt DateTime?
 }
 
 model Permission {

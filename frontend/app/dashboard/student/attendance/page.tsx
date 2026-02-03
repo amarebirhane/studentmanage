@@ -138,7 +138,7 @@ export default function StudentAttendancePage() {
 
                                         {status ? (
                                             <div className="flex flex-col items-center gap-1">
-                                                <StatusIcon className={cn("h-6 w-6", status.color)} />
+                                                <status.icon className={cn("h-6 w-6", status.color)} />
                                                 <span className={cn("text-[10px] font-bold uppercase", status.color)}>
                                                     {status.label}
                                                 </span>

@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { User, LoginCredentials } from '@/types/user'; // Ensure LoginCredentials is exported from types/user
+import { User, LoginCredentials } from '@/types/user';
 import { authService } from '@/services/auth.service';
 
 interface AuthState {
@@ -8,7 +8,7 @@ interface AuthState {
     isAuthenticated: boolean;
     isLoading: boolean;
     error: string | null;
-    hasAttemptedLoad: boolean; // Track if we've tried to load user
+    hasAttemptedLoad: boolean;
 
     selectedSchoolId: string | null;
     setSelectedSchoolId: (id: string | null) => void;
@@ -19,11 +19,25 @@ interface AuthState {
     updateProfile: (data: Partial<User>) => Promise<void>;
 }
 
+// Helper to set cookie manually (since we don't have js-cookie)
+const setCookie = (name: string, value: string, days = 7) => {
+    if (typeof window === 'undefined') return;
+    const date = new Date();
+    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+    const expires = `; expires=${date.toUTCString()}`;
+    document.cookie = `${name}=${value || ''}${expires}; path=/; SameSite=Strict`; // Removed Secure for localhost dev
+};
+
+const removeCookie = (name: string) => {
+    if (typeof window === 'undefined') return;
+    document.cookie = `${name}=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;`;
+};
+
 export const useAuthStore = create<AuthState>((set, get) => ({
     user: null,
     token: null,
     isAuthenticated: false,
-    isLoading: true, // Start in loading state to prevent premature redirects
+    isLoading: true,
     error: null,
     hasAttemptedLoad: false,
     selectedSchoolId: typeof window !== 'undefined' ? localStorage.getItem('selectedSchoolId') : null,
@@ -40,6 +54,13 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         try {
             console.log('Auth Store - Calling login API...');
             const response = await authService.login(credentials);
+
+            // Set token in cookie for middleware
+            setCookie('token', response.token);
+
+            // Set user role in cookie for easier middleware redirection if needed
+            setCookie('user_role', response.user.role);
+
             set({
                 user: response.user,
                 token: response.token,
@@ -77,7 +98,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         } catch (error) {
             console.error("Logout API error", error);
         } finally {
-            // Always clear state even if API call fails
+            removeCookie('token');
+            removeCookie('user_role');
+            localStorage.removeItem('selectedSchoolId');
+
             set({
                 user: null,
                 token: null,
@@ -86,7 +110,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
                 isLoading: false,
             });
 
-            // Hard redirect to login to clear all memory state and ensure clean slate
             if (typeof window !== 'undefined') {
                 window.location.href = '/login';
             }
@@ -94,7 +117,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     },
 
     loadUser: async () => {
-        // Prevent multiple simultaneous loads or redundant loads
         if (get().hasAttemptedLoad && get().user) {
             set({ isLoading: false });
             return;
@@ -103,8 +125,13 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         set({ isLoading: true });
         try {
             const user = await authService.getProfile();
+            // Ensure cookies stay synced on reload
+            setCookie('user_role', user.role);
+
             set({ user, isAuthenticated: true, isLoading: false, hasAttemptedLoad: true });
         } catch (error) {
+            removeCookie('token');
+            removeCookie('user_role');
             set({ user: null, token: null, isAuthenticated: false, isLoading: false, hasAttemptedLoad: true });
         }
     },

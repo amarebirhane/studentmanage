@@ -1,31 +1,70 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
+const roleRoutes = {
+    ADMIN: '/dashboard/admin',
+    TEACHER: '/dashboard/teacher',
+    STUDENT: '/dashboard/student',
+    PARENT: '/dashboard/parent',
+};
+
 export function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
-
-    // Get the token from cookies
     const token = request.cookies.get('token')?.value;
+    const userRole = request.cookies.get('user_role')?.value as keyof typeof roleRoutes | undefined;
 
-    // Define public routes that don't require authentication
-    const publicRoutes = ['/login', '/register', '/forgot-password', '/reset-password'];
-    const isPublicRoute = publicRoutes.some(route => pathname.startsWith(route));
+    // Public routes
+    const publicRoutes = ['/login', '/register', '/forgot-password', '/reset-password', '/'];
+    const isPublicRoute = publicRoutes.some(route => pathname === route || pathname.startsWith(route + '/'));
 
-    // If user is not authenticated and trying to access protected route
-    if (!token && !isPublicRoute && pathname !== '/') {
-        const loginUrl = new URL('/login', request.url);
-        loginUrl.searchParams.set('redirect', pathname);
-        return NextResponse.redirect(loginUrl);
+    // 1. Redirect unauthenticated users to login
+    if (!token) {
+        if (!isPublicRoute) {
+            const loginUrl = new URL('/login', request.url);
+            loginUrl.searchParams.set('redirect', pathname);
+            return NextResponse.redirect(loginUrl);
+        }
+        return NextResponse.next();
     }
 
-    // Let the application handle redirects from public auth pages to dashboard
-    // to avoid loops if token is present but invalid/expired in the store.
+    // 2. Redirect authenticated users away from auth pages
+    if (isPublicRoute && pathname !== '/') {
+        const dashboardUrl = userRole ? roleRoutes[userRole] : '/dashboard';
+        return NextResponse.redirect(new URL(dashboardUrl || '/dashboard', request.url));
+    }
+
+    // 3. Role-Based Access Control
+    if (pathname.startsWith('/dashboard')) {
+        // Enforce role boundaries
+        if (userRole) {
+            if (pathname.startsWith('/dashboard/admin') && userRole !== 'ADMIN') {
+                return NextResponse.redirect(new URL(roleRoutes[userRole], request.url));
+            }
+            if (pathname.startsWith('/dashboard/teacher') && userRole !== 'TEACHER') {
+                return NextResponse.redirect(new URL(roleRoutes[userRole], request.url));
+            }
+            if (pathname.startsWith('/dashboard/student') && userRole !== 'STUDENT') {
+                return NextResponse.redirect(new URL(roleRoutes[userRole], request.url));
+            }
+            if (pathname.startsWith('/dashboard/parent') && userRole !== 'PARENT') {
+                return NextResponse.redirect(new URL(roleRoutes[userRole], request.url));
+            }
+        }
+    }
 
     return NextResponse.next();
 }
 
 export const config = {
     matcher: [
-        '/((?!api|_next/static|_next/image|favicon.ico).*)',
+        /*
+         * Match all request paths except for the ones starting with:
+         * - api (API routes)
+         * - _next/static (static files)
+         * - _next/image (image optimization files)
+         * - favicon.ico (favicon file)
+         * - uploads (static uploads)
+         */
+        '/((?!api|_next/static|_next/image|favicon.ico|uploads).*)',
     ],
 };

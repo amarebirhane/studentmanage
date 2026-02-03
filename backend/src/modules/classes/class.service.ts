@@ -93,4 +93,50 @@ export class ClassService {
             data: { deletedAt: new Date() }
         });
     }
+
+    static async getSubjects(schoolId?: string, classId?: string) {
+        const where: any = { deletedAt: null };
+        if (schoolId) where.schoolId = schoolId;
+        if (classId) where.classId = classId;
+
+        return prisma.subject.findMany({
+            where,
+            include: {
+                class: true,
+                teacher: {
+                    include: {
+                        user: {
+                            select: { firstName: true, lastName: true }
+                        }
+                    }
+                }
+            },
+            orderBy: { name: 'asc' },
+        });
+    }
+
+    static async createSubject(data: { name: string; code?: string; classId: string; teacherId?: string; schoolId?: string }) {
+        return prisma.subject.create({
+            data: {
+                name: data.name,
+                code: data.code,
+                classId: data.classId,
+                teacherId: data.teacherId,
+                schoolId: data.schoolId
+            }
+        });
+    }
+
+    static async deleteSubject(id: string, schoolId?: string) {
+        const where: any = { id, deletedAt: null };
+        if (schoolId) where.schoolId = schoolId;
+
+        const subject = await prisma.subject.findFirst({ where });
+        if (!subject) throw new Error('Subject not found');
+
+        return prisma.subject.update({
+            where: { id },
+            data: { deletedAt: new Date() }
+        });
+    }
 }

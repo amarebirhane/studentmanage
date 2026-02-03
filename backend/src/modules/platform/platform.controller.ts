@@ -44,3 +44,12 @@ export const getSystemLogs = async (req: any, res: Response, next: NextFunction)
         next(error);
     }
 };
+
+export const getAllAdmins = async (req: any, res: Response, next: NextFunction) => {
+    try {
+        const admins = await PlatformService.getAllAdmins();
+        new ApiResponse(res, 200, 'All school administrators retrieved', admins).send();
+    } catch (error) {
+        next(error);
+    }
+};

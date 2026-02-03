@@ -15,7 +15,10 @@ import {
     BookOpen,
     ClipboardList,
     ShieldCheck,
-    LogOut
+    LogOut,
+    DollarSign,
+    BarChart3,
+    CreditCard
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -26,16 +29,16 @@ const Sidebar = () => {
 
     const menuGroups = [
         {
-            label: 'Main Menu',
+            label: 'System Dashboard',
             items: [
                 {
                     title: 'System Overview',
-                    href: '/dashboard/superadmin',
+                    href: '/dashboard/super-admin',
                     icon: ShieldCheck,
                     show: isSuperAdmin,
                 },
                 {
-                    title: 'Dashboard',
+                    title: 'My Dashboard',
                     href: user?.role ? `/dashboard/${user.role.toLowerCase()}` : '/dashboard/admin',
                     icon: LayoutDashboard,
                     show: !isSuperAdmin,
@@ -47,13 +50,31 @@ const Sidebar = () => {
             items: [
                 {
                     title: 'Schools',
-                    href: '/dashboard/schools',
+                    href: '/dashboard/super-admin/schools',
                     icon: GraduationCap,
                     show: isSuperAdmin,
                 },
                 {
+                    title: 'Revenue Tracking',
+                    href: '/dashboard/super-admin/revenue',
+                    icon: DollarSign,
+                    show: isSuperAdmin,
+                },
+                {
                     title: 'Global Analytics',
-                    href: '/dashboard/analytics',
+                    href: '/dashboard/super-admin/analytics',
+                    icon: BarChart3,
+                    show: isSuperAdmin,
+                },
+                {
+                    title: 'Subscriptions',
+                    href: '/dashboard/super-admin/subscriptions',
+                    icon: CreditCard,
+                    show: isSuperAdmin,
+                },
+                {
+                    title: 'Audit Logs',
+                    href: '/dashboard/super-admin/logs',
                     icon: ClipboardList,
                     show: isSuperAdmin,
                 },

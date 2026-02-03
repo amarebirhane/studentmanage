@@ -16,7 +16,17 @@ export class AssignmentService {
     }) {
         return prisma.assignment.create({
             data: {
-                ...data,
+                title: data.title,
+                description: data.description,
+                subjectId: data.subjectId,
+                dueDate: data.dueDate,
+                classId: data.classId,
+                sectionId: data.sectionId,
+                attachmentUrl: data.attachmentUrl,
+                resourcesUrl: data.resourcesUrl,
+                teacherId: data.teacherId,
+                schoolId: data.schoolId,
+                userId: data.userId,
                 status: 'PUBLISHED',
             },
             include: {

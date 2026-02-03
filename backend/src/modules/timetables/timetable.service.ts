@@ -45,7 +45,14 @@ export class TimetableService {
 
         return prisma.timetableEntry.create({
             data: {
-                ...data,
+                dayOfWeek,
+                periodNumber,
+                subjectId: data.subjectId,
+                classId,
+                sectionId,
+                teacherId,
+                room,
+                schoolId,
             }
         });
     }

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { GraduationCap, Search, Plus, Loader2, Users, Layout, MoreVertical, Edit, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -10,6 +11,7 @@ import { toast } from "react-hot-toast";
 import { Badge } from "@/components/ui/badge";
 
 export default function ClassesPage() {
+    const router = useRouter();
     const [classes, setClasses] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState("");
@@ -64,7 +66,10 @@ export default function ClassesPage() {
                         <Layout className="h-4 w-4 mr-2" />
                         Manage Sections
                     </Button>
-                    <Button className="glass bg-primary/20 hover:bg-primary/30 text-primary border-primary/20">
+                    <Button
+                        onClick={() => router.push('/dashboard/admin/classes/new')}
+                        className="glass bg-primary/20 hover:bg-primary/30 text-primary border-primary/20"
+                    >
                         <Plus className="h-4 w-4 mr-2" />
                         Add New Class
                     </Button>

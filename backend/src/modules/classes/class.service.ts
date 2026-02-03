@@ -2,13 +2,15 @@ import { prisma } from '../../config';
 
 export class ClassService {
     static async getClasses(schoolId?: string) {
-        const where: any = {};
+        const where: any = { deletedAt: null };
         if (schoolId) where.schoolId = schoolId;
 
         return prisma.class.findMany({
             where,
             include: {
-                sections: true,
+                sections: {
+                    where: { deletedAt: null }
+                },
                 _count: {
                     select: { students: true }
                 }
@@ -18,12 +20,13 @@ export class ClassService {
     }
 
     static async getSections(schoolId?: string) {
-        const where: any = {};
+        const where: any = { deletedAt: null };
         if (schoolId) where.schoolId = schoolId;
 
         return prisma.section.findMany({
             where: {
-                class: where
+                ...where,
+                class: { schoolId }
             },
             include: {
                 class: true,
@@ -63,25 +66,32 @@ export class ClassService {
     }
 
     static async deleteClass(id: string, schoolId?: string) {
-        const where: any = { id };
+        const where: any = { id, deletedAt: null };
         if (schoolId) where.schoolId = schoolId;
 
         const cls = await prisma.class.findFirst({ where });
         if (!cls) throw new Error('Class not found');
 
-        return prisma.class.delete({ where: { id } });
+        return prisma.class.update({
+            where: { id },
+            data: { deletedAt: new Date() }
+        });
     }
 
     static async deleteSection(id: string, schoolId?: string) {
         const section = await prisma.section.findFirst({
             where: {
                 id,
+                deletedAt: null,
                 class: schoolId ? { schoolId } : undefined
             }
         });
 
         if (!section) throw new Error('Section not found');
 
-        return prisma.section.delete({ where: { id } });
+        return prisma.section.update({
+            where: { id },
+            data: { deletedAt: new Date() }
+        });
     }
 }

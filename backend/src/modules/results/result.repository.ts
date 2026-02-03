@@ -8,8 +8,8 @@ export const createResult = async (data: Prisma.GradeRecordCreateInput): Promise
 };
 
 export const findResultById = async (id: string): Promise<GradeRecord | null> => {
-    return prisma.gradeRecord.findUnique({
-        where: { id },
+    return prisma.gradeRecord.findFirst({
+        where: { id, deletedAt: null },
         include: {
             student: {
                 include: {
@@ -29,8 +29,9 @@ export const updateResult = async (id: string, data: Prisma.GradeRecordUpdateInp
 };
 
 export const deleteResult = async (id: string): Promise<GradeRecord> => {
-    return prisma.gradeRecord.delete({
+    return prisma.gradeRecord.update({
         where: { id },
+        data: { deletedAt: new Date() }
     });
 };
 
@@ -39,7 +40,7 @@ export const findAllResults = async (params: {
 }): Promise<GradeRecord[]> => {
     const { where } = params;
     return prisma.gradeRecord.findMany({
-        where,
+        where: { ...where, deletedAt: null },
         include: {
             student: {
                 include: {

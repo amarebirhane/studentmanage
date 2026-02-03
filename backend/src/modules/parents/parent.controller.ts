@@ -61,4 +61,14 @@ export class ParentController {
             return ApiResponse.error(res, error.message);
         }
     }
+
+    static async getTeacherParents(req: any, res: Response) {
+        try {
+            const { schoolId } = req.user;
+            const parents = await ParentService.getTeacherParents(req.user.id, schoolId);
+            return ApiResponse.success(res, parents, 'Teacher parents retrieved');
+        } catch (error: any) {
+            return ApiResponse.error(res, error.message);
+        }
+    }
 }

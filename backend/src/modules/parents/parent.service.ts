@@ -209,4 +209,43 @@ export class ParentService {
             }))
         };
     }
+
+    static async getTeacherParents(teacherUserId: string, schoolId?: string) {
+        const teacher = await prisma.teacherProfile.findFirst({
+            where: { userId: teacherUserId },
+            include: { sections: { include: { students: true } } }
+        });
+
+        if (!teacher) return [];
+
+        const studentIds = teacher.sections.flatMap(s => s.students.map(std => std.id));
+        if (studentIds.length === 0) return [];
+
+        return prisma.user.findMany({
+            where: {
+                role: 'PARENT',
+                deletedAt: null,
+                schoolId,
+                parentProfiles: {
+                    some: {
+                        studentId: { in: studentIds }
+                    }
+                }
+            },
+            include: {
+                parentProfiles: {
+                    include: {
+                        student: {
+                            include: {
+                                user: {
+                                    select: { firstName: true, lastName: true }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            orderBy: { firstName: 'asc' }
+        });
+    }
 }

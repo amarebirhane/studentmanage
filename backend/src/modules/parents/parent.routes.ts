@@ -7,6 +7,9 @@ const router = Router();
 // Parent Portal Routes
 router.get('/financials', protect, authorize('PARENT'), ParentController.getFinancials);
 
+// Teacher Routes
+router.get('/my-parents', protect, authorize('TEACHER'), ParentController.getTeacherParents);
+
 // Admin-only Routes
 router.use(protect, authorize('ADMIN'));
 

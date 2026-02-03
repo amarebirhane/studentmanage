@@ -7,6 +7,7 @@ import { UserRole } from '@/types/user';
  */
 export function getDashboardRoute(role: UserRole): string {
     const routes: Record<UserRole, string> = {
+        SUPER_ADMIN: '/dashboard/super-admin',
         ADMIN: '/dashboard/admin',
         TEACHER: '/dashboard/teacher',
         STUDENT: '/dashboard/student',

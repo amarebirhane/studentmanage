@@ -37,7 +37,9 @@ export class AuthController {
             });
 
             const { password, ...userWithoutPassword } = user;
-            return ApiResponse.success(res, { ...userWithoutPassword, token, refreshToken }, 'Login successful');
+            const responseData = { user: userWithoutPassword, token, refreshToken };
+            console.log('[AuthController] Sending login response data:', JSON.stringify(responseData, null, 2));
+            return ApiResponse.success(res, responseData, 'Login successful');
         } catch (error: any) {
             console.error('Login error:', error);
             if (error.message === 'Invalid email or password') {

@@ -92,6 +92,7 @@ export default function LoginPage() {
                 router.push(dashboardRoute);
             }
         } catch (err: any) {
+            console.error('LoginPage - Submit Error:', err);
             toast.error(err.response?.data?.message || 'Invalid credentials');
         }
     };

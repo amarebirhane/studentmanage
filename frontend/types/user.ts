@@ -12,10 +12,11 @@ export interface User {
     updatedAt: string;
 }
 
-export interface AuthResponse {
+export type AuthResponse = {
     user: User;
     token: string;
-}
+    refreshToken?: string;
+} | (User & { token: string; refreshToken?: string; });
 
 export interface LoginCredentials {
     email: string;

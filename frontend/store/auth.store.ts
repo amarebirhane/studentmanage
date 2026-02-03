@@ -54,21 +54,32 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         try {
             console.log('Auth Store - Calling login API...');
             const response = await authService.login(credentials);
+            console.log('Auth Store - Login Response:', response);
+
+            // Robust data extraction: Support both {user, token} and flat {id, email, token, ...}
+            const user = ('user' in response) ? response.user : (('id' in response) ? response : null);
+            const token = response.token;
+
+            if (!user || !token) {
+                console.error('Auth Store - ERROR: Incomplete response data!', { user, token, response });
+                throw new Error('Identity verification failed: Incomplete profile or token data');
+            }
 
             // Set token in cookie for middleware
-            setCookie('token', response.token);
+            setCookie('token', token);
 
             // Set user role in cookie for easier middleware redirection if needed
-            setCookie('user_role', response.user.role);
+            setCookie('user_role', user.role);
 
             set({
-                user: response.user,
-                token: response.token,
+                user,
+                token,
                 isAuthenticated: true,
                 isLoading: false,
                 hasAttemptedLoad: true,
             });
         } catch (err: any) {
+            console.error('Auth Store - Login Error:', err);
             set({
                 error: err.response?.data?.message || 'Login failed',
                 isLoading: false,

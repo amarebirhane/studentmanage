@@ -15,7 +15,7 @@ export class DashboardService {
                 _sum: { amount: true },
                 where: { status: 'PAID' }
             }),
-            prisma.school.count({ where: { status: 'ACTIVE' } }),
+            prisma.school.count({ where: { isSuspended: false } }),
             prisma.activityLog.findMany({
                 take: 10,
                 orderBy: { createdAt: 'desc' },

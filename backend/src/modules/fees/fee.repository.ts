@@ -51,3 +51,9 @@ export const findAllFeeInvoices = async (params: {
         }
     });
 };
+
+export const createFeePayment = async (data: Prisma.FeePaymentCreateInput) => {
+    return prisma.feePayment.create({
+        data,
+    });
+};

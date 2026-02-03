@@ -78,3 +78,41 @@ export const getAllFeeInvoices = async (filters: any = {}, schoolId?: string, us
 
     return feeRepository.findAllFeeInvoices({ where });
 };
+
+export const recordPayment = async (invoiceId: string, data: { amount: number, method?: string, reference?: string }, schoolId?: string) => {
+    const invoice = await feeRepository.findFeeInvoiceById(invoiceId);
+    if (!invoice || (schoolId && (invoice as any).schoolId !== schoolId)) {
+        throw new ApiError(404, 'Fee invoice not found');
+    }
+
+    const payment = await feeRepository.createFeePayment({
+        invoice: { connect: { id: invoiceId } },
+        amount: data.amount,
+        method: data.method,
+        reference: data.reference,
+        school: schoolId ? { connect: { id: schoolId } } : undefined
+    });
+
+    // Check if invoice is fully paid
+    const allPayments = await prisma.feePayment.aggregate({
+        where: { invoiceId, deletedAt: null },
+        _sum: { amount: true }
+    });
+
+    const totalPaid = allPayments._sum.amount || 0;
+    if (totalPaid >= invoice.amount) {
+        await feeRepository.updateFeeInvoice(invoiceId, { status: 'PAID' });
+    }
+
+    await AuditLogService.log({
+        action: 'RECORD_PAYMENT',
+        module: 'FEES',
+        userId: invoice.studentId,
+        schoolId,
+        details: { paymentId: payment.id, invoiceId }
+    });
+
+    return payment;
+};
+
+import { prisma } from '../../config';

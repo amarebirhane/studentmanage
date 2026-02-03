@@ -7,7 +7,6 @@ import { ApiError } from '../utils/apiResponse';
  * Should be used AFTER the 'protect' middleware.
  */
 export const tenantMiddleware = (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-    console.log(`[TenantMiddleware] Processing request: ${req.method} ${req.originalUrl}`);
     if (!req.user) {
         return next(new ApiError(401, 'Authentication required for tenant context'));
     }

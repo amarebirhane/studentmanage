@@ -1,14 +1,25 @@
 import * as feeRepository from './fee.repository';
 import { Prisma } from '@prisma/client';
 import { ApiError } from '../../utils/apiResponse';
+import { AuditLogService } from '../platform/audit.service';
 
 export const createFeeInvoice = async (data: any, schoolId?: string) => {
-    return feeRepository.createFeeInvoice({
+    const invoice = await feeRepository.createFeeInvoice({
         ...data,
         discount: data.discount || 0,
         scholarship: data.scholarship || 0,
         school: schoolId ? { connect: { id: schoolId } } : undefined
     });
+
+    await AuditLogService.log({
+        action: 'CREATE_FEE_INVOICE',
+        module: 'FEES',
+        userId: invoice.studentId, // Or appropriate user
+        schoolId,
+        details: { invoiceId: invoice.id }
+    });
+
+    return invoice;
 };
 
 export const applyDiscountAndScholarship = async (id: string, data: { discount?: number, scholarship?: number }, schoolId?: string) => {
@@ -40,7 +51,17 @@ export const deleteFeeInvoice = async (id: string, schoolId?: string) => {
     if (!feeInvoice || (schoolId && (feeInvoice as any).schoolId !== schoolId)) {
         throw new ApiError(404, 'Fee invoice not found');
     }
-    return feeRepository.deleteFeeInvoice(id);
+    const deleted = await feeRepository.deleteFeeInvoice(id);
+
+    await AuditLogService.log({
+        action: 'DELETE_FEE_INVOICE',
+        module: 'FEES',
+        userId: (feeInvoice as any).studentId,
+        schoolId,
+        details: { invoiceId: id }
+    });
+
+    return deleted;
 };
 
 export const getAllFeeInvoices = async (filters: any = {}, schoolId?: string, userId?: string, role?: string) => {

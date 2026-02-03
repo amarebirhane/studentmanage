@@ -8,8 +8,8 @@ export const createFeeInvoice = async (data: Prisma.FeeInvoiceCreateInput): Prom
 };
 
 export const findFeeInvoiceById = async (id: string): Promise<FeeInvoice | null> => {
-    return prisma.feeInvoice.findUnique({
-        where: { id },
+    return prisma.feeInvoice.findFirst({
+        where: { id, deletedAt: null },
         include: {
             student: {
                 include: {
@@ -29,8 +29,9 @@ export const updateFeeInvoice = async (id: string, data: Prisma.FeeInvoiceUpdate
 };
 
 export const deleteFeeInvoice = async (id: string): Promise<FeeInvoice> => {
-    return prisma.feeInvoice.delete({
+    return prisma.feeInvoice.update({
         where: { id },
+        data: { deletedAt: new Date() }
     });
 };
 
@@ -39,7 +40,7 @@ export const findAllFeeInvoices = async (params: {
 }): Promise<FeeInvoice[]> => {
     const { where } = params;
     return prisma.feeInvoice.findMany({
-        where,
+        where: { ...where, deletedAt: null },
         include: {
             student: {
                 include: {

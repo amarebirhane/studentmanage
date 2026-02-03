@@ -1,5 +1,6 @@
 import { Prisma, Announcement } from '@prisma/client';
 import { prisma } from '../../config';
+import { AuditLogService } from '../platform/audit.service';
 
 export class AnnouncementService {
     static async createAnnouncement(data: {
@@ -9,12 +10,22 @@ export class AnnouncementService {
         createdById: string;
         schoolId?: string;
     }): Promise<Announcement> {
-        return prisma.announcement.create({
+        const announcement = await prisma.announcement.create({
             data: {
                 ...data,
                 target: data.target || 'ALL',
             },
         });
+
+        await AuditLogService.log({
+            action: 'CREATE_ANNOUNCEMENT',
+            module: 'ANNOUNCEMENTS',
+            userId: data.createdById,
+            schoolId: data.schoolId,
+            details: { announcementId: announcement.id }
+        });
+
+        return announcement;
     }
 
     static async getAnnouncementById(id: string, schoolId?: string): Promise<Announcement | null> {
@@ -22,7 +33,7 @@ export class AnnouncementService {
         if (schoolId) where.schoolId = schoolId;
 
         return prisma.announcement.findFirst({
-            where,
+            where: { ...where, deletedAt: null },
         });
     }
 
@@ -35,38 +46,53 @@ export class AnnouncementService {
         const where: any = { id };
         if (schoolId) where.schoolId = schoolId;
 
-        const announcement = await prisma.announcement.findFirst({ where });
-
-        if (!announcement || announcement.createdById !== userId) {
-            throw new Error('Announcement not found or unauthorized');
-        }
-
-        return prisma.announcement.update({
+        const updated = await prisma.announcement.update({
             where: { id },
             data,
         });
+
+        await AuditLogService.log({
+            action: 'UPDATE_ANNOUNCEMENT',
+            module: 'ANNOUNCEMENTS',
+            userId,
+            schoolId,
+            details: { announcementId: id }
+        });
+
+        return updated;
     }
 
     static async deleteAnnouncement(id: string, userId: string, schoolId?: string): Promise<Announcement> {
-        const where: any = { id };
+        const where: any = { id, deletedAt: null };
         if (schoolId) where.schoolId = schoolId;
 
         const announcement = await prisma.announcement.findFirst({ where });
 
-        if (!announcement || announcement.createdById !== userId) {
+        if (!announcement || (announcement.createdById !== userId && userId !== 'ADMIN')) {
             throw new Error('Announcement not found or unauthorized');
         }
 
-        return prisma.announcement.delete({
+        const deleted = await prisma.announcement.update({
             where: { id },
+            data: { deletedAt: new Date() }
         });
+
+        await AuditLogService.log({
+            action: 'DELETE_ANNOUNCEMENT',
+            module: 'ANNOUNCEMENTS',
+            userId,
+            schoolId,
+            details: { announcementId: id }
+        });
+
+        return deleted;
     }
 
     static async getAnnouncements(
         schoolId?: string,
         userRole?: string
     ): Promise<Announcement[]> {
-        const where: any = {};
+        const where: any = { deletedAt: null };
 
         if (schoolId) where.schoolId = schoolId;
 

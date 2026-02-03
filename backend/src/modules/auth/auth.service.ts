@@ -44,9 +44,15 @@ export class AuthService {
             },
         });
 
+        console.log(`[AuthService] Login attempt for: ${email}`);
+        console.log(`[AuthService] User found: ${!!user}`);
+
         if (!user || !(await comparePassword(password, user.password))) {
+            if (user) console.log(`[AuthService] Password match failed`);
             throw new Error('Invalid email or password');
         }
+
+        console.log(`[AuthService] Login successful for: ${email}`);
 
         const token = signToken(user.id);
         const refreshToken = signRefreshToken(user.id);

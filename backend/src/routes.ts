@@ -26,30 +26,33 @@ import { tenantMiddleware } from './middlewares/tenant.middleware';
 const router = Router();
 console.log('🛣️  Routes initializing...');
 
-// Public / Platform-wide routes
+// 1. Unprotected / Public Routes
 router.use('/auth', authRoutes);
 router.use('/schools', schoolRoutes);
 router.use('/platform', platformRoutes);
 
-// School-specific routes (Isolated by tenantMiddleware)
-router.use(protect, tenantMiddleware);
+// 2. Protected & Isolated Routes
+const protectedRouter = Router();
+protectedRouter.use(protect, tenantMiddleware);
 
-router.use('/students', studentRoutes);
-router.use('/classes', classRoutes);
-router.use('/admin', userRoutes);
-router.use('/teachers', teacherRoutes);
-router.use('/parents', parentRoutes);
-router.use('/attendance', attendanceRoutes);
-router.use('/exams', examRoutes);
-router.use('/results', resultRoutes);
-router.use('/fees', feeRoutes);
-router.use('/fee-structures', feeStructureRoutes);
-router.use('/announcements', announcementRoutes);
-router.use('/messages', messageRoutes);
-router.use('/assignments', assignmentRoutes);
-router.use('/permissions', permissionRoutes);
-router.use('/reports', reportRoutes);
-router.use('/timetables', timetableRoutes);
-router.use('/dashboard', dashboardRoutes);
+protectedRouter.use('/students', studentRoutes);
+protectedRouter.use('/classes', classRoutes);
+protectedRouter.use('/admin', userRoutes);
+protectedRouter.use('/teachers', teacherRoutes);
+protectedRouter.use('/parents', parentRoutes);
+protectedRouter.use('/attendance', attendanceRoutes);
+protectedRouter.use('/exams', examRoutes);
+protectedRouter.use('/results', resultRoutes);
+protectedRouter.use('/fees', feeRoutes);
+protectedRouter.use('/fee-structures', feeStructureRoutes);
+protectedRouter.use('/announcements', announcementRoutes);
+protectedRouter.use('/messages', messageRoutes);
+protectedRouter.use('/assignments', assignmentRoutes);
+protectedRouter.use('/permissions', permissionRoutes);
+protectedRouter.use('/reports', reportRoutes);
+protectedRouter.use('/timetables', timetableRoutes);
+protectedRouter.use('/dashboard', dashboardRoutes);
+
+router.use(protectedRouter);
 
 export default router;

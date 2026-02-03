@@ -29,7 +29,19 @@ const createStore = (prefix: string) => {
     try {
         const { RedisStore } = require('rate-limit-redis');
         return new RedisStore({
-            sendCommand: (...args: string[]) => redisClient.call(...args),
+            sendCommand: async (...args: string[]) => {
+                try {
+                    // Fail safely if connection is closed
+                    if (redisClient.status !== 'ready' && redisClient.status !== 'connecting') {
+                        throw new Error('Redis connection lost');
+                    }
+                    return await redisClient.call(...args);
+                } catch (error) {
+                    // Log error but don't crash
+                    // console.error(`Rate limit Redis error: ${error.message}`);
+                    throw error;
+                }
+            },
             prefix: `rl:${prefix}:`, // Unique prefix for each limiter
         });
     } catch (error) {
@@ -38,12 +50,22 @@ const createStore = (prefix: string) => {
     }
 };
 
+// Skip function to fail open if Redis is down
+const skipIfRedisDown = () => {
+    if (useRedis && redisClient && redisClient.status !== 'ready' && redisClient.status !== 'connecting') {
+        // console.warn('⚠️  Redis down, skipping rate limit');
+        return true;
+    }
+    return false;
+};
+
 export const limiter = rateLimit({
     windowMs: 30 * 60 * 1000, // 30 minutes
     max: 500,
     standardHeaders: true,
     legacyHeaders: false,
     store: createStore('general'),
+    skip: skipIfRedisDown,
     message: 'Too many requests from this IP, please try again after 30 minutes',
 });
 
@@ -52,6 +74,7 @@ export const authLimiter = rateLimit({
     max: 50,
     skipSuccessfulRequests: true,
     store: createStore('auth'),
+    skip: skipIfRedisDown,
     message:
         'Too many authentication attempts from this IP, please try again after 30 minutes',
 });

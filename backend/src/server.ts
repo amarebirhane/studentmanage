@@ -35,7 +35,13 @@ const startServer = async () => {
 
     // Handle unhandled promise rejections
     process.on('unhandledRejection', (err: any) => {
-        console.log(`Error: ${err.message}`);
+        // Ignore Redis connection closed errors as they are expected when Redis is down
+        if (err && (err.message === 'Connection is closed.' || err.message.includes('Connection is closed'))) {
+            console.warn('⚠️  Redis connection closed (handled rejection)');
+            return;
+        }
+
+        console.error('Unhandled Rejection:', err);
         // Close server & exit process
         server.close(() => process.exit(1));
     });

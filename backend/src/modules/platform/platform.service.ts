@@ -12,7 +12,8 @@ export class PlatformService {
             userCount,
             studentCount,
             teacherCount,
-            revenue
+            revenue,
+            recentSchools
         ] = await Promise.all([
             prisma.school.count(),
             prisma.user.count(),
@@ -21,6 +22,15 @@ export class PlatformService {
             prisma.feeInvoice.aggregate({
                 _sum: { amount: true },
                 where: { status: 'PAID' }
+            }),
+            prisma.school.findMany({
+                take: 5,
+                orderBy: { createdAt: 'desc' },
+                include: {
+                    _count: {
+                        select: { students: true }
+                    }
+                }
             })
         ]);
 
@@ -29,7 +39,13 @@ export class PlatformService {
             users: userCount,
             students: studentCount,
             teachers: teacherCount,
-            totalRevenue: revenue._sum.amount || 0
+            totalRevenue: revenue._sum.amount || 0,
+            recentSchools: recentSchools.map(s => ({
+                id: s.id,
+                name: s.name,
+                students: s._count.students,
+                createdAt: s.createdAt
+            }))
         };
     }
 
@@ -74,5 +90,33 @@ export class PlatformService {
                 }
             }
         });
+    }
+
+    /**
+     * Get all school administrators
+     */
+    static async getAllAdmins() {
+        const admins = await prisma.user.findMany({
+            where: {
+                role: 'ADMIN',
+                deletedAt: null
+            },
+            include: {
+                school: {
+                    select: {
+                        name: true
+                    }
+                }
+            }
+        });
+
+        return admins.map(admin => ({
+            id: admin.id,
+            name: `${admin.firstName} ${admin.lastName}`,
+            email: admin.email,
+            phone: admin.phone || 'N/A',
+            school: admin.school?.name || 'Unassigned',
+            status: 'Active' // We can expand this later
+        }));
     }
 }

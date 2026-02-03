@@ -15,5 +15,6 @@ router.get('/:id', checkPermission('fees', 'view'), feeController.getFeeInvoice)
 router.patch('/:id', checkPermission('fees', 'edit'), feeController.updateFeeInvoice);
 router.patch('/:id/adjustment', checkPermission('fees', 'edit'), feeController.applyAdjustment);
 router.delete('/:id', checkPermission('fees', 'delete'), feeController.deleteFeeInvoice);
+router.post('/:id/payments', checkPermission('fees', 'edit'), feeController.recordPayment);
 
 export default router;

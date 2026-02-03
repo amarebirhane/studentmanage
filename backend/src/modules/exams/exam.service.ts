@@ -4,7 +4,7 @@ import { Prisma } from '@prisma/client';
 export class ExamService {
     static async createExam(data: {
         name: string;
-        subject: string;
+        subjectId: string;
         examDate: Date;
         maxMarks: number;
         classId?: string;
@@ -138,10 +138,10 @@ export class ExamService {
 
                 return prisma.gradeRecord.upsert({
                     where: {
-                        studentId_examId_subject: {
+                        studentId_examId_subjectId: {
                             studentId: entry.studentId,
                             examId: data.examId,
-                            subject: (exam as any).subject || 'General',
+                            subjectId: exam.subjectId!,
                         },
                     },
                     update: {
@@ -153,7 +153,7 @@ export class ExamService {
                     create: {
                         studentId: entry.studentId,
                         examId: data.examId,
-                        subject: (exam as any).subject || 'General',
+                        subjectId: exam.subjectId!,
                         scoredMarks: entry.scoredMarks,
                         totalMarks: exam.maxMarks,
                         grade,

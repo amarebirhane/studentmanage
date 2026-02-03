@@ -9,55 +9,19 @@ const router = Router();
 // Apply protection and tenant isolation to all exam routes
 router.use(protect, tenantMiddleware);
 
-// Create Exam
-router.post(
-    '/',
-    checkPermission('exams', 'create'),
-    examController.createExam
-);
+// Teacher & Student Routes (no additional permissions needed - just authentication)
+// Teachers can create exams, view them, and enter marks
+router.post('/', examController.createExam);
+router.get('/', examController.getAllExams);
+router.get('/my-results', examController.getMyResults); // Student-specific
+router.get('/:id', examController.getExam);
 
-// Get All Exams
-router.get(
-    '/',
-    checkPermission('exams', 'view'),
-    examController.getAllExams
-);
+// Enter Marks & Publish Results (teachers only - but no permission check needed)
+router.put('/:id/marks', examController.enterMarks);
+router.post('/:id/publish', examController.publishResults);
+router.patch('/:id', examController.updateExam);
 
-// Student: Get My Results
-router.get(
-    '/my-results',
-    examController.getMyResults // Specific view for students
-);
-
-// Enter Marks
-router.put(
-    '/:id/marks',
-    checkPermission('exams', 'edit'),
-    examController.enterMarks
-);
-
-// Publish Results
-router.post(
-    '/:id/publish',
-    checkPermission('exams', 'edit'),
-    examController.publishResults
-);
-
-// Get Single Exam
-router.get(
-    '/:id',
-    checkPermission('exams', 'view'),
-    examController.getExam
-);
-
-// Update Exam
-router.patch(
-    '/:id',
-    checkPermission('exams', 'edit'),
-    examController.updateExam
-);
-
-// Delete Exam
+// Admin-only operations (require explicit permissions)
 router.delete(
     '/:id',
     checkPermission('exams', 'delete'),

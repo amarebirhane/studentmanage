@@ -9,12 +9,14 @@ const router = Router();
 // Apply protection and tenant isolation to all teacher routes
 router.use(protect, tenantMiddleware);
 
+// Teacher-specific routes (no additional permissions needed - just authentication)
+router.get('/dashboard', TeacherController.getDashboardStats);
+router.get('/my-classes', TeacherController.getTeacherClasses);
+
+// Admin routes (require explicit permissions)
 router.route('/')
     .get(checkPermission('teachers', 'view'), TeacherController.getTeachers)
     .post(checkPermission('teachers', 'create'), TeacherController.createTeacher);
-
-router.get('/dashboard', TeacherController.getDashboardStats); // Role-specific view
-router.get('/my-classes', TeacherController.getTeacherClasses);
 
 router.route('/:id')
     .get(checkPermission('teachers', 'view'), TeacherController.getTeacherById)

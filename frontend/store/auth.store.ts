@@ -25,7 +25,7 @@ const setCookie = (name: string, value: string, days = 7) => {
     const date = new Date();
     date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
     const expires = `; expires=${date.toUTCString()}`;
-    document.cookie = `${name}=${value || ''}${expires}; path=/; SameSite=Strict`; // Removed Secure for localhost dev
+    document.cookie = `${name}=${value || ''}${expires}; path=/; SameSite=Lax`; // Removed Secure for localhost dev
 };
 
 const removeCookie = (name: string) => {

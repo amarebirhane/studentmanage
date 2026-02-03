@@ -11,11 +11,22 @@ const api: AxiosInstance = axios.create({
 // Request interceptor
 api.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
-        // Add X-School-ID if present in localStorage (especially for Super Admins)
+        // Add X-School-ID if present in localStorage
         if (typeof window !== 'undefined') {
             const schoolId = localStorage.getItem('selectedSchoolId');
             if (schoolId) {
                 config.headers['X-School-ID'] = schoolId;
+            }
+
+            // Manually inject token from cookie to ensure it reaches backend
+            // This fixes issues where SameSite=Strict blocks cookies on cross-port localhost requests
+            const token = document.cookie
+                .split('; ')
+                .find((row) => row.startsWith('token='))
+                ?.split('=')[1];
+
+            if (token) {
+                config.headers['Authorization'] = `Bearer ${token}`;
             }
         }
         return config;

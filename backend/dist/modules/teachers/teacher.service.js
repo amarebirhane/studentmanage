@@ -104,9 +104,12 @@ class TeacherService {
             return updatedProfile;
         });
     }
-    static async getTeacherClasses(userId) {
-        return config_1.prisma.teacherProfile.findUnique({
-            where: { userId },
+    static async getTeacherClasses(userId, schoolId) {
+        const where = { userId };
+        if (schoolId)
+            where.schoolId = schoolId;
+        return config_1.prisma.teacherProfile.findFirst({
+            where,
             include: {
                 sections: {
                     include: {
@@ -129,9 +132,12 @@ class TeacherService {
             await tx.user.delete({ where: { id: teacher.userId } });
         });
     }
-    static async getDashboardStats(userId) {
-        const teacher = await config_1.prisma.teacherProfile.findUnique({
-            where: { userId },
+    static async getDashboardStats(userId, schoolId) {
+        const where = { userId };
+        if (schoolId)
+            where.schoolId = schoolId;
+        const teacher = await config_1.prisma.teacherProfile.findFirst({
+            where,
             include: {
                 sections: {
                     include: {

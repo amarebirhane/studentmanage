@@ -51,7 +51,7 @@ class TeacherController {
     }
     static async getDashboardStats(req, res) {
         try {
-            const stats = await teacher_service_1.TeacherService.getDashboardStats(req.user.id);
+            const stats = await teacher_service_1.TeacherService.getDashboardStats(req.user?.id, req.schoolId);
             return apiResponse_1.ApiResponse.success(res, stats, 'Dashboard stats retrieved');
         }
         catch (error) {

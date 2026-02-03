@@ -146,8 +146,11 @@ class StudentService {
         });
     }
     static async approveAdmission(id, schoolId) {
-        const student = await config_1.prisma.studentProfile.findUnique({ where: { id } });
-        if (!student || (schoolId && student.schoolId !== schoolId)) {
+        const where = { id };
+        if (schoolId)
+            where.schoolId = schoolId;
+        const student = await config_1.prisma.studentProfile.findFirst({ where });
+        if (!student) {
             throw new Error('Student not found');
         }
         return await config_1.prisma.studentProfile.update({
@@ -167,6 +170,33 @@ class StudentService {
         return await config_1.prisma.$transaction(async (tx) => {
             await tx.studentProfile.delete({ where: { id } });
             await tx.user.delete({ where: { id: student.userId } });
+        });
+    }
+    static async bulkPromoteStudents(data) {
+        const { studentIds, targetClassId, targetSectionId, schoolId } = data;
+        return await config_1.prisma.studentProfile.updateMany({
+            where: {
+                id: { in: studentIds },
+                schoolId,
+            },
+            data: {
+                classId: targetClassId,
+                sectionId: targetSectionId || null,
+            },
+        });
+    }
+    static async updateStudentStatus(id, status, schoolId) {
+        const where = { id };
+        if (schoolId)
+            where.schoolId = schoolId;
+        const student = await config_1.prisma.studentProfile.findFirst({ where });
+        if (!student) {
+            throw new Error('Student not found');
+        }
+        return await config_1.prisma.studentProfile.update({
+            where: { id },
+            data: { status },
+            include: { user: true },
         });
     }
 }

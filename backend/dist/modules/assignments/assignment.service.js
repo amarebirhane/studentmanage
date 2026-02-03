@@ -74,6 +74,16 @@ class AssignmentService {
         });
     }
     static async submitAssignment(data) {
+        // Verify assignment exists and belongs to the school
+        const assignment = await config_1.prisma.assignment.findFirst({
+            where: {
+                id: data.assignmentId,
+                schoolId: data.schoolId,
+            }
+        });
+        if (!assignment) {
+            throw new Error('Assignment not found in this school');
+        }
         // Check if already submitted
         const existing = await config_1.prisma.assignmentSubmission.findUnique({
             where: {
@@ -87,7 +97,12 @@ class AssignmentService {
             throw new Error('Assignment already submitted');
         }
         return config_1.prisma.assignmentSubmission.create({
-            data,
+            data: {
+                assignmentId: data.assignmentId,
+                studentId: data.studentId,
+                fileUrl: data.fileUrl,
+                content: data.content,
+            },
             include: {
                 assignment: {
                     select: {
@@ -109,6 +124,17 @@ class AssignmentService {
         });
     }
     static async gradeSubmission(data) {
+        const submission = await config_1.prisma.assignmentSubmission.findFirst({
+            where: {
+                id: data.submissionId,
+                assignment: {
+                    schoolId: data.schoolId,
+                }
+            }
+        });
+        if (!submission) {
+            throw new Error('Submission not found');
+        }
         return config_1.prisma.assignmentSubmission.update({
             where: { id: data.submissionId },
             data: {
@@ -157,9 +183,12 @@ class AssignmentService {
             orderBy: { submittedAt: 'desc' },
         });
     }
-    static async getAssignmentSubmissions(assignmentId, teacherId) {
-        const assignment = await config_1.prisma.assignment.findUnique({
-            where: { id: assignmentId },
+    static async getAssignmentSubmissions(assignmentId, teacherId, schoolId) {
+        const assignment = await config_1.prisma.assignment.findFirst({
+            where: {
+                id: assignmentId,
+                schoolId: schoolId,
+            },
         });
         if (!assignment) {
             throw new Error('Assignment not found');

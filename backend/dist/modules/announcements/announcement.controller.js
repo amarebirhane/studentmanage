@@ -9,7 +9,7 @@ const createAnnouncement = async (req, res, next) => {
             title: req.body.title,
             content: req.body.content,
             target: req.body.target,
-            createdById: req.user.id,
+            createdById: req.user?.id,
             schoolId: req.schoolId,
         });
         new apiResponse_1.ApiResponse(res, 201, 'Announcement created successfully', announcement).send();
@@ -21,7 +21,7 @@ const createAnnouncement = async (req, res, next) => {
 exports.createAnnouncement = createAnnouncement;
 const getAnnouncement = async (req, res, next) => {
     try {
-        const announcement = await announcement_service_1.AnnouncementService.getAnnouncementById(req.params.id);
+        const announcement = await announcement_service_1.AnnouncementService.getAnnouncementById(req.params.id, req.schoolId);
         new apiResponse_1.ApiResponse(res, 200, 'Announcement details', announcement).send();
     }
     catch (error) {
@@ -31,7 +31,7 @@ const getAnnouncement = async (req, res, next) => {
 exports.getAnnouncement = getAnnouncement;
 const updateAnnouncement = async (req, res, next) => {
     try {
-        const announcement = await announcement_service_1.AnnouncementService.updateAnnouncement(req.params.id, req.body, req.user.id);
+        const announcement = await announcement_service_1.AnnouncementService.updateAnnouncement(req.params.id, req.body, req.user?.id, req.schoolId);
         new apiResponse_1.ApiResponse(res, 200, 'Announcement updated successfully', announcement).send();
     }
     catch (error) {
@@ -41,7 +41,7 @@ const updateAnnouncement = async (req, res, next) => {
 exports.updateAnnouncement = updateAnnouncement;
 const deleteAnnouncement = async (req, res, next) => {
     try {
-        await announcement_service_1.AnnouncementService.deleteAnnouncement(req.params.id, req.user.id);
+        await announcement_service_1.AnnouncementService.deleteAnnouncement(req.params.id, req.user?.id, req.schoolId);
         new apiResponse_1.ApiResponse(res, 200, 'Announcement deleted successfully').send();
     }
     catch (error) {
@@ -51,7 +51,7 @@ const deleteAnnouncement = async (req, res, next) => {
 exports.deleteAnnouncement = deleteAnnouncement;
 const getAnnouncements = async (req, res, next) => {
     try {
-        const announcements = await announcement_service_1.AnnouncementService.getAnnouncements(req.schoolId, req.user.role);
+        const announcements = await announcement_service_1.AnnouncementService.getAnnouncements(req.schoolId, req.user?.role);
         new apiResponse_1.ApiResponse(res, 200, 'Announcements retrieved', announcements).send();
     }
     catch (error) {

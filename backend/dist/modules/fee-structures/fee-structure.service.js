@@ -32,9 +32,12 @@ class FeeStructureService {
             orderBy: { createdAt: 'desc' },
         });
     }
-    static async getFeeStructureById(id) {
-        const feeStructure = await config_1.prisma.feeStructure.findUnique({
-            where: { id },
+    static async getFeeStructureById(id, schoolId) {
+        const where = { id };
+        if (schoolId)
+            where.schoolId = schoolId;
+        const feeStructure = await config_1.prisma.feeStructure.findFirst({
+            where,
             include: {
                 class: true,
                 school: true,

@@ -11,13 +11,19 @@ class AnnouncementService {
             },
         });
     }
-    static async getAnnouncementById(id) {
-        return config_1.prisma.announcement.findUnique({
-            where: { id },
+    static async getAnnouncementById(id, schoolId) {
+        const where = { id };
+        if (schoolId)
+            where.schoolId = schoolId;
+        return config_1.prisma.announcement.findFirst({
+            where,
         });
     }
-    static async updateAnnouncement(id, data, userId) {
-        const announcement = await config_1.prisma.announcement.findUnique({ where: { id } });
+    static async updateAnnouncement(id, data, userId, schoolId) {
+        const where = { id };
+        if (schoolId)
+            where.schoolId = schoolId;
+        const announcement = await config_1.prisma.announcement.findFirst({ where });
         if (!announcement || announcement.createdById !== userId) {
             throw new Error('Announcement not found or unauthorized');
         }
@@ -26,8 +32,11 @@ class AnnouncementService {
             data,
         });
     }
-    static async deleteAnnouncement(id, userId) {
-        const announcement = await config_1.prisma.announcement.findUnique({ where: { id } });
+    static async deleteAnnouncement(id, userId, schoolId) {
+        const where = { id };
+        if (schoolId)
+            where.schoolId = schoolId;
+        const announcement = await config_1.prisma.announcement.findFirst({ where });
         if (!announcement || announcement.createdById !== userId) {
             throw new Error('Announcement not found or unauthorized');
         }

@@ -7,13 +7,13 @@ const sendMessage = async (req, res, next) => {
     try {
         const { recipientId, subject, content } = req.body;
         const message = await message_service_1.MessageService.sendMessage({
-            senderId: req.user.id,
+            senderId: req.user?.id,
             recipientId,
             subject,
             content,
             schoolId: req.schoolId,
         });
-        new apiResponse_1.ApiResponse(res, 201, 'Message sent successfully', message).send();
+        return apiResponse_1.ApiResponse.success(res, message, 'Message sent successfully', 201);
     }
     catch (error) {
         next(error);
@@ -22,8 +22,8 @@ const sendMessage = async (req, res, next) => {
 exports.sendMessage = sendMessage;
 const getInbox = async (req, res, next) => {
     try {
-        const messages = await message_service_1.MessageService.getInbox(req.user.id, req.schoolId);
-        new apiResponse_1.ApiResponse(res, 200, 'Inbox messages', messages).send();
+        const messages = await message_service_1.MessageService.getInbox(req.user?.id, req.schoolId);
+        return apiResponse_1.ApiResponse.success(res, messages, 'Inbox messages');
     }
     catch (error) {
         next(error);
@@ -32,8 +32,8 @@ const getInbox = async (req, res, next) => {
 exports.getInbox = getInbox;
 const getSentMessages = async (req, res, next) => {
     try {
-        const messages = await message_service_1.MessageService.getSentMessages(req.user.id, req.schoolId);
-        new apiResponse_1.ApiResponse(res, 200, 'Sent messages', messages).send();
+        const messages = await message_service_1.MessageService.getSentMessages(req.user?.id, req.schoolId);
+        return apiResponse_1.ApiResponse.success(res, messages, 'Sent messages');
     }
     catch (error) {
         next(error);
@@ -42,8 +42,8 @@ const getSentMessages = async (req, res, next) => {
 exports.getSentMessages = getSentMessages;
 const markAsRead = async (req, res, next) => {
     try {
-        const message = await message_service_1.MessageService.markAsRead(req.params.id, req.user.id);
-        new apiResponse_1.ApiResponse(res, 200, 'Message marked as read', message).send();
+        const message = await message_service_1.MessageService.markAsRead(req.params.id, req.user?.id, req.schoolId);
+        return apiResponse_1.ApiResponse.success(res, message, 'Message marked as read');
     }
     catch (error) {
         next(error);
@@ -52,8 +52,8 @@ const markAsRead = async (req, res, next) => {
 exports.markAsRead = markAsRead;
 const deleteMessage = async (req, res, next) => {
     try {
-        await message_service_1.MessageService.deleteMessage(req.params.id, req.user.id);
-        new apiResponse_1.ApiResponse(res, 200, 'Message deleted successfully').send();
+        await message_service_1.MessageService.deleteMessage(req.params.id, req.user?.id, req.schoolId);
+        return apiResponse_1.ApiResponse.success(res, {}, 'Message deleted successfully');
     }
     catch (error) {
         next(error);

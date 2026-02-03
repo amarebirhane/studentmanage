@@ -6,7 +6,7 @@ const apiResponse_1 = require("../../utils/apiResponse");
 class ClassController {
     static async getClasses(req, res) {
         try {
-            const classes = await class_service_1.ClassService.getClasses();
+            const classes = await class_service_1.ClassService.getClasses(req.schoolId);
             return apiResponse_1.ApiResponse.success(res, classes, 'Classes retrieved');
         }
         catch (error) {
@@ -15,7 +15,7 @@ class ClassController {
     }
     static async getSections(req, res) {
         try {
-            const sections = await class_service_1.ClassService.getSections();
+            const sections = await class_service_1.ClassService.getSections(req.schoolId);
             return apiResponse_1.ApiResponse.success(res, sections, 'Sections retrieved');
         }
         catch (error) {
@@ -25,7 +25,7 @@ class ClassController {
     static async createClass(req, res) {
         try {
             const { name, grade } = req.body;
-            const cls = await class_service_1.ClassService.createClass(name, grade);
+            const cls = await class_service_1.ClassService.createClass(name, grade, req.schoolId);
             return apiResponse_1.ApiResponse.success(res, cls, 'Class created successfully', 201);
         }
         catch (error) {
@@ -35,7 +35,7 @@ class ClassController {
     static async createSection(req, res) {
         try {
             const { name, classId } = req.body;
-            const section = await class_service_1.ClassService.createSection(name, classId);
+            const section = await class_service_1.ClassService.createSection(name, classId, req.schoolId);
             return apiResponse_1.ApiResponse.success(res, section, 'Section created successfully', 201);
         }
         catch (error) {
@@ -44,7 +44,7 @@ class ClassController {
     }
     static async deleteClass(req, res) {
         try {
-            await class_service_1.ClassService.deleteClass(req.params.id);
+            await class_service_1.ClassService.deleteClass(req.params.id, req.schoolId);
             return apiResponse_1.ApiResponse.success(res, {}, 'Class deleted successfully');
         }
         catch (error) {
@@ -53,7 +53,7 @@ class ClassController {
     }
     static async deleteSection(req, res) {
         try {
-            await class_service_1.ClassService.deleteSection(req.params.id);
+            await class_service_1.ClassService.deleteSection(req.params.id, req.schoolId);
             return apiResponse_1.ApiResponse.success(res, {}, 'Section deleted successfully');
         }
         catch (error) {

@@ -35,14 +35,12 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const announcementController = __importStar(require("./announcement.controller"));
-const auth_middleware_1 = require("../../middlewares/auth.middleware");
-const role_middleware_1 = require("../../middlewares/role.middleware");
-const client_1 = require("@prisma/client");
+const permission_middleware_1 = require("../../middlewares/permission.middleware");
 const router = (0, express_1.Router)();
-router.use(auth_middleware_1.protect);
-router.post('/', (0, role_middleware_1.authorize)(client_1.UserRole.ADMIN, client_1.UserRole.TEACHER), announcementController.createAnnouncement);
-router.get('/', announcementController.getAnnouncements);
-router.get('/:id', announcementController.getAnnouncement);
-router.patch('/:id', (0, role_middleware_1.authorize)(client_1.UserRole.ADMIN, client_1.UserRole.TEACHER), announcementController.updateAnnouncement);
-router.delete('/:id', (0, role_middleware_1.authorize)(client_1.UserRole.ADMIN), announcementController.deleteAnnouncement);
+// Routes are already protected and tenant-isolated by the parent router in routes.ts
+router.post('/', (0, permission_middleware_1.checkPermission)('announcements', 'create'), announcementController.createAnnouncement);
+router.get('/', (0, permission_middleware_1.checkPermission)('announcements', 'view'), announcementController.getAnnouncements);
+router.get('/:id', (0, permission_middleware_1.checkPermission)('announcements', 'view'), announcementController.getAnnouncement);
+router.patch('/:id', (0, permission_middleware_1.checkPermission)('announcements', 'edit'), announcementController.updateAnnouncement);
+router.delete('/:id', (0, permission_middleware_1.checkPermission)('announcements', 'delete'), announcementController.deleteAnnouncement);
 exports.default = router;

@@ -22,6 +22,7 @@ const fee_structure_routes_1 = __importDefault(require("./modules/fee-structures
 const assignment_routes_1 = __importDefault(require("./modules/assignments/assignment.routes"));
 const permission_routes_1 = __importDefault(require("./modules/permissions/permission.routes"));
 const report_routes_1 = __importDefault(require("./modules/reports/report.routes"));
+const timetable_routes_1 = __importDefault(require("./modules/timetables/timetable.routes"));
 const auth_middleware_1 = require("./middlewares/auth.middleware");
 const tenant_middleware_1 = require("./middlewares/tenant.middleware");
 const router = (0, express_1.Router)();
@@ -47,4 +48,5 @@ router.use('/messages', message_routes_1.default);
 router.use('/assignments', assignment_routes_1.default);
 router.use('/permissions', permission_routes_1.default);
 router.use('/reports', report_routes_1.default);
+router.use('/timetables', timetable_routes_1.default);
 exports.default = router;

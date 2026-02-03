@@ -35,12 +35,12 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const messageController = __importStar(require("./message.controller"));
-const auth_middleware_1 = require("../../middlewares/auth.middleware");
+const permission_middleware_1 = require("../../middlewares/permission.middleware");
 const router = (0, express_1.Router)();
-router.use(auth_middleware_1.protect); // All routes require authentication
-router.post('/', messageController.sendMessage);
-router.get('/inbox', messageController.getInbox);
-router.get('/sent', messageController.getSentMessages);
-router.patch('/:id/read', messageController.markAsRead);
-router.delete('/:id', messageController.deleteMessage);
+// Routes are already protected and tenant-isolated by the parent router in routes.ts
+router.post('/', (0, permission_middleware_1.checkPermission)('messages', 'create'), messageController.sendMessage);
+router.get('/inbox', (0, permission_middleware_1.checkPermission)('messages', 'view'), messageController.getInbox);
+router.get('/sent', (0, permission_middleware_1.checkPermission)('messages', 'view'), messageController.getSentMessages);
+router.patch('/:id/read', (0, permission_middleware_1.checkPermission)('messages', 'edit'), messageController.markAsRead);
+router.delete('/:id', (0, permission_middleware_1.checkPermission)('messages', 'delete'), messageController.deleteMessage);
 exports.default = router;

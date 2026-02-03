@@ -34,16 +34,15 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
-const feeStructureController = __importStar(require("./fee-structure.controller"));
+const timetableController = __importStar(require("./timetable.controller"));
+const auth_middleware_1 = require("../../middlewares/auth.middleware");
+const tenant_middleware_1 = require("../../middlewares/tenant.middleware");
 const permission_middleware_1 = require("../../middlewares/permission.middleware");
 const router = (0, express_1.Router)();
-// Routes are already protected and tenant-isolated by the parent router in routes.ts
-// Accountant and Admin can manage fee structures
-router.post('/', (0, permission_middleware_1.checkPermission)('fee-structures', 'create'), feeStructureController.createFeeStructure);
-router.get('/', (0, permission_middleware_1.checkPermission)('fee-structures', 'view'), feeStructureController.getAllFeeStructures);
-router.get('/:id', (0, permission_middleware_1.checkPermission)('fee-structures', 'view'), feeStructureController.getFeeStructureById);
-router.patch('/:id', (0, permission_middleware_1.checkPermission)('fee-structures', 'edit'), feeStructureController.updateFeeStructure);
-router.delete('/:id', (0, permission_middleware_1.checkPermission)('fee-structures', 'delete'), feeStructureController.deleteFeeStructure);
-router.post('/bulk-invoices', (0, permission_middleware_1.checkPermission)('fee-structures', 'edit'), // Generating invoices is an 'edit' or 'create' action on structures/invoices
-feeStructureController.bulkGenerateInvoices);
+router.use(auth_middleware_1.protect);
+router.use(tenant_middleware_1.tenantMiddleware);
+router.post('/', (0, permission_middleware_1.checkPermission)('timetable', 'create'), timetableController.createEntry);
+router.get('/', (0, permission_middleware_1.checkPermission)('timetable', 'view'), timetableController.getTimetable);
+router.patch('/:id', (0, permission_middleware_1.checkPermission)('timetable', 'edit'), timetableController.updateEntry);
+router.delete('/:id', (0, permission_middleware_1.checkPermission)('timetable', 'delete'), timetableController.deleteEntry);
 exports.default = router;

@@ -128,5 +128,79 @@ class ReportService {
         });
         return workbook;
     }
+    /**
+     * Generate Individual Student Report Card (PDF)
+     */
+    static async generateReportCardPDF(studentId, schoolId) {
+        const doc = new pdfkit_1.default();
+        const student = await config_1.prisma.studentProfile.findFirst({
+            where: { id: studentId, schoolId },
+            include: {
+                user: { select: { firstName: true, lastName: true } },
+                class: { select: { name: true } },
+                section: { select: { name: true } }
+            }
+        });
+        if (!student)
+            throw new Error('Student not found');
+        const grades = await config_1.prisma.gradeRecord.findMany({
+            where: { studentId },
+            include: { exam: true }
+        });
+        const studentData = student;
+        // PDF Content
+        doc.fontSize(22).text('Academic Report Card', { align: 'center' });
+        doc.moveDown();
+        doc.fontSize(14).text(`Name: ${studentData.user.firstName} ${studentData.user.lastName}`);
+        doc.text(`Enrollment No: ${studentData.enrollmentNo || 'N/A'}`);
+        doc.text(`Class: ${studentData.class?.name || 'N/A'} - ${studentData.section?.name || 'N/A'}`);
+        doc.moveDown();
+        // Table Header
+        const startY = doc.y;
+        doc.fontSize(12).text('Subject', 50, startY);
+        doc.text('Exam', 200, startY);
+        doc.text('Marks', 350, startY);
+        doc.text('Grade', 450, startY);
+        doc.moveDown();
+        doc.moveTo(50, doc.y).lineTo(550, doc.y).stroke();
+        let totalScored = 0;
+        let totalMax = 0;
+        grades.forEach((grade) => {
+            const y = doc.y;
+            if (y > 700) {
+                doc.addPage();
+                doc.fontSize(12).text('Subject', 50, 50);
+                doc.text('Exam', 200, 50);
+                doc.text('Marks', 350, 50);
+                doc.text('Grade', 450, 50);
+                doc.moveDown();
+                doc.moveTo(50, doc.y).lineTo(550, doc.y).stroke();
+            }
+            doc.text(grade.subject, 50, doc.y);
+            doc.text(grade.exam.name, 200, doc.y - 12);
+            doc.text(`${grade.scoredMarks}/${grade.totalMarks}`, 350, doc.y - 12);
+            doc.text(grade.grade || '-', 450, doc.y - 12);
+            doc.moveDown();
+            totalScored += grade.scoredMarks;
+            totalMax += grade.totalMarks;
+        });
+        doc.moveDown();
+        doc.moveTo(50, doc.y).lineTo(550, doc.y).stroke();
+        doc.moveDown();
+        const percentage = totalMax > 0 ? (totalScored / totalMax) * 100 : 0;
+        doc.fontSize(14).text(`Total Marks: ${totalScored} / ${totalMax}`, { align: 'right' });
+        doc.text(`Percentage: ${percentage.toFixed(2)}%`, { align: 'right' });
+        return doc;
+    }
+    /**
+     * Get Student Performance Analytics
+     */
+    static async getPerformanceAnalytics(studentId, schoolId) {
+        return config_1.prisma.performanceInsight.findMany({
+            where: { studentId },
+            orderBy: { generatedAt: 'desc' },
+            take: 10
+        });
+    }
 }
 exports.ReportService = ReportService;

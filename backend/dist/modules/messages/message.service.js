@@ -66,8 +66,11 @@ class MessageService {
             orderBy: { createdAt: 'desc' },
         });
     }
-    static async markAsRead(messageId, userId) {
-        const message = await config_1.prisma.message.findUnique({ where: { id: messageId } });
+    static async markAsRead(messageId, userId, schoolId) {
+        const where = { id: messageId };
+        if (schoolId)
+            where.schoolId = schoolId;
+        const message = await config_1.prisma.message.findFirst({ where });
         if (!message || message.recipientId !== userId) {
             throw new Error('Message not found or unauthorized');
         }
@@ -76,8 +79,11 @@ class MessageService {
             data: { readAt: new Date() },
         });
     }
-    static async deleteMessage(messageId, userId) {
-        const message = await config_1.prisma.message.findUnique({ where: { id: messageId } });
+    static async deleteMessage(messageId, userId, schoolId) {
+        const where = { id: messageId };
+        if (schoolId)
+            where.schoolId = schoolId;
+        const message = await config_1.prisma.message.findFirst({ where });
         if (!message || (message.senderId !== userId && message.recipientId !== userId)) {
             throw new Error('Message not found or unauthorized');
         }

@@ -16,9 +16,14 @@ import { limiter } from './middlewares/rateLimit.middleware';
 import { tenantMiddleware } from './middlewares/tenant.middleware';
 
 // Middleware
+app.set('etag', false); // Disable ETags to prevent 304 Not Modified in development
 app.use(helmet({
     crossOriginResourcePolicy: false,
 }));
+app.use((req, res, next) => {
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+    next();
+});
 app.use(morgan('dev'));
 app.use(cors({
     origin: config.cors.origin,

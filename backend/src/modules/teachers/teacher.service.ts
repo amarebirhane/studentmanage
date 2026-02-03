@@ -19,9 +19,10 @@ export class TeacherService {
                         phone: true,
                     },
                 },
-                sections: {
-                    include: {
-                        class: true,
+                _count: {
+                    select: {
+                        subjects: true,
+                        sections: true,
                     },
                 },
             },

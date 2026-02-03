@@ -1,29 +1,29 @@
 import api from '@/lib/api';
 import { ApiResponse } from '@/types/api';
 
-export interface AdminStats {
-    students: number;
-    teachers: number;
-    classes: number;
-    parents: number;
-    revenue: number;
+export interface SchoolAdminData {
+    stats: {
+        totalStudents: number;
+        totalTeachers: number;
+        totalClasses: number;
+        totalRevenue: number;
+        pendingFeesCount: number;
+        todayAttendance: number;
+    };
 }
 
-export interface TeacherStats {
-    activeClasses: number;
-    totalStudents: number;
-    upcomingExams: number;
-    pendingAttendance: number;
+export interface TeacherData {
+    stats: {
+        managedClasses: number;
+        taughtSubjects: number;
+        activeAssignments: number;
+    };
+    upcomingExams: any[]; // Define Exam type properly if possible
 }
 
 export const dashboardService = {
-    async getAdminStats(): Promise<AdminStats> {
-        const { data } = await api.get<ApiResponse<AdminStats>>('/dashboard/admin/stats');
-        return data.data!;
-    },
-
-    async getTeacherStats(): Promise<TeacherStats> {
-        const { data } = await api.get<ApiResponse<TeacherStats>>('/dashboard/teacher/stats');
+    async getDashboardStats<T = SchoolAdminData | TeacherData>(): Promise<T> {
+        const { data } = await api.get<ApiResponse<T>>('/dashboard');
         return data.data!;
     },
 };

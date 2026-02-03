@@ -1,12 +1,10 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Users, GraduationCap, School, Activity, ArrowUpRight, Plus } from 'lucide-react';
+import { Users, GraduationCap, School, Activity, ArrowUpRight, Plus, Banknote } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { studentService } from '@/services/student.service';
-import { teacherService } from '@/services/teacher.service';
-import { classService } from '@/services/class.service';
+import { dashboardService, SchoolAdminData } from '@/services/dashboard.service';
 import Link from 'next/link';
 
 export default function AdminDashboard() {
@@ -14,25 +12,24 @@ export default function AdminDashboard() {
         students: 0,
         teachers: 0,
         classes: 0,
-        activeSessions: 0
+        todayAttendance: 0,
+        revenue: 0
     });
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchStats = async () => {
             try {
-                const [students, teachers, classes] = await Promise.all([
-                    studentService.getStudents({ limit: 1 }),
-                    teacherService.getTeachers({ limit: 1 }),
-                    classService.getClasses()
-                ]);
-
-                setStats({
-                    students: students.pagination?.total || 0,
-                    teachers: teachers.pagination?.total || 0,
-                    classes: classes.length || 0,
-                    activeSessions: Math.floor(Math.random() * 10) + 5 // Placeholder for active sessions
-                });
+                const data = await dashboardService.getDashboardStats<SchoolAdminData>();
+                if (data && data.stats) {
+                    setStats({
+                        students: data.stats.totalStudents || 0,
+                        teachers: data.stats.totalTeachers || 0,
+                        classes: data.stats.totalClasses || 0,
+                        todayAttendance: data.stats.todayAttendance || 0,
+                        revenue: data.stats.totalRevenue || 0
+                    });
+                }
             } catch (error) {
                 console.error('Failed to fetch dashboard stats', error);
             } finally {
@@ -47,7 +44,7 @@ export default function AdminDashboard() {
         { title: 'Total Students', value: stats.students, icon: Users, color: 'text-blue-600', bg: 'bg-blue-100', href: '/dashboard/admin/students' },
         { title: 'Total Teachers', value: stats.teachers, icon: GraduationCap, color: 'text-green-600', bg: 'bg-green-100', href: '/dashboard/admin/teachers' },
         { title: 'Total Classes', value: stats.classes, icon: School, color: 'text-purple-600', bg: 'bg-purple-100', href: '/dashboard/admin/classes' },
-        { title: 'Active Sessions', value: stats.activeSessions, icon: Activity, color: 'text-orange-600', bg: 'bg-orange-100', href: '#' },
+        { title: 'Today\'s Attendance', value: stats.todayAttendance, icon: Activity, color: 'text-orange-600', bg: 'bg-orange-100', href: '/dashboard/admin/attendance' },
     ];
 
     return (

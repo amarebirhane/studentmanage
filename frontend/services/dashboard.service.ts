@@ -10,6 +10,10 @@ export interface SchoolAdminData {
         pendingFeesCount: number;
         todayAttendance: number;
     };
+    recentActivity: {
+        enrollments: any[];
+        payments: any[];
+    };
 }
 
 export interface TeacherData {

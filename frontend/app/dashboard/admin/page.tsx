@@ -8,28 +8,14 @@ import { dashboardService, SchoolAdminData } from '@/services/dashboard.service'
 import Link from 'next/link';
 
 export default function AdminDashboard() {
-    const [stats, setStats] = useState({
-        students: 0,
-        teachers: 0,
-        classes: 0,
-        todayAttendance: 0,
-        revenue: 0
-    });
+    const [data, setData] = useState<SchoolAdminData | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchStats = async () => {
             try {
-                const data = await dashboardService.getDashboardStats<SchoolAdminData>();
-                if (data && data.stats) {
-                    setStats({
-                        students: data.stats.totalStudents || 0,
-                        teachers: data.stats.totalTeachers || 0,
-                        classes: data.stats.totalClasses || 0,
-                        todayAttendance: data.stats.todayAttendance || 0,
-                        revenue: data.stats.totalRevenue || 0
-                    });
-                }
+                const result = await dashboardService.getDashboardStats<SchoolAdminData>();
+                setData(result);
             } catch (error) {
                 console.error('Failed to fetch dashboard stats', error);
             } finally {
@@ -41,10 +27,10 @@ export default function AdminDashboard() {
     }, []);
 
     const statCards = [
-        { title: 'Total Students', value: stats.students, icon: Users, color: 'text-blue-600', bg: 'bg-blue-100', href: '/dashboard/admin/students' },
-        { title: 'Total Teachers', value: stats.teachers, icon: GraduationCap, color: 'text-green-600', bg: 'bg-green-100', href: '/dashboard/admin/teachers' },
-        { title: 'Total Classes', value: stats.classes, icon: School, color: 'text-purple-600', bg: 'bg-purple-100', href: '/dashboard/admin/classes' },
-        { title: 'Today\'s Attendance', value: stats.todayAttendance, icon: Activity, color: 'text-orange-600', bg: 'bg-orange-100', href: '/dashboard/admin/attendance' },
+        { title: 'Total Students', value: data?.stats?.totalStudents || 0, icon: Users, color: 'text-blue-600', bg: 'bg-blue-100', href: '/dashboard/admin/students' },
+        { title: 'Total Teachers', value: data?.stats?.totalTeachers || 0, icon: GraduationCap, color: 'text-green-600', bg: 'bg-green-100', href: '/dashboard/admin/teachers' },
+        { title: 'Total Classes', value: data?.stats?.totalClasses || 0, icon: School, color: 'text-purple-600', bg: 'bg-purple-100', href: '/dashboard/admin/classes' },
+        { title: 'Today\'s Attendance', value: data?.stats?.todayAttendance || 0, icon: Activity, color: 'text-orange-600', bg: 'bg-orange-100', href: '/dashboard/admin/attendance' },
     ];
 
     return (
@@ -96,31 +82,55 @@ export default function AdminDashboard() {
                     </CardHeader>
                     <CardContent>
                         <div className="space-y-4">
-                            {[1, 2, 3].map((item) => (
-                                <div key={item} className="flex items-center gap-4 p-4 rounded-xl bg-secondary/20 border border-white/5">
-                                    <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                                        <Users className="h-5 w-5 text-primary" />
+                            {data?.recentActivity?.enrollments?.length ? data.recentActivity.enrollments.map((enrollment: any) => (
+                                <div key={enrollment.id} className="flex items-center gap-4 p-4 rounded-xl bg-secondary/20 border border-white/5 group hover:bg-secondary/30 transition-all">
+                                    <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0 border border-primary/20 overflow-hidden">
+                                        {enrollment.avatar ? (
+                                            <img src={enrollment.avatar} alt="" className="h-full w-full object-cover" />
+                                        ) : (
+                                            <Users className="h-5 w-5 text-primary" />
+                                        )}
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <p className="text-sm font-semibold">New student enrolled</p>
-                                        <p className="text-xs text-muted-foreground">Class 10A • 2 hours ago</p>
+                                        <p className="text-sm font-semibold truncate">{enrollment.name}</p>
+                                        <p className="text-xs text-muted-foreground">Enrolled in {enrollment.class} • {new Date(enrollment.date).toLocaleDateString()}</p>
                                     </div>
-                                    <Button variant="ghost" size="sm">Details</Button>
+                                    <Button variant="ghost" size="sm" className="opacity-0 group-hover:opacity-100 transition-opacity">Details</Button>
                                 </div>
-                            ))}
+                            )) : (
+                                <div className="text-center py-10">
+                                    <p className="text-sm text-muted-foreground">No recent enrollments</p>
+                                </div>
+                            )}
                         </div>
                     </CardContent>
                 </Card>
 
                 <Card className="glass-card border-none">
                     <CardHeader>
-                        <CardTitle>Quick Actions</CardTitle>
+                        <CardTitle>Recent Payments</CardTitle>
                     </CardHeader>
-                    <CardContent className="grid grid-cols-1 gap-3">
-                        <Button variant="secondary" className="w-full justify-start h-12 rounded-xl">Generate Attendance Report</Button>
-                        <Button variant="secondary" className="w-full justify-start h-12 rounded-xl">Schedule New Exam</Button>
-                        <Button variant="secondary" className="w-full justify-start h-12 rounded-xl">Publish Announcement</Button>
-                        <Button variant="secondary" className="w-full justify-start h-12 rounded-xl">Manage Permissions</Button>
+                    <CardContent>
+                        <div className="space-y-4">
+                            {data?.recentActivity?.payments?.length ? data.recentActivity.payments.map((payment: any) => (
+                                <div key={payment.id} className="flex items-center gap-4 p-4 rounded-xl bg-secondary/20 border border-white/5">
+                                    <div className="h-10 w-10 rounded-full bg-green-500/10 flex items-center justify-center shrink-0 border border-green-500/20">
+                                        <Banknote className="h-5 w-5 text-green-600" />
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <p className="text-sm font-semibold truncate">{payment.studentName}</p>
+                                        <p className="text-xs text-muted-foreground">${payment.amount} • {payment.method}</p>
+                                    </div>
+                                    <div className="text-right">
+                                        <p className="text-[10px] text-muted-foreground">{new Date(payment.date).toLocaleDateString()}</p>
+                                    </div>
+                                </div>
+                            )) : (
+                                <div className="text-center py-10">
+                                    <p className="text-sm text-muted-foreground">No recent payments tracked</p>
+                                </div>
+                            )}
+                        </div>
                     </CardContent>
                 </Card>
             </div>

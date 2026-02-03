@@ -41,7 +41,9 @@ export class DashboardService {
             classes,
             revenue,
             pendingFees,
-            attendanceToday
+            attendanceToday,
+            recentStudents,
+            recentPayments
         ] = await Promise.all([
             prisma.studentProfile.count({ where: { schoolId, deletedAt: null } }),
             prisma.teacherProfile.count({ where: { schoolId, deletedAt: null } }),
@@ -59,6 +61,18 @@ export class DashboardService {
                         lt: new Date(new Date().setHours(23, 59, 59, 999))
                     }
                 }
+            }),
+            prisma.studentProfile.findMany({
+                where: { schoolId, deletedAt: null },
+                take: 5,
+                orderBy: { createdAt: 'desc' },
+                include: { user: { select: { firstName: true, lastName: true, avatarUrl: true } }, class: true }
+            }),
+            prisma.feePayment.findMany({
+                where: { schoolId, deletedAt: null },
+                take: 5,
+                orderBy: { createdAt: 'desc' },
+                include: { invoice: { include: { student: { include: { user: { select: { firstName: true, lastName: true } } } } } } }
             })
         ]);
 
@@ -70,6 +84,22 @@ export class DashboardService {
                 totalRevenue: revenue._sum.amount || 0,
                 pendingFeesCount: pendingFees,
                 todayAttendance: attendanceToday
+            },
+            recentActivity: {
+                enrollments: recentStudents.map(s => ({
+                    id: s.id,
+                    name: `${s.user.firstName} ${s.user.lastName}`,
+                    class: s.class?.name || 'Unassigned',
+                    date: s.createdAt,
+                    avatar: s.user.avatarUrl
+                })),
+                payments: recentPayments.map(p => ({
+                    id: p.id,
+                    studentName: `${p.invoice.student.user.firstName} ${p.invoice.student.user.lastName}`,
+                    amount: p.amount,
+                    date: p.createdAt,
+                    method: p.method
+                }))
             }
         };
     }

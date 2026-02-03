@@ -1,8 +1,9 @@
 import { GradeRecord, Prisma } from '@prisma/client';
 import { prisma } from '../../config';
+import { AuditLogService } from '../platform/audit.service';
 
 export const createResult = async (data: Prisma.GradeRecordCreateInput): Promise<GradeRecord> => {
-    return prisma.gradeRecord.create({
+    const result = await prisma.gradeRecord.create({
         data,
     });
 };

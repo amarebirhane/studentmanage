@@ -1,8 +1,12 @@
 import { prisma } from '../../config';
 
 export class UserService {
-    static async getUsers() {
+    static async getUsers(schoolId?: string) {
+        const where: any = { deletedAt: null };
+        if (schoolId) where.schoolId = schoolId;
+
         return prisma.user.findMany({
+            where,
             select: {
                 id: true,
                 firstName: true,
@@ -11,14 +15,18 @@ export class UserService {
                 role: true,
                 phone: true,
                 createdAt: true,
+                schoolId: true,
             },
             orderBy: { createdAt: 'desc' },
         });
     }
 
-    static async getUserById(id: string) {
+    static async getUserById(id: string, schoolId?: string) {
+        const where: any = { id, deletedAt: null };
+        if (schoolId) where.schoolId = schoolId;
+
         const user = await prisma.user.findUnique({
-            where: { id },
+            where,
             select: {
                 id: true,
                 firstName: true,
@@ -26,6 +34,7 @@ export class UserService {
                 email: true,
                 role: true,
                 phone: true,
+                schoolId: true,
             },
         });
 
@@ -49,7 +58,16 @@ export class UserService {
         });
     }
 
-    static async deleteUser(id: string) {
-        return prisma.user.delete({ where: { id } });
+    static async deleteUser(id: string, schoolId?: string) {
+        const where: any = { id };
+        if (schoolId) where.schoolId = schoolId;
+
+        const user = await prisma.user.findFirst({ where });
+        if (!user) throw new Error('User not found');
+
+        return prisma.user.update({
+            where: { id },
+            data: { deletedAt: new Date() }
+        });
     }
 }

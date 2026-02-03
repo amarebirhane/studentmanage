@@ -18,7 +18,8 @@ const redis = new Redis(redisUrl, {
     },
     maxRetriesPerRequest: null,
     enableReadyCheck: false,
-    lazyConnect: true, // Don't connect immediately, wait for first command
+    // Don't immediately connect, let it connect on first command
+    lazyConnect: false,
 });
 
 redis.on('connect', () => {
@@ -33,9 +34,8 @@ redis.on('error', (err: any) => {
     logger.error('Redis connection error', err);
 });
 
-// Attempt to connect, but don't crash if it fails
-redis.connect().catch(() => {
-    logger.warn('⚠️  Redis not available. Running without cache and rate limiting will use memory store.');
+redis.on('close', () => {
+    // Silently handle connection close
 });
 
 export default redis;

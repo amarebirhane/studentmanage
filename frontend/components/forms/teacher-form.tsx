@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import toast from 'react-hot-toast';
-import { Upload, User, Phone, Mail, Hash, BookOpen } from 'lucide-react';
+import { Upload, User, Phone, Mail, Hash, BookOpen, Eye, EyeOff, Lock } from 'lucide-react';
 
 interface TeacherFormProps {
     teacherId?: string;
@@ -28,7 +28,9 @@ const TeacherForm = ({ teacherId, initialData }: TeacherFormProps) => {
         experience: '',
         joiningDate: '',
         avatarUrl: null,
+        password: '',
     });
+    const [showPassword, setShowPassword] = useState(false);
 
     const [avatarFile, setAvatarFile] = useState<File | null>(null);
     const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
@@ -48,6 +50,7 @@ const TeacherForm = ({ teacherId, initialData }: TeacherFormProps) => {
                 experience: profile.experience?.toString() || '',
                 joiningDate: profile.joiningDate ? new Date(profile.joiningDate).toISOString().split('T')[0] : '',
                 avatarUrl: profile.avatarUrl || null,
+                password: '',
             });
             if (profile.avatarUrl) {
                 setAvatarPreview(profile.avatarUrl.startsWith('http') ? profile.avatarUrl : `${process.env.NEXT_PUBLIC_API_URL?.replace('/api/v1', '')}${profile.avatarUrl}`);
@@ -127,6 +130,28 @@ const TeacherForm = ({ teacherId, initialData }: TeacherFormProps) => {
                                 <Label>Phone</Label>
                                 <Input name="phone" value={formData.phone} onChange={handleChange} />
                             </div>
+                            {!teacherId && (
+                                <div className="space-y-2">
+                                    <Label>Initial Password</Label>
+                                    <div className="relative">
+                                        <Input
+                                            name="password"
+                                            type={showPassword ? "text" : "password"}
+                                            value={formData.password}
+                                            onChange={handleChange}
+                                            placeholder="Leave empty for default: Teacher@123"
+                                            className="pr-10"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                                        >
+                                            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
                         </CardContent>
                     </Card>
 

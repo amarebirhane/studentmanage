@@ -29,10 +29,10 @@ export function middleware(request: NextRequest) {
     }
 
     // 2. Redirect authenticated users away from auth pages
-    if (isPublicRoute && pathname !== '/') {
-        const dashboardUrl = userRole ? roleRoutes[userRole] : '/dashboard';
-        return NextResponse.redirect(new URL(dashboardUrl || '/dashboard', request.url));
-    }
+    // if (isPublicRoute && pathname !== '/') {
+    //     const dashboardUrl = userRole ? roleRoutes[userRole] : '/dashboard';
+    //     return NextResponse.redirect(new URL(dashboardUrl || '/dashboard', request.url));
+    // }
 
     // 3. Role-Based Access Control
     if (pathname.startsWith('/dashboard')) {

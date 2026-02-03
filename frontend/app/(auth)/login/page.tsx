@@ -34,12 +34,13 @@ export default function LoginPage() {
     const router = useRouter();
 
     // Redirect if already authenticated
-    useEffect(() => {
-        if (isAuthenticated && user) {
-            const dashboardRoute = getDashboardRoute(user.role);
-            router.push(dashboardRoute);
-        }
-    }, [isAuthenticated, user, router]);
+    // Redirect if already authenticated
+    // useEffect(() => {
+    //     if (isAuthenticated && user) {
+    //         const dashboardRoute = getDashboardRoute(user.role);
+    //         router.push(dashboardRoute);
+    //     }
+    // }, [isAuthenticated, user, router]);
 
     if (isLoading) {
         return (

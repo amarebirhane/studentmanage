@@ -56,11 +56,21 @@ export default function TeachersPage() {
         {
             accessorKey: 'id',
             header: 'Teacher ID',
-            cell: ({ row }) => <span className="text-xs font-mono">{row.original.id.split('-')[0]}</span>,
+            cell: ({ row }) => <span className="text-xs font-mono">{row.original.id.split('-')[0].toUpperCase()}</span>,
         },
         {
-            accessorKey: 'subjects',
-            header: 'Subjects / Specialization',
+            header: 'Assignments',
+            cell: ({ row }) => {
+                const teacher = row.original;
+                const subjectsCount = teacher._count?.subjects || 0;
+                const sectionsCount = teacher._count?.sections || 0;
+                return (
+                    <div className="flex flex-col gap-1">
+                        <div className="text-xs font-medium">{subjectsCount} Subjects</div>
+                        <div className="text-[10px] text-muted-foreground">{sectionsCount} Sections managed</div>
+                    </div>
+                );
+            }
         },
         {
             id: 'actions',

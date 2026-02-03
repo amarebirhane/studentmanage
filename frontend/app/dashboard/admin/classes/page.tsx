@@ -1,18 +1,22 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { DataTable } from '@/components/tables/data-table';
-import { classService } from '@/services/class.service';
-import { ColumnDef } from '@tanstack/react-table';
-import Link from 'next/link';
-import toast from 'react-hot-toast';
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { GraduationCap, Search, Plus, Loader2, Users, Layout, MoreVertical, Edit, Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { classService } from "@/services/class.service";
+import { toast } from "react-hot-toast";
+import { Badge } from "@/components/ui/badge";
 
 export default function ClassesPage() {
     const [classes, setClasses] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [searchQuery, setSearchQuery] = useState("");
+
+    useEffect(() => {
+        fetchClasses();
+    }, []);
 
     const fetchClasses = async () => {
         try {
@@ -20,91 +24,139 @@ export default function ClassesPage() {
             const data = await classService.getClasses();
             setClasses(data || []);
         } catch (error) {
-            toast.error('Failed to fetch classes');
+            console.error('Failed to fetch classes:', error);
+            toast.error('Failed to load academic structures');
         } finally {
             setLoading(false);
         }
     };
 
-    useEffect(() => {
-        fetchClasses();
-    }, []);
+    const handleDelete = async (id: string, type: 'class' | 'section') => {
+        if (!confirm(`Are you sure you want to delete this ${type}?`)) return;
 
-    const handleDelete = async (id: string) => {
-        if (confirm('Are you sure you want to delete this class?')) {
-            try {
+        try {
+            if (type === 'class') {
                 await classService.deleteClass(id);
-                toast.success('Class deleted successfully');
-                fetchClasses();
-            } catch (error) {
-                toast.error('Failed to delete class');
+            } else {
+                await classService.deleteSection(id);
             }
+            toast.success(`${type.charAt(0).toUpperCase() + type.slice(1)} deleted successfully`);
+            fetchClasses();
+        } catch (error) {
+            toast.error(`Failed to delete ${type}`);
         }
     };
 
-    const columns: ColumnDef<any>[] = [
-        {
-            accessorKey: 'name',
-            header: 'Class Name',
-        },
-        {
-            accessorKey: 'description',
-            header: 'Description',
-        },
-        {
-            accessorKey: '_count.students',
-            header: 'Enrolled Students',
-            cell: ({ row }) => row.original._count?.students || 0,
-        },
-        {
-            id: 'actions',
-            cell: ({ row }) => {
-                const cls = row.original;
-                return (
-                    <div className="flex items-center gap-2">
-                        <Link href={`/dashboard/admin/classes/edit/${cls.id}`}>
-                            <Button variant="ghost" size="sm">
-                                <Edit className="h-4 w-4" />
-                            </Button>
-                        </Link>
-                        <Button variant="ghost" size="sm" onClick={() => handleDelete(cls.id)}>
-                            <Trash2 className="h-4 w-4 text-destructive" />
-                        </Button>
-                    </div>
-                );
-            },
-        },
-    ];
+    const filteredClasses = classes.filter(cls =>
+        cls.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        cls.grade?.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
     return (
-        <div className="p-6 space-y-6">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="space-y-8 animate-in fade-in duration-500 p-6">
+            <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight">Classes Management</h1>
-                    <p className="text-muted-foreground mt-1">Define grade levels and curriculum tracks.</p>
+                    <h1 className="text-3xl font-bold tracking-tight">Academic Management</h1>
+                    <p className="text-muted-foreground">Define grade levels, sections, and curriculum tracks.</p>
                 </div>
-                <Link href="/dashboard/admin/classes/new">
-                    <Button className="shadow-lg shadow-primary/20 gap-2 h-11 px-6">
-                        <Plus className="h-5 w-5" /> Add New Class
+                <div className="flex gap-3">
+                    <Button variant="outline" className="glass border-white/10">
+                        <Layout className="h-4 w-4 mr-2" />
+                        Manage Sections
                     </Button>
-                </Link>
+                    <Button className="glass bg-primary/20 hover:bg-primary/30 text-primary border-primary/20">
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add New Class
+                    </Button>
+                </div>
             </div>
 
-            <Card className="glass-card border-none">
-                <CardContent className="p-0">
-                    {loading ? (
-                        <div className="flex items-center justify-center h-64">
-                            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+            <div className="flex items-center space-x-4">
+                <div className="relative flex-1 max-w-sm">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                        placeholder="Search by class name or grade..."
+                        className="pl-10 glass border-white/10"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                </div>
+            </div>
+
+            {loading ? (
+                <div className="flex flex-col items-center justify-center py-20 space-y-4">
+                    <Loader2 className="h-8 w-8 text-primary animate-spin" />
+                    <p className="text-muted-foreground font-medium">Loading classes...</p>
+                </div>
+            ) : (
+                <div className="grid gap-6">
+                    {filteredClasses.length > 0 ? filteredClasses.map((cls) => (
+                        <Card key={cls.id} className="glass border-white/10 overflow-hidden group hover:border-primary/30 transition-colors">
+                            <CardContent className="p-0">
+                                <div className="p-6">
+                                    <div className="flex items-start justify-between mb-6">
+                                        <div className="flex items-center gap-4">
+                                            <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20">
+                                                <GraduationCap className="h-6 w-6 text-primary" />
+                                            </div>
+                                            <div>
+                                                <h3 className="text-lg font-bold">{cls.name}</h3>
+                                                <div className="flex items-center text-xs text-muted-foreground">
+                                                    <span className="font-medium mr-2">Grade: {cls.grade}</span>
+                                                    <span>•</span>
+                                                    <span className="ml-2">{cls._count?.students || 0} Students total</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <Button variant="ghost" size="sm" onClick={() => handleDelete(cls.id, 'class')}>
+                                                <Trash2 className="h-4 w-4 text-destructive" />
+                                            </Button>
+                                            <Button variant="ghost" size="sm">
+                                                <Edit className="h-4 w-4" />
+                                            </Button>
+                                        </div>
+                                    </div>
+
+                                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                        {cls.sections?.length > 0 ? cls.sections.map((section: any) => (
+                                            <div key={section.id} className="p-4 rounded-xl bg-white/5 border border-white/5 flex items-center justify-between group/section hover:bg-white/10 transition-colors">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="h-8 w-8 rounded-lg bg-secondary/50 flex items-center justify-center text-xs font-bold text-primary">
+                                                        {section.name}
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-sm font-semibold">Section {section.name}</p>
+                                                        <div className="flex items-center text-[10px] text-muted-foreground">
+                                                            <Users className="h-3 w-3 mr-1" />
+                                                            {section._count?.students || 0} Students
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0 opacity-0 group-section/hover:opacity-100" onClick={() => handleDelete(section.id, 'section')}>
+                                                    <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                                                </Button>
+                                            </div>
+                                        )) : (
+                                            <div className="p-4 rounded-xl bg-dashed border border-white/10 flex items-center justify-center text-xs text-muted-foreground italic">
+                                                No sections defined
+                                            </div>
+                                        )}
+                                        <Button variant="outline" className="h-full border-dashed border-white/10 hover:bg-white/5 text-xs text-muted-foreground py-4">
+                                            <Plus className="h-3 w-3 mr-1" /> Add Section
+                                        </Button>
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    )) : (
+                        <div className="text-center py-20 border-2 border-dashed border-white/5 rounded-3xl">
+                            <p className="text-muted-foreground font-medium">No classes found.</p>
+                            <p className="text-xs text-muted-foreground mt-1">Try refining your search or add a new academic class.</p>
                         </div>
-                    ) : (
-                        <DataTable
-                            columns={columns}
-                            data={classes}
-                            searchPlaceholder="Search classes..."
-                        />
                     )}
-                </CardContent>
-            </Card>
+                </div>
+            )}
         </div>
     );
 }

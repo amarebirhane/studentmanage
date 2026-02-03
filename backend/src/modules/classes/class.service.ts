@@ -122,7 +122,7 @@ export class ClassService {
                 code: data.code,
                 classId: data.classId,
                 teacherId: data.teacherId,
-                schoolId: data.schoolId
+                schoolId: data.schoolId as string
             }
         });
     }

@@ -15,4 +15,9 @@ router.post('/sections', checkPermission('classes', 'create'), ClassController.c
 router.delete('/:id', checkPermission('classes', 'delete'), ClassController.deleteClass);
 router.delete('/sections/:id', checkPermission('classes', 'delete'), ClassController.deleteSection);
 
+// Subject Routes
+router.get('/subjects', checkPermission('classes', 'view'), ClassController.getSubjects);
+router.post('/subjects', checkPermission('classes', 'create'), ClassController.createSubject);
+router.delete('/subjects/:id', checkPermission('classes', 'delete'), ClassController.deleteSubject);
+
 export default router;

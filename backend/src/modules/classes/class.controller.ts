@@ -59,4 +59,39 @@ export class ClassController {
             return ApiResponse.error(res, error.message, 400);
         }
     }
+
+    static async getSubjects(req: AuthenticatedRequest, res: Response) {
+        try {
+            const { classId } = req.query;
+            const subjects = await ClassService.getSubjects(req.schoolId, classId as string);
+            return ApiResponse.success(res, subjects, 'Subjects retrieved');
+        } catch (error: any) {
+            return ApiResponse.error(res, error.message);
+        }
+    }
+
+    static async createSubject(req: AuthenticatedRequest, res: Response) {
+        try {
+            const { name, code, classId, teacherId } = req.body;
+            const subject = await ClassService.createSubject({
+                name,
+                code,
+                classId,
+                teacherId,
+                schoolId: req.schoolId
+            });
+            return ApiResponse.success(res, subject, 'Subject created successfully', 201);
+        } catch (error: any) {
+            return ApiResponse.error(res, error.message, 400);
+        }
+    }
+
+    static async deleteSubject(req: AuthenticatedRequest, res: Response) {
+        try {
+            await ClassService.deleteSubject(req.params.id as string, req.schoolId);
+            return ApiResponse.success(res, {}, 'Subject deleted successfully');
+        } catch (error: any) {
+            return ApiResponse.error(res, error.message, 400);
+        }
+    }
 }

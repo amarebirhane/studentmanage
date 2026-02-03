@@ -39,7 +39,11 @@ export class AuthController {
             const { password, ...userWithoutPassword } = user;
             return ApiResponse.success(res, { ...userWithoutPassword, token, refreshToken }, 'Login successful');
         } catch (error: any) {
-            return ApiResponse.error(res, error.message, 401);
+            console.error('Login error:', error);
+            if (error.message === 'Invalid email or password') {
+                return ApiResponse.error(res, error.message, 401);
+            }
+            return ApiResponse.error(res, 'Internal server error', 500);
         }
     }
 

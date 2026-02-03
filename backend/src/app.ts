@@ -28,7 +28,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(limiter);
-app.use(tenantMiddleware);
+// app.use(tenantMiddleware);
 
 // Static Files
 app.use('/uploads', express.static(config.upload.path));

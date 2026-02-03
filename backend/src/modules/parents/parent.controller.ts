@@ -3,45 +3,50 @@ import { ParentService } from './parent.service';
 import { ApiResponse } from '../../utils/apiResponse';
 
 export class ParentController {
-    static async getParents(req: Request, res: Response) {
+    static async getParents(req: any, res: Response) {
         try {
-            const parents = await ParentService.getParents();
+            const { schoolId } = req.user;
+            const parents = await ParentService.getParents(schoolId);
             return ApiResponse.success(res, parents, 'Parents retrieved');
         } catch (error: any) {
             return ApiResponse.error(res, error.message);
         }
     }
 
-    static async getParentById(req: Request, res: Response) {
+    static async getParentById(req: any, res: Response) {
         try {
-            const parent = await ParentService.getParentById(req.params.id as string);
+            const { schoolId } = req.user;
+            const parent = await ParentService.getParentById(req.params.id as string, schoolId);
             return ApiResponse.success(res, parent, 'Parent retrieved');
         } catch (error: any) {
             return ApiResponse.error(res, error.message, 404);
         }
     }
 
-    static async createParent(req: Request, res: Response) {
+    static async createParent(req: any, res: Response) {
         try {
-            const parent = await ParentService.createParent(req.body);
+            const { schoolId } = req.user;
+            const parent = await ParentService.createParent(req.body, schoolId);
             return ApiResponse.success(res, parent, 'Parent created successfully', 201);
         } catch (error: any) {
             return ApiResponse.error(res, error.message, 400);
         }
     }
 
-    static async updateParent(req: Request, res: Response) {
+    static async updateParent(req: any, res: Response) {
         try {
-            const parent = await ParentService.updateParent(req.params.id as string, req.body);
+            const { schoolId } = req.user;
+            const parent = await ParentService.updateParent(req.params.id as string, req.body, schoolId);
             return ApiResponse.success(res, parent, 'Parent updated successfully');
         } catch (error: any) {
             return ApiResponse.error(res, error.message, 400);
         }
     }
 
-    static async deleteParent(req: Request, res: Response) {
+    static async deleteParent(req: any, res: Response) {
         try {
-            await ParentService.deleteParent(req.params.id as string);
+            const { schoolId } = req.user;
+            await ParentService.deleteParent(req.params.id as string, schoolId);
             return ApiResponse.success(res, {}, 'Parent deleted successfully');
         } catch (error: any) {
             return ApiResponse.error(res, error.message, 400);

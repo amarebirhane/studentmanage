@@ -2,9 +2,12 @@ import { prisma } from '../../config';
 import { hashPassword } from '../../utils/password';
 
 export class ParentService {
-    static async getParents() {
+    static async getParents(schoolId?: string) {
+        const where: any = { role: 'PARENT', deletedAt: null };
+        if (schoolId) where.schoolId = schoolId;
+
         return prisma.user.findMany({
-            where: { role: 'PARENT' },
+            where,
             include: {
                 parentProfiles: {
                     include: {
@@ -25,9 +28,12 @@ export class ParentService {
         });
     }
 
-    static async getParentById(id: string) {
+    static async getParentById(id: string, schoolId?: string) {
+        const where: any = { id, role: 'PARENT', deletedAt: null };
+        if (schoolId) where.schoolId = schoolId;
+
         const parent = await prisma.user.findFirst({
-            where: { id, role: 'PARENT' },
+            where,
             include: {
                 parentProfiles: {
                     include: {
@@ -48,7 +54,7 @@ export class ParentService {
         return parent;
     }
 
-    static async createParent(data: any) {
+    static async createParent(data: any, schoolId?: string) {
         const { firstName, lastName, email, password, phone, studentIds, relationship } = data;
 
         const userExists = await prisma.user.findUnique({ where: { email } });
@@ -67,6 +73,7 @@ export class ParentService {
                     password: hashedPassword,
                     role: 'PARENT',
                     phone,
+                    schoolId,
                 },
             });
 
@@ -89,10 +96,13 @@ export class ParentService {
         });
     }
 
-    static async updateParent(id: string, data: any) {
+    static async updateParent(id: string, data: any, schoolId?: string) {
         const { firstName, lastName, phone, email, studentIds, relationship } = data;
 
-        const parent = await prisma.user.findFirst({ where: { id, role: 'PARENT' } });
+        const where: any = { id, role: 'PARENT', deletedAt: null };
+        if (schoolId) where.schoolId = schoolId;
+
+        const parent = await prisma.user.findFirst({ where });
         if (!parent) {
             throw new Error('Parent not found');
         }
@@ -126,15 +136,24 @@ export class ParentService {
         });
     }
 
-    static async deleteParent(id: string) {
-        const parent = await prisma.user.findFirst({ where: { id, role: 'PARENT' } });
+    static async deleteParent(id: string, schoolId?: string) {
+        const where: any = { id, role: 'PARENT', deletedAt: null };
+        if (schoolId) where.schoolId = schoolId;
+
+        const parent = await prisma.user.findFirst({ where });
         if (!parent) {
             throw new Error('Parent not found');
         }
 
         return await prisma.$transaction(async (tx) => {
-            await tx.parentProfile.deleteMany({ where: { userId: id } });
-            await tx.user.delete({ where: { id } });
+            await tx.user.update({
+                where: { id },
+                data: { deletedAt: new Date() }
+            });
+            await tx.parentProfile.updateMany({
+                where: { userId: id },
+                data: { deletedAt: new Date() }
+            });
         });
     }
 

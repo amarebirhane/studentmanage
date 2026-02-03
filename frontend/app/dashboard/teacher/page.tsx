@@ -1,16 +1,47 @@
 'use client';
 
-import React from 'react';
-import { BookOpen, Users, ClipboardCheck, Plus, ArrowUpRight } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { BookOpen, Users, ClipboardCheck, Plus, ArrowUpRight, GraduationCap } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { dashboardService, TeacherData } from '@/services/dashboard.service';
 import Link from 'next/link';
 
 export default function TeacherDashboard() {
+    const [stats, setStats] = useState({
+        classes: 0,
+        subjects: 0,
+        assignments: 0
+    });
+    const [upcomingExams, setUpcomingExams] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchStats = async () => {
+            try {
+                const data = await dashboardService.getDashboardStats<TeacherData>();
+                if (data && data.stats) {
+                    setStats({
+                        classes: data.stats.managedClasses || 0,
+                        subjects: data.stats.taughtSubjects || 0,
+                        assignments: data.stats.activeAssignments || 0
+                    });
+                    setUpcomingExams(data.upcomingExams || []);
+                }
+            } catch (error) {
+                console.error('Failed to fetch dashboard stats', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchStats();
+    }, []);
+
     const statCards = [
-        { title: 'My Classes', value: '0', icon: BookOpen, color: 'text-blue-600', bg: 'bg-blue-100', href: '/dashboard/teacher/classes' },
-        { title: 'Total Students', value: '0', icon: Users, color: 'text-green-600', bg: 'bg-green-100', href: '/dashboard/teacher/students' },
-        { title: 'Attendance Today', value: '0%', icon: ClipboardCheck, color: 'text-purple-600', bg: 'bg-purple-100', href: '/dashboard/teacher/attendance' },
+        { title: 'My Classes', value: stats.classes, icon: BookOpen, color: 'text-blue-600', bg: 'bg-blue-100', href: '/dashboard/teacher/classes' },
+        { title: 'Taught Subjects', value: stats.subjects, icon: GraduationCap, color: 'text-green-600', bg: 'bg-green-100', href: '/dashboard/teacher/subjects' },
+        { title: 'Active Assignments', value: stats.assignments, icon: ClipboardCheck, color: 'text-purple-600', bg: 'bg-purple-100', href: '/dashboard/teacher/assignments' },
     ];
 
     return (
@@ -42,7 +73,9 @@ export default function TeacherDashboard() {
                         </CardHeader>
                         <CardContent>
                             <div className="flex items-baseline justify-between">
-                                <div className="text-3xl font-bold">{stat.value}</div>
+                                <div className="text-3xl font-bold">
+                                    {loading ? '...' : stat.value}
+                                </div>
                                 <Link href={stat.href} className="text-xs text-primary font-semibold flex items-center hover:underline">
                                     View all <ArrowUpRight className="h-3 w-3 ml-1" />
                                 </Link>
@@ -55,12 +88,30 @@ export default function TeacherDashboard() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <Card className="glass-card border-none">
                     <CardHeader>
-                        <CardTitle>Upcoming Classes</CardTitle>
+                        <CardTitle>Upcoming Exams</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-center py-12 text-muted-foreground italic">
-                            No classes scheduled for today.
-                        </div>
+                        {upcomingExams.length > 0 ? (
+                            <div className="space-y-4">
+                                {upcomingExams.map((exam: any) => (
+                                    <div key={exam.id} className="flex items-center gap-4 p-4 rounded-xl bg-secondary/20 border border-white/5">
+                                        <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                                            <BookOpen className="h-5 w-5 text-primary" />
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-sm font-semibold">{exam.name}</p>
+                                            <p className="text-xs text-muted-foreground">
+                                                {new Date(exam.examDate).toLocaleDateString()} • {exam.class?.name}
+                                            </p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="text-center py-12 text-muted-foreground italic">
+                                No upcoming exams found.
+                            </div>
+                        )}
                     </CardContent>
                 </Card>
 

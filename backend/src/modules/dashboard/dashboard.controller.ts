@@ -13,7 +13,7 @@ export class DashboardController {
                 case 'SUPER_ADMIN':
                     data = await DashboardService.getSuperAdminDashboard();
                     break;
-                case 'SCHOOL_ADMIN':
+                case 'ADMIN':
                     data = await DashboardService.getSchoolAdminDashboard(schoolId);
                     break;
                 case 'TEACHER':
@@ -37,6 +37,7 @@ export class DashboardController {
 
             return ApiResponse.success(res, data, `${role} dashboard data retrieved`);
         } catch (error: any) {
+            console.error('Dashboard Error Stack:', error);
             return ApiResponse.error(res, error.message);
         }
     }

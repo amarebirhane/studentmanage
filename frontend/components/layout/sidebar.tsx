@@ -8,7 +8,6 @@ import { cn } from '@/lib/utils';
 import {
     LayoutDashboard,
     Users,
-    UserPlus,
     GraduationCap,
     Settings,
     Calendar,
@@ -18,7 +17,8 @@ import {
     LogOut,
     DollarSign,
     BarChart3,
-    CreditCard
+    CreditCard,
+    UserPlus
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -55,6 +55,12 @@ const Sidebar = () => {
                     show: isSuperAdmin,
                 },
                 {
+                    title: 'School Admins',
+                    href: '/dashboard/super-admin/admins',
+                    icon: UserPlus,
+                    show: isSuperAdmin,
+                },
+                {
                     title: 'Revenue Tracking',
                     href: '/dashboard/super-admin/revenue',
                     icon: DollarSign,
@@ -87,25 +93,25 @@ const Sidebar = () => {
                     title: 'Students',
                     href: '/dashboard/admin/students',
                     icon: Users,
-                    show: isTeacher || isAdmin,
+                    show: (isTeacher || isAdmin) && !isSuperAdmin,
                 },
                 {
                     title: 'Parents',
                     href: '/dashboard/admin/parents',
                     icon: Users,
-                    show: isTeacher || isAdmin,
+                    show: (isTeacher || isAdmin) && !isSuperAdmin,
                 },
                 {
                     title: 'Classes',
                     href: '/dashboard/admin/classes',
                     icon: GraduationCap,
-                    show: isTeacher || isAdmin,
+                    show: (isTeacher || isAdmin) && !isSuperAdmin,
                 },
                 {
                     title: 'Attendance',
                     href: '/dashboard/attendance',
                     icon: Calendar,
-                    show: isTeacher || isAdmin || isStudent,
+                    show: (isTeacher || isAdmin || isStudent) && !isSuperAdmin,
                 },
             ]
         },
@@ -116,23 +122,23 @@ const Sidebar = () => {
                     title: 'Fee Invoices',
                     href: '/dashboard/admin/fees',
                     icon: ClipboardList,
-                    show: isAdmin || isAccountant || isStudent || isParent,
+                    show: (isAdmin || isAccountant || isStudent || isParent) && !isSuperAdmin,
                 },
                 {
                     title: 'Reports',
                     href: '/dashboard/admin/reports',
                     icon: BookOpen,
-                    show: isAdmin || isAccountant,
+                    show: (isAdmin || isAccountant) && !isSuperAdmin,
                 },
                 {
                     title: 'My Profile',
                     href: '/dashboard/settings',
                     icon: UserPlus,
-                    show: isStudent || isParent,
+                    show: (isStudent || isParent) && !isSuperAdmin,
                 },
             ]
         },
-        ...(isAdmin ? [{
+        ...(isAdmin && !isSuperAdmin ? [{
             label: 'Administrative',
             items: [
                 {

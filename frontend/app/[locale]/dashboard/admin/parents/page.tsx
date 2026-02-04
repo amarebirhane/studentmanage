@@ -11,10 +11,13 @@ import Link from 'next/link';
 import toast from 'react-hot-toast';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { DeleteConfirmDialog } from '@/components/DeleteConfirmDialog';
 
 export default function ParentsPage() {
     const [parents, setParents] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [parentToDelete, setParentToDelete] = useState<string | null>(null);
 
     const fetchParents = async () => {
         try {
@@ -33,14 +36,20 @@ export default function ParentsPage() {
     }, []);
 
     const handleDelete = async (id: string) => {
-        if (confirm('Are you sure you want to delete this parent?')) {
-            try {
-                await parentService.deleteParent(id);
-                toast.success('Parent deleted successfully');
-                fetchParents();
-            } catch (error) {
-                toast.error('Failed to delete parent');
-            }
+        setParentToDelete(id);
+        setDeleteDialogOpen(true);
+    };
+
+    const confirmDelete = async () => {
+        if (!parentToDelete) return;
+        try {
+            await parentService.deleteParent(parentToDelete);
+            toast.success('Parent deleted successfully');
+            fetchParents();
+        } catch (error) {
+            toast.error('Failed to delete parent');
+        } finally {
+            setParentToDelete(null);
         }
     };
 
@@ -154,6 +163,14 @@ export default function ParentsPage() {
                     )}
                 </CardContent>
             </Card>
+
+            <DeleteConfirmDialog
+                open={deleteDialogOpen}
+                onOpenChange={setDeleteDialogOpen}
+                onConfirm={confirmDelete}
+                title="Delete Parent"
+                description="Are you sure you want to delete this parent account? This action cannot be undone."
+            />
         </div>
     );
 }

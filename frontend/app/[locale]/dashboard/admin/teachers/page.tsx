@@ -10,10 +10,13 @@ import { ColumnDef } from '@tanstack/react-table';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { DeleteConfirmDialog } from '@/components/DeleteConfirmDialog';
 
 export default function TeachersPage() {
     const [teachers, setTeachers] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [teacherToDelete, setTeacherToDelete] = useState<string | null>(null);
 
     const fetchTeachers = async () => {
         try {
@@ -32,14 +35,20 @@ export default function TeachersPage() {
     }, []);
 
     const handleDelete = async (id: string) => {
-        if (confirm('Are you sure you want to delete this teacher?')) {
-            try {
-                await teacherService.deleteTeacher(id);
-                toast.success('Teacher deleted successfully');
-                fetchTeachers();
-            } catch (error) {
-                toast.error('Failed to delete teacher');
-            }
+        setTeacherToDelete(id);
+        setDeleteDialogOpen(true);
+    };
+
+    const confirmDelete = async () => {
+        if (!teacherToDelete) return;
+        try {
+            await teacherService.deleteTeacher(teacherToDelete);
+            toast.success('Teacher deleted successfully');
+            fetchTeachers();
+        } catch (error) {
+            toast.error('Failed to delete teacher');
+        } finally {
+            setTeacherToDelete(null);
         }
     };
 
@@ -160,6 +169,14 @@ export default function TeachersPage() {
                     )}
                 </CardContent>
             </Card>
+
+            <DeleteConfirmDialog
+                open={deleteDialogOpen}
+                onOpenChange={setDeleteDialogOpen}
+                onConfirm={confirmDelete}
+                title="Delete Teacher"
+                description="Are you sure you want to delete this teacher? This will permanently remove all teacher records and cannot be undone."
+            />
         </div>
     );
 }

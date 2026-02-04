@@ -53,5 +53,50 @@
         "teachers": "Barsiisota",
         "settings": "Sajata",
         "signOut": "Bahi"
+    },
+    "Landing": {
+        "heroBadge": "Sirna Bulchiinsa Mana Barnootaa Sadarkaa #1ffaa",
+        "heroTitle": "Barnoota Kalaqaan Humneessuu",
+        "heroDesc": "Dhaabbilee barnootaa amayyaaf furmaata guutuu, hunda-tokko ta'e. Bulchiinsa salphaatti hojjedhu, barumsa guddisu, fi hawaasa mana barnootaa cimaa ijaaru.",
+        "startFreeTrial": "Tajaajila bilisaan jalqabi",
+        "liveDemo": "Agarsiisa Kallattii",
+        "noCreditCard": "Kaardiin kaffaltii hin barbaachisu",
+        "setupInMinutes": "Daqiiqaa muraasa keessatti qophaa'a",
+        "moduleSubtitle": "Moojuulota",
+        "moduleTitle": "Waan Guddachuuf Barbaachisu Hunda",
+        "moduleDesc": "Meeshaalee humna qaban kanneen hojiiwwan mana barnootaa walxaxaa salphaatti hojjechuufi milkaa'ina barnootaa fiduuf dizaayini godhaman.",
+        "ctaTitle": "Mana barnootaa keessan ammayyeessuuf qophiidhaa?",
+        "ctaDesc": "Addunyaa guututti manneen barnootaa 500+ ol ta'an deeggeruun gara fuulduraa bulchiinsa barnootaa dhandhamaa.",
+        "getStarted": "Amma Jalqabi",
+        "contactSales": "Gurgurtaa Quunnamu",
+        "footerRights": "© 2026 EduSmart SMS. Mirgi hunduu eegamaadha.",
+        "privacy": "Iftoomina",
+        "terms": "Waliigaltee",
+        "features": {
+            "admin": {
+                "title": "Paaneelii Bulchiinsaa Beekamaa",
+                "desc": "Analiitiksii guddaa qabaachuun hojjettoota, barattoota, fi sirna barnootaa irratti to'annoo guutuu qabaachuu."
+            },
+            "student": {
+                "title": "Bulchiinsa Barattootaa",
+                "desc": "Guddina barnootaa, hirmaannaa, fi raawwii barataa salphaatti hordofuu."
+            },
+            "parent": {
+                "title": "Poortaalii Warraa",
+                "desc": "Warra socho'insa ijoollee isaanii irratti odeeffannoo yeroo dhugaa akka argatan gochuu."
+            },
+            "curriculum": {
+                "title": "Ijaaraa Sirna Barnootaa",
+                "desc": "Qabiyyee koorsii, qormaataa, fi bu'aa karaa dijitaalaa dizaayinii gochuufi bulchuu."
+            },
+            "attendance": {
+                "title": "Hordoffii Hirmaannaa",
+                "desc": "Akeekkachiisa yeroodhaan warraaf ergamuun hirmaannaa ofumaan mallatteessuu."
+            },
+            "financial": {
+                "title": "Faayinaansii Wabii Qabu",
+                "desc": "Kaffaltii, mindaa, fi baasii mana barnootaa bakka nageenya qabu tokkotti bulchuu."
+            }
+        }
     }
 }

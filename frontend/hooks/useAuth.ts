@@ -6,11 +6,16 @@ export const useAuth = () => {
 
     // Load user only once on initial mount if token exists but user is not loaded
     useEffect(() => {
-        // Trigger loadUser if we haven't attempted it yet
-        if (!hasAttemptedLoad && !user) {
+        const hasToken = document.cookie.split(';').some(c => c.trim().startsWith('token='));
+
+        // Trigger loadUser if we haven't attempted it yet and have a token
+        if (!hasAttemptedLoad && !user && hasToken) {
             loadUser().catch(() => {
                 // Silently fail - user is not authenticated
             });
+        } else if (!hasAttemptedLoad && !user && !hasToken) {
+            // If no token, just mark as loaded
+            useAuthStore.setState({ hasAttemptedLoad: true, isLoading: false });
         }
     }, [hasAttemptedLoad, user, loadUser]);
 

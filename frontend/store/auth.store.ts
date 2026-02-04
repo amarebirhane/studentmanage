@@ -30,7 +30,7 @@ const setCookie = (name: string, value: string, days = 7) => {
 
 const removeCookie = (name: string) => {
     if (typeof window === 'undefined') return;
-    document.cookie = `${name}=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;`;
+    document.cookie = `${name}=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT; SameSite=Lax`;
 };
 
 export const useAuthStore = create<AuthState>((set, get) => ({
@@ -117,20 +117,24 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         } catch (error) {
             console.error("Logout API error", error);
         } finally {
+            // First clear cookies and storage
             removeCookie('token');
             removeCookie('user_role');
             localStorage.removeItem('selectedSchoolId');
 
+            // Then reset state
             set({
                 user: null,
                 token: null,
                 isAuthenticated: false,
                 hasAttemptedLoad: true,
                 isLoading: false,
+                error: null
             });
 
+            // Finally redirect
             if (typeof window !== 'undefined') {
-                window.location.href = '/login';
+                window.location.replace('/login'); // Use replace to prevent back button issues
             }
         }
     },

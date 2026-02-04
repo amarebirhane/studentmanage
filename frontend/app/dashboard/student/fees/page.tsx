@@ -13,6 +13,8 @@ import { Button } from '@/components/ui/button';
 export default function StudentFeesPage() {
     const [fees, setFees] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [processingId, setProcessingId] = useState<string | null>(null);
+    const { user } = useAuth();
 
     useEffect(() => {
         fetchFees();

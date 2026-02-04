@@ -22,6 +22,7 @@
     "@types/pdfkit": "^0.17.4",
     "@types/swagger-jsdoc": "^6.0.4",
     "@types/swagger-ui-express": "^4.1.8",
+    "axios": "^1.13.4",
     "bcryptjs": "^2.4.3",
     "bullmq": "^5.67.2",
     "cookie-parser": "^1.4.6",

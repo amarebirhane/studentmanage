@@ -23,6 +23,7 @@ import notificationRoutes from './modules/notifications/notification.routes';
 import searchRoutes from './modules/search/search.routes';
 import uploadRoutes from './routes/upload.routes';
 import resourceRoutes from './modules/resources/resource.routes';
+import paymentRoutes from './modules/finance/payment.routes';
 
 import { protect } from './middlewares/auth.middleware';
 import { tenantMiddleware } from './middlewares/tenant.middleware';
@@ -61,6 +62,7 @@ protectedRouter.use('/notifications', notificationRoutes);
 protectedRouter.use('/search', searchRoutes);
 protectedRouter.use('/upload', uploadRoutes);
 protectedRouter.use('/resources', resourceRoutes);
+protectedRouter.use('/finance/payments', paymentRoutes);
 
 router.use(protectedRouter);
 

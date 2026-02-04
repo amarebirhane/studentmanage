@@ -6,7 +6,7 @@ const ENDPOINT = '/notifications';
 export const notificationService = {
     async getMyNotifications() {
         const { data } = await api.get<ApiResponse<any[]>>(ENDPOINT);
-        return data.data;
+        return data.data || [];
     },
     async markAsRead(id: string) {
         const { data } = await api.patch<ApiResponse<any>>(`${ENDPOINT}/${id}/read`);

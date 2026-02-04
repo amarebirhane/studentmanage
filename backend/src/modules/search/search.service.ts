@@ -33,10 +33,10 @@ export class SearchService {
                         { user: { lastName: { contains: decodedQuery, mode: 'insensitive' } } },
                         { employeeId: { contains: decodedQuery, mode: 'insensitive' } }
                     ]
-                },
+                } as any,
                 include: {
                     user: { select: { firstName: true, lastName: true, avatarUrl: true } }
-                },
+                } as any,
                 take: 5
             }),
             // Search Classes
@@ -50,23 +50,23 @@ export class SearchService {
         ]);
 
         return {
-            students: students.map(s => ({
+            students: (students as any[]).map(s => ({
                 id: s.id,
                 type: 'student',
-                title: `${s.user.firstName} ${s.user.lastName}`,
+                title: `${s.user?.firstName} ${s.user?.lastName}`,
                 subtitle: `ID: ${s.enrollmentNo} • ${s.class?.name || 'No Class'}`,
-                avatar: s.user.avatarUrl,
+                avatar: s.user?.avatarUrl,
                 link: `/dashboard/admin/students/view/${s.id}`
             })),
-            teachers: teachers.map(t => ({
+            teachers: (teachers as any[]).map(t => ({
                 id: t.id,
                 type: 'teacher',
-                title: `${t.user.firstName} ${t.user.lastName}`,
+                title: `${t.user?.firstName} ${t.user?.lastName}`,
                 subtitle: `ID: ${t.employeeId || 'N/A'}`,
-                avatar: t.user.avatarUrl,
+                avatar: t.user?.avatarUrl,
                 link: `/dashboard/admin/teachers/view/${t.id}`
             })),
-            classes: classes.map(c => ({
+            classes: (classes as any[]).map(c => ({
                 id: c.id,
                 type: 'class',
                 title: c.name,

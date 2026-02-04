@@ -17,6 +17,8 @@ export class ExamService {
         const exam = await prisma.exam.create({
             data: {
                 ...data,
+                classId: data.classId || null,
+                sectionId: data.sectionId || null,
                 published: false,
             },
             include: {

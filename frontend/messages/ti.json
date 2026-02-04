@@ -98,5 +98,30 @@
                 "desc": "ክፍሊታት፡ ደሞዝን ወጻኢታት ቤት ትምህርትን ኣብ ሓደ ውሑስ ቦታ ኣመሓድር።"
             }
         }
+    },
+    "Auth": {
+        "welcomeBack": "እንቋዕ ብደሓን መጻእኩም",
+        "authenticateDesc": "ናብቲ ውሑስ ዳሽቦርድኹም ንምቕጻል መንነትኩም ኣረጋግጹ።",
+        "identityVector": "መንነት",
+        "emailPlaceholder": "user@portal.com",
+        "credentialKey": "መሕለፊ ቃል",
+        "passwordPlaceholder": "••••••••••••",
+        "recoverAccess": "መእተዊ መሊስካ ረክብ",
+        "preserveSession": "ን 30 ዙራት ነቲ ክፍለ-ግዜ ዓቅቦ",
+        "loginButton": "እቶ",
+        "authorizing": "የረጋግጽ ኣሎ...",
+        "securityClearance": "ናይ ደህንነት ፍቃድ የድሊ",
+        "revolutionaryClassrooms": "ዘመናዊ ክፍልታት ትምህርቲ ምቕያር",
+        "brandingDesc": "ዛጊት ካብ ዝተነደፉ ኣዝዩ ዝማዕበለ ፖርታል ምሕደራ ቤት ትምህርቲ። ስሉጥ ስራሕ ምስ ጽባቐ ይራኸብ።",
+        "universalManagement": "ሓፈሻዊ ምሕደራ",
+        "universalManagementDesc": "ንኣመሓደርቲ፡ መምህራንን ተምሃሮን ዝኸውን ሓደ ፖርታል።",
+        "realtimeIntelligence": "ቅጽበታዊ ብልሒ",
+        "realtimeIntelligenceDesc": "ንቕጽበታዊ ውሳነ ዝኸውን ናይ ቀጥታ ትንታነ።",
+        "systemCore": "ኮር ስርዓት V2.4",
+        "accessRoot": "ናብ መበገሲ ተመለስ",
+        "enterValidCode": "በጃኹም ትኽክለኛ ናይ 6 ኣሃዝ ኮድ የእትዉ",
+        "twoFactorRequired": "ክልተ-ደረጃ ምርግጋጽ የድሊ",
+        "invalid2faCode": "ጌጋ ናይ 2FA ኮድ",
+        "invalidCredentials": "ጌጋ ሓበሬታ"
     }
 }

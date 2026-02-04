@@ -98,5 +98,30 @@
                 "desc": "Kaffaltii, mindaa, fi baasii mana barnootaa bakka nageenya qabu tokkotti bulchuu."
             }
         }
+    },
+    "Auth": {
+        "welcomeBack": "Baga Nagaan Deebitan",
+        "authenticateDesc": "Gara daashboordii keessan isa nageenya qabutti darbuuf eenyummaa keessan mirkaneessaa.",
+        "identityVector": "Eenyummaa",
+        "emailPlaceholder": "user@portal.com",
+        "credentialKey": "Jecha Darbii",
+        "passwordPlaceholder": "••••••••••••",
+        "recoverAccess": "Giddu-gala Deebisii Argadhu",
+        "preserveSession": "Turtii kana Marsaa 30f tursiisi",
+        "loginButton": "seeni",
+        "authorizing": "Mirkaneessaa jira...",
+        "securityClearance": "Hayyamni Nageenyaa Barbaachisaadha",
+        "revolutionaryClassrooms": "Kutaawwan Barnootaa Ammayyeessuu",
+        "brandingDesc": "Poortaalii bulchiinsa mana barnootaa baay'ee guddate kan dizaayini godhame. Hoji-qabeessummaan miidhagina waliin wal arga.",
+        "universalManagement": "Bulchiinsa Waliigalaa",
+        "universalManagementDesc": "Bulchitoota, barsiisota, fi barattootaaf poortaalii tokko.",
+        "realtimeIntelligence": "Qalbi-qabeessummaa Yeroo Dhugaa",
+        "realtimeIntelligenceDesc": "Murtoo hatattamaa kennuuf analiitiksii kallattii.",
+        "systemCore": "Core Sirnaa V2.4",
+        "accessRoot": "Gara Jalqabaatti Deebi'i",
+        "enterValidCode": "Maaloo koodii amansiisaa nambarii 6 galchaa",
+        "twoFactorRequired": "Mirkaneessi dachaa barbaachisaadha",
+        "invalid2faCode": "Koodii 2FA dogoggora",
+        "invalidCredentials": "Odeeffannoo dogoggora"
     }
 }

@@ -98,5 +98,30 @@
                 "desc": "Manage fees, payroll, and school expenses in one secure location."
             }
         }
+    },
+    "Auth": {
+        "welcomeBack": "Welcome Back",
+        "authenticateDesc": "Authenticate your identity to proceed to your secure dashboard.",
+        "identityVector": "Identity Vector",
+        "emailPlaceholder": "user@portal.com",
+        "credentialKey": "Credential Key",
+        "passwordPlaceholder": "••••••••••••",
+        "recoverAccess": "Recover Access",
+        "preserveSession": "Preserve session for 30 cycles",
+        "loginButton": "login",
+        "authorizing": "Authorizing...",
+        "securityClearance": "Security Clearance Required",
+        "revolutionaryClassrooms": "Revolutionizing Modern Classrooms",
+        "brandingDesc": "The most advanced school management portal ever designed. Efficiency meets elegance.",
+        "universalManagement": "Universal Management",
+        "universalManagementDesc": "One portal for admins, teachers, and students.",
+        "realtimeIntelligence": "Real-time Intelligence",
+        "realtimeIntelligenceDesc": "Live analytics for immediate decision making.",
+        "systemCore": "System Core V2.4",
+        "accessRoot": "Access Root",
+        "enterValidCode": "Please enter a valid 6-digit code",
+        "twoFactorRequired": "Two-factor authentication required",
+        "invalid2faCode": "Invalid 2FA Code",
+        "invalidCredentials": "Invalid credentials"
     }
 }

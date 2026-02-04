@@ -98,5 +98,30 @@
                 "desc": "ክፍያዎችን፣ የደመወዝ ክፍያን እና የትምህርት ቤት ወጪዎችን በአንድ ደህንነቱ በተጠበቀ ቦታ ያስተዳድሩ።"
             }
         }
+    },
+    "Auth": {
+        "welcomeBack": "እንኳን ደህና መጡ",
+        "authenticateDesc": "ወደ ደህንነቱ የተጠበቀ ዳሽቦርድዎ ለመቀጠል ማንነትዎን ያረጋግጡ።",
+        "identityVector": "መታወቂያ",
+        "emailPlaceholder": "user@portal.com",
+        "credentialKey": "የይለፍ ቃል",
+        "passwordPlaceholder": "••••••••••••",
+        "recoverAccess": "መድረሻን መልሰው ያግኙ",
+        "preserveSession": "ክፍለ-ጊዜውን ለ 30 ዑደቶች ያቆዩ",
+        "loginButton": "ግባ",
+        "authorizing": "በማረጋገጥ ላይ...",
+        "securityClearance": "የደህንነት ፈቃድ ያስፈልጋል",
+        "revolutionaryClassrooms": "ዘመናዊ የመማሪያ ክፍሎችን መቀየር",
+        "brandingDesc": "እስካሁን ከተነደፉት እጅግ የላቀ የትምህርት ቤት አስተዳደር ፖርታል:: ቅልጥፍና ከውበት ጋር ይገናኛል::",
+        "universalManagement": "አጠቃላይ አስተዳደር",
+        "universalManagementDesc": "ለአስተዳዳሪዎች፣ ለመምህራን እና ለተማሪዎች አንድ ፖርታል።",
+        "realtimeIntelligence": "ቅጽበታዊ ብልህነት",
+        "realtimeIntelligenceDesc": "ለፈጣን ውሳኔ አሰጣጥ የቀጥታ ትንታኔ።",
+        "systemCore": "ስርዓት ኮር V2.4",
+        "accessRoot": "ወደ መነሻ ተመለስ",
+        "enterValidCode": "እባክዎ ትክክለኛ ባለ 6 አሃዝ ኮድ ያስገቡ",
+        "twoFactorRequired": "ባለ ሁለት ደረጃ ማረጋገጫ ያስፈልጋል",
+        "invalid2faCode": "የተሳሳተ የ 2FA ኮድ",
+        "invalidCredentials": "የተሳሳተ መረጃ"
     }
 }

@@ -9,12 +9,21 @@ import Link from 'next/link';
 import { studentService } from '@/services/student.service';
 import { StudentProfile } from '@/types/student';
 import toast from 'react-hot-toast';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 export default function ViewStudentPage() {
     const params = useParams();
     const id = params.id as string;
     const [student, setStudent] = useState<StudentProfile | null>(null);
     const [loading, setLoading] = useState(true);
+
+    const getFullAvatarUrl = (url: string | null | undefined) => {
+        if (!url) return null;
+        if (url.startsWith('http')) return url;
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || '';
+        const baseUrl = apiUrl.replace('/api/v1', '');
+        return `${baseUrl}${url}`;
+    };
 
     useEffect(() => {
         const fetchStudent = async () => {
@@ -54,15 +63,12 @@ export default function ViewStudentPage() {
                 <Card className="lg:col-span-1 glass-card border-none overflow-hidden">
                     <div className="h-32 bg-primary/20 relative">
                         <div className="absolute -bottom-12 left-1/2 -translate-x-1/2">
-                            <div className="h-24 w-24 rounded-2xl bg-white p-1 shadow-xl">
-                                {student.avatarUrl ? (
-                                    <img src={student.avatarUrl} className="h-full w-full object-cover rounded-xl" alt="Avatar" />
-                                ) : (
-                                    <div className="h-full w-full bg-secondary flex items-center justify-center rounded-xl">
-                                        <User className="h-10 w-10 text-muted-foreground" />
-                                    </div>
-                                )}
-                            </div>
+                            <Avatar className="h-24 w-24 rounded-2xl border-4 border-background shadow-xl">
+                                <AvatarImage src={getFullAvatarUrl(student.avatarUrl || student.user?.avatarUrl) || ''} className="object-cover" />
+                                <AvatarFallback className="bg-secondary text-2xl font-bold text-muted-foreground">
+                                    {student.user?.firstName?.[0]}{student.user?.lastName?.[0]}
+                                </AvatarFallback>
+                            </Avatar>
                         </div>
                     </div>
                     <CardContent className="pt-16 text-center space-y-2 pb-8">

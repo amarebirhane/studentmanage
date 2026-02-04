@@ -84,6 +84,7 @@ model User {
   activityLogs     ActivityLog[]
   resetToken       String?
   resetTokenExpiry DateTime?
+  uploadedResources Resource[] @relation("ResourceUploader")
 }
 
 model StudentProfile {
@@ -139,6 +140,7 @@ model Subject {
   exams        Exam[]
   timetables   TimetableEntry[]
   assignments  Assignment[]
+  resources    Resource[]
   gradeRecords GradeRecord[]
   schoolId     String
   school       School           @relation(fields: [schoolId], references: [id])
@@ -225,6 +227,7 @@ model Class {
   timetable     TimetableEntry[]
   exams         Exam[]
   assignments   Assignment[]
+  resources     Resource[]
   createdAt     DateTime         @default(now())
   updatedAt     DateTime         @updatedAt
   deletedAt     DateTime?
@@ -624,6 +627,7 @@ model School {
   libraryTransactions  LibraryTransaction[]
   transportAssignments TransportAssignment[]
   hostelAssignments    HostelAssignment[]
+  resources           Resource[]
 }
 
 model Announcement {
@@ -712,4 +716,23 @@ model ActivityLog {
   details   Json?
   schoolId  String?
   createdAt DateTime @default(now())
+}
+
+model Resource {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  type        String
+  url         String
+  subject     Subject? @relation(fields: [subjectId], references: [id])
+  subjectId   String?
+  class       Class?   @relation(fields: [classId], references: [id])
+  classId     String?
+  uploadedBy  User     @relation("ResourceUploader", fields: [uploadedById], references: [id])
+  uploadedById String
+  schoolId    String
+  school      School   @relation(fields: [schoolId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  deletedAt   DateTime?
 }

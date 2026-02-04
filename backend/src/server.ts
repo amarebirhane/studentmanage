@@ -2,6 +2,7 @@ import { createServer } from 'http';
 import { Server } from 'socket.io';
 import app from './app';
 import { config, connectDB } from './config';
+import { setupNotificationSocket } from './modules/notifications/notification.socket';
 
 const startServer = async () => {
     // Connect to Database
@@ -18,13 +19,7 @@ const startServer = async () => {
         }
     });
 
-    io.on('connection', (socket) => {
-        console.log('🔌 New client connected:', socket.id);
-
-        socket.on('disconnect', () => {
-            console.log('🔌 Client disconnected:', socket.id);
-        });
-    });
+    setupNotificationSocket(io);
 
     // Make io accessible in the app
     app.set('io', io);

@@ -98,7 +98,8 @@ export class TimetableService {
             });
         }
 
-        throw new Error('User role not supported for my-timetable');
+        // Return empty for ADMIN, SUPER_ADMIN, etc. who don't have personal timetables
+        return [];
     }
 
     static async getTimetable(filters: {

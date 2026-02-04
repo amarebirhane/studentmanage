@@ -10,6 +10,7 @@ router.use(protect);
 router.use(tenantMiddleware);
 
 router.post('/', checkPermission('timetable', 'create'), timetableController.createEntry);
+router.get('/my-timetable', timetableController.getMyTimetable);
 router.get('/', checkPermission('timetable', 'view'), timetableController.getTimetable);
 router.patch('/:id', checkPermission('timetable', 'edit'), timetableController.updateEntry);
 router.delete('/:id', checkPermission('timetable', 'delete'), timetableController.deleteEntry);

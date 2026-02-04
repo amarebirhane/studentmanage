@@ -77,15 +77,33 @@ const TeacherForm = ({ teacherId, initialData }: TeacherFormProps) => {
         }
     };
 
+    const uploadAvatar = async () => {
+        if (!avatarFile) return formData.avatarUrl;
+        const data = new FormData();
+        data.append('file', avatarFile);
+        try {
+            const res = await api.post('/upload', data, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
+            const avatarUrl = res.data?.data?.url || res.data?.url;
+            return avatarUrl;
+        } catch (error) {
+            toast.error('Avatar upload failed');
+            return formData.avatarUrl;
+        }
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
 
         try {
+            const avatarUrl = await uploadAvatar();
             const { experience, ...rest } = formData;
             const submitData = {
                 ...rest,
-                experience: experience ? parseInt(experience) : 0
+                experience: experience ? parseInt(experience) : 0,
+                avatarUrl
             };
 
             if (teacherId) {
@@ -183,6 +201,30 @@ const TeacherForm = ({ teacherId, initialData }: TeacherFormProps) => {
                 </div>
 
                 <div className="space-y-8">
+                    <Card className="glass-card">
+                        <CardHeader>
+                            <CardTitle className="text-xl flex items-center gap-2">
+                                <Upload className="h-5 w-5 text-primary" /> Photo
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="flex flex-col items-center space-y-4">
+                            <div className="relative group">
+                                <div className="h-32 w-32 rounded-2xl bg-secondary flex items-center justify-center overflow-hidden border-2 border-dashed border-muted-foreground/25 group-hover:border-primary/50 transition-colors">
+                                    {avatarPreview ? (
+                                        <img src={avatarPreview} alt="Preview" className="h-full w-full object-cover" />
+                                    ) : (
+                                        <User className="h-12 w-12 text-muted-foreground/50" />
+                                    )}
+                                </div>
+                                <Label htmlFor="avatar-upload" className="absolute inset-0 cursor-pointer flex items-center justify-center bg-black/40 text-white opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl">
+                                    <Upload className="h-6 w-6" />
+                                </Label>
+                                <input id="avatar-upload" type="file" className="hidden" accept="image/*" onChange={handleAvatarChange} />
+                            </div>
+                            <p className="text-[10px] text-muted-foreground text-center uppercase tracking-widest font-bold">Recommended: 400x400 JPG/PNG</p>
+                        </CardContent>
+                    </Card>
+
                     <Card className="glass-card">
                         <CardHeader>
                             <CardTitle className="text-xl">Employment</CardTitle>

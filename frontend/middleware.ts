@@ -11,13 +11,7 @@ const roleRoutes = {
 
 import createMiddleware from 'next-intl/middleware';
 
-const roleRoutes = {
-    SUPER_ADMIN: '/dashboard/super-admin',
-    ADMIN: '/dashboard/admin',
-    TEACHER: '/dashboard/teacher',
-    STUDENT: '/dashboard/student',
-    PARENT: '/dashboard/parent',
-};
+
 
 const intlMiddleware = createMiddleware({
     locales: ['en', 'am', 'or'],

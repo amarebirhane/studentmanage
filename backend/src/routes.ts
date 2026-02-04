@@ -63,6 +63,7 @@ protectedRouter.use('/search', searchRoutes);
 protectedRouter.use('/upload', uploadRoutes);
 protectedRouter.use('/resources', resourceRoutes);
 protectedRouter.use('/finance/payments', paymentRoutes);
+protectedRouter.use('/finance/expenses', expenseRoutes);
 
 router.use(protectedRouter);
 

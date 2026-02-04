@@ -10,6 +10,7 @@ import { ColumnDef } from '@tanstack/react-table';
 import { StudentProfile } from '@/types/student';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 
 export default function StudentsPage() {
     const [students, setStudents] = useState<StudentProfile[]>([]);
@@ -44,6 +45,24 @@ export default function StudentsPage() {
     };
 
     const columns: ColumnDef<StudentProfile>[] = [
+        {
+            id: 'avatar',
+            header: '',
+            cell: ({ row }) => {
+                const avatarUrl = row.original.avatarUrl;
+                const fullAvatarUrl = avatarUrl
+                    ? (avatarUrl.startsWith('http') ? avatarUrl : `${process.env.NEXT_PUBLIC_API_URL?.replace('/api/v1', '')}${avatarUrl}`)
+                    : null;
+                return (
+                    <Avatar className="h-9 w-9 border border-primary/10">
+                        <AvatarImage src={fullAvatarUrl || undefined} className="object-cover" />
+                        <AvatarFallback className="bg-primary/5 text-primary text-xs">
+                            {row.original.user?.firstName?.[0]}{row.original.user?.lastName?.[0]}
+                        </AvatarFallback>
+                    </Avatar>
+                );
+            },
+        },
         {
             accessorKey: 'user.firstName',
             header: 'First Name',

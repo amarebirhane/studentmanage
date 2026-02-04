@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { useRole } from '@/hooks/useRole';
 import { cn } from '@/lib/utils';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import {
     LayoutDashboard,
     Users,
@@ -30,6 +31,15 @@ const Sidebar = () => {
     const pathname = usePathname();
     const { user, logout } = useAuth();
     const { isSuperAdmin, isAdmin, isTeacher, isStudent, isAccountant, isParent } = useRole({ userRole: user?.role as any });
+
+    const getAvatarUrl = () => {
+        if (user?.avatarUrl) {
+            return user.avatarUrl.startsWith('http')
+                ? user.avatarUrl
+                : `${process.env.NEXT_PUBLIC_API_URL?.replace('/api/v1', '')}${user.avatarUrl}`;
+        }
+        return user?.email ? `https://api.dicebear.com/7.x/initials/svg?seed=${user.email}` : '';
+    };
 
     const menuGroups = [
         {
@@ -265,9 +275,12 @@ const Sidebar = () => {
             <div className="p-4 border-t border-white/5 bg-black/5">
                 <div className="glass-card bg-secondary/30 border-none p-4 rounded-2xl">
                     <div className="flex items-center space-x-3 mb-4">
-                        <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20 shrink-0">
-                            <span className="font-bold text-primary">{user?.firstName?.[0]}</span>
-                        </div>
+                        <Avatar className="h-10 w-10 border border-primary/20 shrink-0 rounded-xl">
+                            <AvatarImage src={getAvatarUrl()} alt={user?.firstName || 'User'} className="object-cover" />
+                            <AvatarFallback className="bg-primary/10 text-primary font-bold">
+                                {user?.firstName?.[0]}
+                            </AvatarFallback>
+                        </Avatar>
                         <div className="flex-1 min-w-0">
                             <p className="text-sm font-bold truncate leading-none mb-1">{user?.firstName} {user?.lastName}</p>
                             <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">{user?.role}</p>

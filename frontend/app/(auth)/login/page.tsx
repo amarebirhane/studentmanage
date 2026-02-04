@@ -56,6 +56,10 @@ export default function LoginPage() {
                 return;
             }
             try {
+                // When submitting code, we also need to pass previous credentials if the backend requires them,
+                // or just the temporary token if the backend gave one.
+                // However, looking at the previous implementation plan and auth service,
+                // it seems 'login' is called again with the code.
                 await login({ ...formData, code: twoFactorToken });
                 const loggedInUser = useAuthStore.getState().user;
                 if (loggedInUser) {
@@ -72,7 +76,6 @@ export default function LoginPage() {
 
         const result = loginSchema.safeParse(formData);
         if (!result.success) {
-            // ... error handling ...
             const errors: Record<string, string> = {};
             result.error.errors.forEach((err) => {
                 if (err.path[0]) errors[err.path[0] as string] = err.message;
@@ -82,16 +85,23 @@ export default function LoginPage() {
         }
 
         try {
-            const response: any = await login(formData); // login now returns response thanks to my auth.store update plan (wait, did I update auth.store? No I decided to use the response returned by login)
+            const response = await login(formData);
 
-            // Wait, look at auth.store.ts again.
-            // login: async (credentials) => { ... const response = await authService.login(credentials); ... }
-            // It currently returns Promise<void>. I need to modify auth.store.ts to return the response or handle the 2FA logic internally.
+            if (response && response.twoFactorRequired) {
+                setTwoFactorRequired(true);
+                toast.success('Two-factor authentication required');
+                return;
+            }
 
-            // Actually, if I modify auth.store.ts, that's cleaner.
-            // But for now, let's fix auth.store.ts first.
+            const loggedInUser = useAuthStore.getState().user;
+            if (loggedInUser) {
+                const dashboardRoute = getDashboardRoute(loggedInUser.role);
+                toast.success(`Welcome back, ${loggedInUser.firstName}!`);
+                router.push(dashboardRoute);
+            }
         } catch (err: any) {
-            // ...
+            console.error('LoginPage - Submit Error:', err);
+            toast.error(err.response?.data?.message || 'Invalid credentials');
         }
     };
     // Redirect if already authenticated
@@ -129,33 +139,7 @@ export default function LoginPage() {
         }
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setValidationErrors({});
 
-        const result = loginSchema.safeParse(formData);
-        if (!result.success) {
-            const errors: Record<string, string> = {};
-            result.error.errors.forEach((err) => {
-                if (err.path[0]) errors[err.path[0] as string] = err.message;
-            });
-            setValidationErrors(errors);
-            return;
-        }
-
-        try {
-            await login(formData);
-            const loggedInUser = useAuthStore.getState().user;
-            if (loggedInUser) {
-                const dashboardRoute = getDashboardRoute(loggedInUser.role);
-                toast.success(`Welcome back, ${loggedInUser.firstName}!`);
-                router.push(dashboardRoute);
-            }
-        } catch (err: any) {
-            console.error('LoginPage - Submit Error:', err);
-            toast.error(err.response?.data?.message || 'Invalid credentials');
-        }
-    };
 
     return (
         <div className="h-screen w-screen grid grid-cols-1 md:grid-cols-[1.1fr,1fr] relative overflow-hidden font-sans selection:bg-primary/30">

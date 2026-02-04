@@ -12,7 +12,7 @@ interface AuthState {
 
     selectedSchoolId: string | null;
     setSelectedSchoolId: (id: string | null) => void;
-    login: (credentials: LoginCredentials) => Promise<void>;
+    login: (credentials: LoginCredentials) => Promise<any>;
     register: (userData: any) => Promise<void>;
     logout: () => void;
     loadUser: () => Promise<void>;
@@ -56,6 +56,12 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             const response = await authService.login(credentials);
             console.log('Auth Store - Login Response:', response);
 
+            // Handle 2FA requirement
+            if ('twoFactorRequired' in response && response.twoFactorRequired) {
+                set({ isLoading: false });
+                return response; // Return response so UI can handle 2FA step
+            }
+
             // Robust data extraction: Support both {user, token} and flat {id, email, token, ...}
             const user = ('user' in response) ? response.user : (('id' in response) ? response : null);
             const token = response.token;
@@ -78,6 +84,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
                 isLoading: false,
                 hasAttemptedLoad: true,
             });
+
+            return response;
         } catch (err: any) {
             console.error('Auth Store - Login Error:', err);
             set({

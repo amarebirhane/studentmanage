@@ -32,7 +32,7 @@ export class ResourceController {
     static async deleteResource(req: AuthenticatedRequest, res: Response) {
         try {
             await ResourceService.deleteResource(
-                req.params.id,
+                req.params.id as string,
                 req.user!.schoolId!
             );
             return ApiResponse.success(res, null, 'Resource deleted successfully');

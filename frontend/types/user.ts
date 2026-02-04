@@ -22,6 +22,7 @@ export type AuthResponse = {
 export interface LoginCredentials {
     email: string;
     password: string;
+    code?: string;
 }
 
 export interface RegisterData {

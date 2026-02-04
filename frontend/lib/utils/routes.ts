@@ -2,7 +2,7 @@ import { UserRole } from '@/types/user';
 
 /**
  * Get the dashboard route for a specific user role
- * @param role - The user's role (ADMIN, TEACHER, STUDENT, PARENT)
+ * @param role - The user's role (SUPER_ADMIN, ADMIN, TEACHER, STUDENT, PARENT, ACCOUNTANT, STAFF)
  * @returns The dashboard route path
  */
 export function getDashboardRoute(role: UserRole): string {

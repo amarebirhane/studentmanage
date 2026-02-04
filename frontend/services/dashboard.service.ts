@@ -25,6 +25,17 @@ export interface TeacherData {
     upcomingExams: any[]; // Define Exam type properly if possible
 }
 
+export interface ParentData {
+    children: Array<{
+        id: string;
+        name: string;
+        class?: string;
+        section?: string;
+        absentCount: number;
+        recentGrades: any[];
+    }>;
+}
+
 export interface SuperAdminData {
     stats: {
         totalSchools: number;

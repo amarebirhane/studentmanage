@@ -56,7 +56,23 @@ export const checkPermission = (module: string, action: 'view' | 'create' | 'edi
                 }
             }
 
-            // 6. Check granular permissions in the database
+            // 6. Special Case: Parents get default access to view essential modules for their children
+            if (req.user.role === 'PARENT' as any && (
+                module === 'students' ||
+                module === 'attendance' ||
+                module === 'timetable' ||
+                module === 'assignments' ||
+                module === 'exams' ||
+                module === 'results' ||
+                module === 'fees' ||
+                module === 'announcements'
+            )) {
+                if (action === 'view') {
+                    return next();
+                }
+            }
+
+            // 7. Check granular permissions in the database
             const hasPermission = await PermissionService.checkPermission(req.user.id, module, action);
 
             if (!hasPermission) {

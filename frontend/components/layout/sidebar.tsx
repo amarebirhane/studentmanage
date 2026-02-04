@@ -129,27 +129,27 @@ const Sidebar = () => {
                 },
                 {
                     title: 'Attendance',
-                    href: isStudent ? '/dashboard/student/attendance' : (isAdmin || isStaff || isTeacher) ? '/dashboard/attendance' : '/dashboard/attendance',
+                    href: isStudent ? '/dashboard/student/attendance' : (isAdmin || isStaff || isTeacher) ? '/dashboard/attendance' : isParent ? '/dashboard/attendance' : '/dashboard/attendance',
                     icon: ClipboardCheck,
-                    show: (isTeacher || isAdmin || isStudent || isStaff) && !isSuperAdmin,
+                    show: (isTeacher || isAdmin || isStudent || isStaff || isParent) && !isSuperAdmin,
                 },
                 {
                     title: 'Timetable',
-                    href: isTeacher ? '/dashboard/teacher/timetable' : (isStudent || isStaff) ? '/dashboard/timetable' : '/dashboard/timetable',
+                    href: isTeacher ? '/dashboard/teacher/timetable' : (isStudent || isStaff || isParent) ? '/dashboard/timetable' : '/dashboard/timetable',
                     icon: Clock,
-                    show: (isTeacher || isStudent || isStaff) && !isSuperAdmin,
+                    show: (isTeacher || isStudent || isStaff || isParent) && !isSuperAdmin,
                 },
                 {
                     title: 'Assignments',
                     href: isTeacher ? '/dashboard/teacher/assignments' : '/dashboard/assignments',
                     icon: BookOpen,
-                    show: (isTeacher || isStudent) && !isSuperAdmin,
+                    show: (isTeacher || isStudent || isParent) && !isSuperAdmin,
                 },
                 {
                     title: 'Exams & Results',
                     href: isTeacher ? '/dashboard/teacher/exams' : '/dashboard/exams',
                     icon: ClipboardList,
-                    show: (isTeacher || isStudent) && !isSuperAdmin,
+                    show: (isTeacher || isStudent || isParent) && !isSuperAdmin,
                 },
             ]
         },

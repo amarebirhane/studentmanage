@@ -10,13 +10,9 @@ const roleRoutes = {
 };
 
 import createMiddleware from 'next-intl/middleware';
+import { routing } from './navigation';
 
-
-
-const intlMiddleware = createMiddleware({
-    locales: ['en', 'am', 'or'],
-    defaultLocale: 'en'
-});
+const intlMiddleware = createMiddleware(routing);
 
 export function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;

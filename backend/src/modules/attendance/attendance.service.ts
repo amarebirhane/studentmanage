@@ -174,19 +174,28 @@ export class AttendanceService {
             if (filters.periodNumber !== undefined) where.periodNumber = filters.periodNumber;
         }
 
-        const records = await prisma.attendanceRecord.findMany({ where });
+        const [records, recent] = await Promise.all([
+            prisma.attendanceRecord.findMany({ where }),
+            prisma.attendanceRecord.findMany({
+                where: { studentId },
+                orderBy: { date: 'desc' },
+                take: 5,
+            })
+        ]);
 
         const summary = {
+            total: records.length,
             totalRecords: records.length,
             present: records.filter((r) => r.status === 'PRESENT').length,
             absent: records.filter((r) => r.status === 'ABSENT').length,
             late: records.filter((r) => r.status === 'LATE').length,
             excused: records.filter((r) => r.status === 'EXCUSED').length,
             percentage: 0,
+            recent,
         };
 
-        if (summary.totalRecords > 0) {
-            summary.percentage = Math.round((summary.present / summary.totalRecords) * 100);
+        if (summary.total > 0) {
+            summary.percentage = Math.round((summary.present / summary.total) * 100);
         }
 
         return summary;

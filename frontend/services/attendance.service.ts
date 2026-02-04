@@ -25,7 +25,11 @@ export const attendanceService = {
         return data.data;
     },
     async getStudentAttendance(studentId: string) {
-        const { data } = await api.get<ApiResponse<any>>(`${ENDPOINT}/student/${studentId}`);
+        const { data } = await api.get<ApiResponse<any>>(`${ENDPOINT}/?studentId=${studentId}`);
+        return data.data;
+    },
+    async getAttendanceStats(studentId: string) {
+        const { data } = await api.get<ApiResponse<any>>(`${ENDPOINT}/summary/${studentId}`);
         return data.data;
     },
     async getDailyReport(params: {

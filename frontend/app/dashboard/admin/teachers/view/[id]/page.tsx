@@ -8,12 +8,21 @@ import { ChevronLeft, User, Phone, Mail, Award, BookOpen, Briefcase } from 'luci
 import Link from 'next/link';
 import { teacherService } from '@/services/teacher.service';
 import toast from 'react-hot-toast';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 export default function ViewTeacherPage() {
     const params = useParams();
     const id = params.id as string;
     const [teacher, setTeacher] = useState<any>(null);
     const [loading, setLoading] = useState(true);
+
+    const getFullAvatarUrl = (url: string | null | undefined) => {
+        if (!url) return null;
+        if (url.startsWith('http')) return url;
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || '';
+        const baseUrl = apiUrl.replace('/api/v1', '');
+        return `${baseUrl}${url}`;
+    };
 
     useEffect(() => {
         const fetchTeacher = async () => {
@@ -50,12 +59,18 @@ export default function ViewTeacherPage() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <Card className="lg:col-span-1 glass-card border-none overflow-hidden">
-                    <div className="h-32 bg-primary/20 relative" />
-                    <CardContent className="pt-8 text-center space-y-4 pb-8">
-                        <div className="h-24 w-24 rounded-2xl bg-secondary flex items-center justify-center mx-auto border-4 border-white shadow-lg">
-                            <User className="h-10 w-10 text-muted-foreground" />
+                <Card className="lg:col-span-1 glass-card border-none overflow-hidden text-center pb-8">
+                    <div className="h-32 bg-primary/20 relative mb-16">
+                        <div className="absolute -bottom-12 left-1/2 -translate-x-1/2">
+                            <Avatar className="h-24 w-24 rounded-2xl border-4 border-background shadow-xl">
+                                <AvatarImage src={getFullAvatarUrl(teacher.avatarUrl || teacher.user?.avatarUrl) || ''} className="object-cover" />
+                                <AvatarFallback className="bg-secondary text-2xl font-bold text-muted-foreground">
+                                    {teacher.user?.firstName?.[0]}{teacher.user?.lastName?.[0]}
+                                </AvatarFallback>
+                            </Avatar>
                         </div>
+                    </div>
+                    <CardContent className="space-y-4">
                         <div>
                             <h2 className="text-2xl font-bold">{teacher.user?.firstName} {teacher.user?.lastName}</h2>
                             <p className="text-sm font-medium text-primary uppercase tracking-widest">{teacher.specialization}</p>

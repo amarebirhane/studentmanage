@@ -25,6 +25,7 @@ import { subjectService } from '@/services/subject.service';
 import { toast } from 'react-hot-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
+import { DeleteConfirmDialog } from '@/components/DeleteConfirmDialog';
 
 export default function AssignmentsPage() {
     const [assignments, setAssignments] = useState<any[]>([]);
@@ -33,6 +34,8 @@ export default function AssignmentsPage() {
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
     const [activeTab, setActiveTab] = useState('list');
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [assignmentToDelete, setAssignmentToDelete] = useState<string | null>(null);
 
     // Form state
     const [formData, setFormData] = useState({
@@ -91,13 +94,20 @@ export default function AssignmentsPage() {
     };
 
     const handleDelete = async (id: string) => {
-        if (!confirm('Are you sure you want to delete this assignment?')) return;
+        setAssignmentToDelete(id);
+        setDeleteDialogOpen(true);
+    };
+
+    const confirmDelete = async () => {
+        if (!assignmentToDelete) return;
         try {
-            await assignmentService.deleteAssignment(id);
-            setAssignments(assignments.filter(a => a.id !== id));
+            await assignmentService.deleteAssignment(assignmentToDelete);
+            setAssignments(assignments.filter(a => a.id !== assignmentToDelete));
             toast.success('Assignment deleted');
         } catch (error) {
             toast.error('Failed to delete assignment');
+        } finally {
+            setAssignmentToDelete(null);
         }
     };
 
@@ -270,6 +280,14 @@ export default function AssignmentsPage() {
                     </Card>
                 </TabsContent>
             </Tabs>
+
+            <DeleteConfirmDialog
+                open={deleteDialogOpen}
+                onOpenChange={setDeleteDialogOpen}
+                onConfirm={confirmDelete}
+                title="Delete Assignment"
+                description="Are you sure you want to delete this assignment? This action cannot be undone and will affect all students."
+            />
         </div>
     );
 }

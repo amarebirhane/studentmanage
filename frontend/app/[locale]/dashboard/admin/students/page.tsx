@@ -11,10 +11,13 @@ import { StudentProfile } from '@/types/student';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { DeleteConfirmDialog } from '@/components/DeleteConfirmDialog';
 
 export default function StudentsPage() {
     const [students, setStudents] = useState<StudentProfile[]>([]);
     const [loading, setLoading] = useState(true);
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [studentToDelete, setStudentToDelete] = useState<string | null>(null);
 
     const fetchStudents = async () => {
         try {
@@ -33,14 +36,20 @@ export default function StudentsPage() {
     }, []);
 
     const handleDelete = async (id: string) => {
-        if (confirm('Are you sure you want to delete this student?')) {
-            try {
-                await studentService.deleteStudent(id);
-                toast.success('Student deleted successfully');
-                fetchStudents();
-            } catch (error) {
-                toast.error('Failed to delete student');
-            }
+        setStudentToDelete(id);
+        setDeleteDialogOpen(true);
+    };
+
+    const confirmDelete = async () => {
+        if (!studentToDelete) return;
+        try {
+            await studentService.deleteStudent(studentToDelete);
+            toast.success('Student deleted successfully');
+            fetchStudents();
+        } catch (error) {
+            toast.error('Failed to delete student');
+        } finally {
+            setStudentToDelete(null);
         }
     };
 
@@ -136,6 +145,14 @@ export default function StudentsPage() {
                     )}
                 </CardContent>
             </Card>
+
+            <DeleteConfirmDialog
+                open={deleteDialogOpen}
+                onOpenChange={setDeleteDialogOpen}
+                onConfirm={confirmDelete}
+                title="Delete Student"
+                description="Are you sure you want to delete this student? This will permanently remove all student records and cannot be undone."
+            />
         </div>
     );
 }

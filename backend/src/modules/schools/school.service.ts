@@ -1,9 +1,35 @@
-import * as schoolRepository from './school.repository';
-import { Prisma } from '@prisma/client';
+import { prisma } from '../../config';
+import { hashPassword } from '../../utils/password';
+import { UserRole, Prisma } from '@prisma/client';
 import { ApiError } from '../../utils/apiResponse';
+import * as schoolRepository from './school.repository';
 
-export const createSchool = async (data: Prisma.SchoolCreateInput) => {
-    return schoolRepository.createSchool(data);
+export const createSchool = async (data: any) => {
+    const { adminUser, ...schoolData } = data;
+
+    return prisma.$transaction(async (tx) => {
+        // 1. Create the school
+        const school = await tx.school.create({
+            data: schoolData,
+        });
+
+        // 2. Create the admin user if provided
+        if (adminUser) {
+            const hashedPassword = await hashPassword(adminUser.password);
+            await tx.user.create({
+                data: {
+                    firstName: adminUser.firstName,
+                    lastName: adminUser.lastName,
+                    email: adminUser.email,
+                    password: hashedPassword,
+                    role: UserRole.ADMIN,
+                    schoolId: school.id,
+                },
+            });
+        }
+
+        return school;
+    });
 };
 
 export const getSchoolById = async (id: string) => {

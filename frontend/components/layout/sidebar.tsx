@@ -23,7 +23,8 @@ import {
     UserPlus,
     Bell,
     MessageSquare,
-    Clock
+    Clock,
+    Video
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -172,6 +173,12 @@ const Sidebar = () => {
                     title: 'Messages',
                     href: '/dashboard/messages',
                     icon: MessageSquare,
+                    show: !isSuperAdmin,
+                },
+                {
+                    title: 'Live Classes',
+                    href: '/dashboard/live-classes',
+                    icon: Video,
                     show: !isSuperAdmin,
                 },
             ]

@@ -4,7 +4,7 @@ export interface Resource {
     id: string;
     title: string;
     description?: string;
-    type: 'PDF' | 'VIDEO' | 'LINK' | 'IMAGE';
+    type: 'PDF' | 'VIDEO' | 'LINK' | 'IMAGE' | 'LIVE_CLASS';
     url: string;
     subjectId?: string;
     classId?: string;

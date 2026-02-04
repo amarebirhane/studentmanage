@@ -15,6 +15,11 @@ import { Label } from '@/components/ui/label';
 import { toast } from 'react-hot-toast';
 import { authService } from '@/services/auth.service';
 import api from '@/lib/api';
+import { useTheme } from 'next-themes';
+import { ChangePasswordDialog } from '@/components/settings/change-password-dialog';
+import { Moon, Sun, Monitor, Laptop, Bell, Activity as ActivityIcon } from 'lucide-react';
+import { NotificationSettingsDialog } from '@/components/settings/notification-settings-dialog';
+import { ActivityLogDialog } from '@/components/settings/activity-log-dialog';
 
 export default function ProfilePage() {
     const { user, isLoading, updateProfile } = useAuth();
@@ -24,6 +29,10 @@ export default function ProfilePage() {
     const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
     const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const { theme, setTheme } = useTheme();
+    const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
+    const [isNotificationDialogOpen, setIsNotificationDialogOpen] = useState(false);
+    const [isActivityLogOpen, setIsActivityLogOpen] = useState(false);
     const [formData, setFormData] = useState({
         firstName: '',
         lastName: '',
@@ -281,9 +290,12 @@ export default function ProfilePage() {
                             </CardContent>
                         </Card>
 
-                        {/* Additional Settings / Info (Placeholder) */}
+                        {/* Additional Settings / Info */}
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <Card className="glass-card border-none hover:bg-white/5 transition-colors cursor-pointer group">
+                            <Card
+                                onClick={() => setIsPasswordDialogOpen(true)}
+                                className="glass-card border-none hover:bg-white/5 transition-colors cursor-pointer group"
+                            >
                                 <CardHeader>
                                     <CardTitle className="flex items-center gap-2 text-lg">
                                         <Shield className="h-5 w-5 text-primary group-hover:scale-110 transition-transform" />
@@ -292,19 +304,75 @@ export default function ProfilePage() {
                                     <CardDescription>Manage password & 2FA</CardDescription>
                                 </CardHeader>
                             </Card>
-                            <Card className="glass-card border-none hover:bg-white/5 transition-colors cursor-pointer group">
+
+                            <Dialog>
+                                <DialogTrigger asChild>
+                                    <Card className="glass-card border-none hover:bg-white/5 transition-colors cursor-pointer group">
+                                        <CardHeader>
+                                            <CardTitle className="flex items-center gap-2 text-lg">
+                                                <User className="h-5 w-5 text-primary group-hover:scale-110 transition-transform" />
+                                                Appearance
+                                            </CardTitle>
+                                            <CardDescription>Theme: <span className="capitalize font-bold text-primary">{theme}</span></CardDescription>
+                                        </CardHeader>
+                                    </Card>
+                                </DialogTrigger>
+                                <DialogContent className="sm:max-w-md glass-card border-white/10">
+                                    <DialogHeader>
+                                        <DialogTitle>Switch Theme</DialogTitle>
+                                        <DialogDescription>
+                                            Choose how the interface looks on your device.
+                                        </DialogDescription>
+                                    </DialogHeader>
+                                    <div className="grid grid-cols-3 gap-4 py-4">
+                                        <Button
+                                            variant={theme === 'light' ? 'default' : 'outline'}
+                                            className={`flex-col h-24 gap-2 ${theme === 'light' ? 'bg-primary' : 'bg-secondary/50'}`}
+                                            onClick={() => setTheme('light')}
+                                        >
+                                            <Sun className="h-6 w-6" />
+                                            <span>Light</span>
+                                        </Button>
+                                        <Button
+                                            variant={theme === 'dark' ? 'default' : 'outline'}
+                                            className={`flex-col h-24 gap-2 ${theme === 'dark' ? 'bg-primary' : 'bg-secondary/50'}`}
+                                            onClick={() => setTheme('dark')}
+                                        >
+                                            <Moon className="h-6 w-6" />
+                                            <span>Dark</span>
+                                        </Button>
+                                        <Button
+                                            variant={theme === 'system' ? 'default' : 'outline'}
+                                            className={`flex-col h-24 gap-2 ${theme === 'system' ? 'bg-primary' : 'bg-secondary/50'}`}
+                                            onClick={() => setTheme('system')}
+                                        >
+                                            <Monitor className="h-6 w-6" />
+                                            <span>System</span>
+                                        </Button>
+                                    </div>
+                                </DialogContent>
+                            </Dialog>
+
+                            <Card
+                                onClick={() => setIsNotificationDialogOpen(true)}
+                                className="glass-card border-none hover:bg-white/5 transition-colors cursor-pointer group"
+                            >
                                 <CardHeader>
                                     <CardTitle className="flex items-center gap-2 text-lg">
-                                        <User className="h-5 w-5 text-primary group-hover:scale-110 transition-transform" />
-                                        Preferences
+                                        <Bell className="h-5 w-5 text-primary group-hover:scale-110 transition-transform" />
+                                        Notifications
                                     </CardTitle>
-                                    <CardDescription>Theme & Notification settings</CardDescription>
+                                    <CardDescription>Configure alerts</CardDescription>
                                 </CardHeader>
                             </Card>
-                            <Card className="glass-card border-none hover:bg-white/5 transition-colors cursor-pointer group">
+
+                            <Card
+                                onClick={() => setIsActivityLogOpen(true)}
+                                className="glass-card border-none hover:bg-white/5 transition-colors cursor-pointer group"
+                            >
                                 <CardHeader>
                                     <CardTitle className="flex items-center gap-2 text-lg">
-                                        <Activity className="h-5 w-5 text-primary group-hover:scale-110 transition-transform" />
+                                        <ActivityIcon className="h-5 w-5 text-primary group-hover:scale-110 transition-transform" />
                                         Activity
                                     </CardTitle>
                                     <CardDescription>View login history</CardDescription>
@@ -314,9 +382,21 @@ export default function ProfilePage() {
                     </div>
                 </main>
             </div>
+            <ChangePasswordDialog
+                open={isPasswordDialogOpen}
+                onOpenChange={setIsPasswordDialogOpen}
+            />
+            <NotificationSettingsDialog
+                open={isNotificationDialogOpen}
+                onOpenChange={setIsNotificationDialogOpen}
+            />
+            <ActivityLogDialog
+                open={isActivityLogOpen}
+                onOpenChange={setIsActivityLogOpen}
+            />
         </div>
     );
 }
 
-// Helper icon component
+// Helper icons
 import { Activity } from 'lucide-react';

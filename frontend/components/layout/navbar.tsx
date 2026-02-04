@@ -2,6 +2,7 @@ import { Bell, LogOut, Search, User } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -13,6 +14,15 @@ import {
 
 export default function Navbar() {
     const { user, logout } = useAuth();
+
+    const getAvatarUrl = () => {
+        if (user?.avatarUrl) {
+            return user.avatarUrl.startsWith('http')
+                ? user.avatarUrl
+                : `${process.env.NEXT_PUBLIC_API_URL?.replace('/api/v1', '')}${user.avatarUrl}`;
+        }
+        return user?.email ? `https://api.dicebear.com/7.x/initials/svg?seed=${user.email}` : '';
+    };
 
     return (
         <header className="h-20 glass border-b px-8 flex items-center justify-between sticky top-0 z-40">
@@ -38,9 +48,12 @@ export default function Navbar() {
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <button className="flex items-center gap-3 p-1 rounded-xl hover:bg-secondary/80 transition-all">
-                            <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20">
-                                <User className="h-5 w-5 text-primary" />
-                            </div>
+                            <Avatar className="h-10 w-10 border border-primary/20">
+                                <AvatarImage src={getAvatarUrl()} alt={user?.firstName || 'User'} />
+                                <AvatarFallback className="bg-primary/10 text-primary">
+                                    {user?.firstName?.[0]}{user?.lastName?.[0]}
+                                </AvatarFallback>
+                            </Avatar>
                             <div className="text-left hidden sm:block">
                                 <p className="text-sm font-semibold leading-none">{user?.firstName} {user?.lastName}</p>
                                 <p className="text-xs text-muted-foreground mt-1 capitalize">{user?.role?.toLowerCase()}</p>

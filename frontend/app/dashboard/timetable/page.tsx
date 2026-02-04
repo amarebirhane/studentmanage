@@ -7,7 +7,7 @@ import { Loader2, Calendar, Clock, MapPin, User, Edit2, Save, X, Plus } from 'lu
 import { timetableService } from '@/services/timetable.service';
 import { toast } from 'react-hot-toast';
 import { cn } from '@/lib/utils';
-import { useAuth } from '@/hooks/use-auth';
+import { useAuth } from '@/hooks/useAuth';
 import { DndContext, DragOverlay, useDraggable, useDroppable, DragEndEvent } from '@dnd-kit/core';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';

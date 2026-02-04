@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { io } from 'socket.io-client';
-import { useAuth } from '@/hooks/use-auth';
+import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'react-hot-toast';
 import { usePathname } from 'next/navigation';
 

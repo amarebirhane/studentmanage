@@ -12,4 +12,10 @@ router.get('/profile', protect, AuthController.getProfile);
 router.put('/profile', protect, AuthController.updateProfile);
 router.patch('/change-password', protect, AuthController.changePassword);
 
+// 2FA Routes
+router.post('/2fa/generate', protect, AuthController.generateTwoFactor);
+router.post('/2fa/enable', protect, AuthController.enableTwoFactor);
+router.post('/2fa/verify', protect, AuthController.verifyTwoFactor);
+router.post('/2fa/disable', protect, AuthController.disableTwoFactor);
+
 export default router;

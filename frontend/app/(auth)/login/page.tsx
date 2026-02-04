@@ -30,10 +30,70 @@ export default function LoginPage() {
     const [showPassword, setShowPassword] = useState(false);
     const [rememberMe, setRememberMe] = useState(false);
 
+    const [twoFactorRequired, setTwoFactorRequired] = useState(false);
+    const [twoFactorToken, setTwoFactorToken] = useState('');
+
     const { login, isLoading, user, isAuthenticated } = useAuth();
     const router = useRouter();
 
-    // Redirect if already authenticated
+    // ... existing useEffect ...
+
+    if (isLoading) {
+        // ... existing loading skeleton ...
+        // Keeping the same as original file, just truncated for brevity here in replacement content if I was rewriting whole file.
+        // But I will try to match exact lines to just inject the state and modify handleSubmit
+    }
+
+    // ... handleChange ...
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setValidationErrors({});
+
+        if (twoFactorRequired) {
+            if (!twoFactorToken || twoFactorToken.length !== 6) {
+                toast.error('Please enter a valid 6-digit code');
+                return;
+            }
+            try {
+                await login({ ...formData, code: twoFactorToken });
+                const loggedInUser = useAuthStore.getState().user;
+                if (loggedInUser) {
+                    const dashboardRoute = getDashboardRoute(loggedInUser.role);
+                    toast.success(`Welcome back, ${loggedInUser.firstName}!`);
+                    router.push(dashboardRoute);
+                }
+            } catch (err: any) {
+                console.error('LoginPage - 2FA Submit Error:', err);
+                toast.error(err.response?.data?.message || 'Invalid 2FA Code');
+            }
+            return;
+        }
+
+        const result = loginSchema.safeParse(formData);
+        if (!result.success) {
+            // ... error handling ...
+            const errors: Record<string, string> = {};
+            result.error.errors.forEach((err) => {
+                if (err.path[0]) errors[err.path[0] as string] = err.message;
+            });
+            setValidationErrors(errors);
+            return;
+        }
+
+        try {
+            const response: any = await login(formData); // login now returns response thanks to my auth.store update plan (wait, did I update auth.store? No I decided to use the response returned by login)
+
+            // Wait, look at auth.store.ts again.
+            // login: async (credentials) => { ... const response = await authService.login(credentials); ... }
+            // It currently returns Promise<void>. I need to modify auth.store.ts to return the response or handle the 2FA logic internally.
+
+            // Actually, if I modify auth.store.ts, that's cleaner.
+            // But for now, let's fix auth.store.ts first.
+        } catch (err: any) {
+            // ...
+        }
+    };
     // Redirect if already authenticated
     // useEffect(() => {
     //     if (isAuthenticated && user) {

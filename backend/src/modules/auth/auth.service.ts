@@ -37,7 +37,7 @@ export class AuthService {
     }
 
     static async login(data: any) {
-        const { email, password } = data;
+        const { email, password, code } = data;
 
         const user = await prisma.user.findFirst({
             where: {
@@ -51,10 +51,20 @@ export class AuthService {
         }
 
         if (user.twoFactorEnabled) {
-            return {
-                twoFactorRequired: true,
-                userId: user.id
-            };
+            if (code) {
+                // Verify 2FA code
+                const verified = speakeasy.totp.verify({
+                    secret: user.twoFactorSecret!,
+                    encoding: 'base32',
+                    token: code
+                });
+                if (!verified) throw new ApiError(400, 'Invalid 2FA Code');
+            } else {
+                return {
+                    twoFactorRequired: true,
+                    userId: user.id
+                };
+            }
         }
 
         const token = signToken(user.id);

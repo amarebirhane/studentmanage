@@ -67,9 +67,14 @@ function RegisterContent() {
         }
 
         try {
-            await register(formData.name, formData.email, formData.password, formData.role);
+            await register({
+                name: formData.name,
+                email: formData.email,
+                password: formData.password,
+                role: formData.role
+            });
             toast.success(t('successRegister'));
-            router.push('/dashboard');
+            router.push('/dashboard' as any);
         } catch (err: any) {
             toast.error(err.message || 'Registration failed');
         } finally {
@@ -187,7 +192,7 @@ export default function RegisterPage() {
     useEffect(() => {
         if (!isLoading && !isAdmin) {
             toast.error(t('adminOnlyError'));
-            router.push('/dashboard');
+            router.push('/dashboard' as any);
         }
     }, [isAdmin, isLoading, router, t]);
 

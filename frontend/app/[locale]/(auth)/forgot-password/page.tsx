@@ -1,14 +1,16 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
+import { useRouter, Link } from '@/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import toast from 'react-hot-toast';
+import { useTranslations } from 'next-intl';
 
 export default function ForgotPasswordPage() {
+    const t = useTranslations('Auth');
     const [email, setEmail] = useState('');
     const [loading, setLoading] = useState(false);
     const [isSubmitted, setIsSubmitted] = useState(false);
@@ -22,9 +24,9 @@ export default function ForgotPasswordPage() {
             // Mocking request
             await new Promise(resolve => setTimeout(resolve, 1000));
             setIsSubmitted(true);
-            toast.success('Reset link sent to your email!');
+            toast.success(t('successResetLink'));
         } catch (err: any) {
-            toast.error('Failed to send reset link.');
+            toast.error(t('errorResetLink'));
         } finally {
             setLoading(false);
         }
@@ -35,14 +37,14 @@ export default function ForgotPasswordPage() {
             <div className="flex items-center justify-center min-h-screen bg-background">
                 <Card className="w-full max-w-md">
                     <CardHeader>
-                        <CardTitle>Check your email</CardTitle>
+                        <CardTitle>{t('checkEmail')}</CardTitle>
                         <CardDescription>
-                            We have sent a password reset link to {email}.
+                            {t('resetLinkSentDesc', { email })}
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
                         <Button asChild className="w-full">
-                            <Link href="/login">Back to Login</Link>
+                            <Link href="/login">{t('backToLogin')}</Link>
                         </Button>
                     </CardContent>
                 </Card>
@@ -54,15 +56,15 @@ export default function ForgotPasswordPage() {
         <div className="flex items-center justify-center min-h-screen bg-background">
             <Card className="w-full max-w-md">
                 <CardHeader>
-                    <CardTitle>Forgot Password</CardTitle>
+                    <CardTitle>{t('forgotPassword')}</CardTitle>
                     <CardDescription>
-                        Enter your email address and we will send you a link to reset your password.
+                        {t('forgotPasswordDesc')}
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div className="space-y-2">
-                            <Label htmlFor="email">Email</Label>
+                            <Label htmlFor="email">{t('email')}</Label>
                             <Input
                                 id="email"
                                 type="email"
@@ -73,12 +75,12 @@ export default function ForgotPasswordPage() {
                             />
                         </div>
                         <Button type="submit" className="w-full" disabled={loading}>
-                            {loading ? 'Sending Link...' : 'Send Reset Link'}
+                            {loading ? t('sendingLink') : t('sendResetLink')}
                         </Button>
                     </form>
                     <div className="mt-4 text-center text-sm">
                         <Link href="/login" className="text-primary hover:underline">
-                            Back to Login
+                            {t('backToLogin')}
                         </Link>
                     </div>
                 </CardContent>

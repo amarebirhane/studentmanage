@@ -50,6 +50,13 @@ export class AuthService {
             throw new Error('Invalid email or password');
         }
 
+        if (user.twoFactorEnabled) {
+            return {
+                twoFactorRequired: true,
+                userId: user.id
+            };
+        }
+
         const token = signToken(user.id);
         const refreshToken = signRefreshToken(user.id);
 

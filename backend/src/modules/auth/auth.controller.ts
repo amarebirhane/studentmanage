@@ -16,7 +16,13 @@ export class AuthController {
 
     static async login(req: AuthenticatedRequest, res: Response) {
         try {
-            const { user, token, refreshToken } = await AuthService.login(req.body);
+            const result = await AuthService.login(req.body);
+
+            if (result.twoFactorRequired) {
+                return ApiResponse.success(res, { twoFactorRequired: true, userId: result.userId }, '2FA verification required');
+            }
+
+            const { user, token, refreshToken } = result;
 
             // Set cookies
             const cookieOptions = {

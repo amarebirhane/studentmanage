@@ -126,6 +126,7 @@ model StudentProfile {
   school                School?                @relation(fields: [schoolId], references: [id])
   examResponses         ExamResponse[]
   transcriptRequests    TranscriptRequest[]
+  paymentTransactions   PaymentTransaction[]
 }
 
 model Subject {
@@ -368,6 +369,7 @@ model FeeInvoice {
   deletedAt   DateTime?
   schoolId    String?
   school      School?        @relation(fields: [schoolId], references: [id])
+  paymentTransactions PaymentTransaction[]
 }
 
 model FeePayment {
@@ -627,7 +629,8 @@ model School {
   libraryTransactions  LibraryTransaction[]
   transportAssignments TransportAssignment[]
   hostelAssignments    HostelAssignment[]
-  resources           Resource[]
+  resources            Resource[]
+  paymentTransactions PaymentTransaction[]
 }
 
 model Announcement {
@@ -735,4 +738,25 @@ model Resource {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   deletedAt   DateTime?
+}
+
+model PaymentTransaction {
+  id          String   @id @default(uuid())
+  txRef       String   @unique
+  amount      Float
+  currency    String   @default("ETB")
+  status      String   @default("PENDING") // PENDING, SUCCESS, FAILED
+  gateway     String   @default("CHAPA")
+  email       String
+  firstName   String
+  lastName    String
+  studentId   String
+  student     StudentProfile @relation(fields: [studentId], references: [id])
+  invoiceId   String?
+  invoice     FeeInvoice?    @relation(fields: [invoiceId], references: [id])
+  schoolId    String
+  school      School   @relation(fields: [schoolId], references: [id])
+  metadata    Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }

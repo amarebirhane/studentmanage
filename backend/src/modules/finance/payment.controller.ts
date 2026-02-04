@@ -33,7 +33,7 @@ export class PaymentController {
     static async verify(req: AuthenticatedRequest, res: Response) {
         try {
             const { tx_ref } = req.params;
-            const result = await PaymentService.verifyPayment(tx_ref);
+            const result = await PaymentService.verifyPayment(tx_ref as string);
             return ApiResponse.success(res, result, 'Verification process completed');
         } catch (error: any) {
             return ApiResponse.error(res, error.message, error.statusCode || 500);

@@ -155,14 +155,18 @@ const StudentForm = ({ studentId, initialData }: StudentFormProps) => {
       avatarUrl = uploaded;
     }
 
-    const { age, ...rest } = formData;
-    const submitData = {
+    const { age, password, ...rest } = formData;
+    const submitData: any = {
       ...rest,
       age: age ? parseInt(age) : undefined,
       classId: rest.classId && rest.classId.trim() !== '' ? rest.classId : undefined,
       sectionId: rest.sectionId && rest.sectionId.trim() !== '' ? rest.sectionId : undefined,
       avatarUrl
     };
+
+    if (!studentId) {
+      submitData.password = password;
+    }
 
     const schema = studentId ? updateStudentSchema : studentSchema;
     const result = schema.safeParse(submitData);

@@ -22,6 +22,7 @@ import dashboardRoutes from './modules/dashboard/dashboard.routes';
 import notificationRoutes from './modules/notifications/notification.routes';
 import searchRoutes from './modules/search/search.routes';
 import uploadRoutes from './routes/upload.routes';
+import resourceRoutes from './modules/resources/resource.routes';
 
 import { protect } from './middlewares/auth.middleware';
 import { tenantMiddleware } from './middlewares/tenant.middleware';
@@ -59,6 +60,7 @@ protectedRouter.use('/dashboard', dashboardRoutes);
 protectedRouter.use('/notifications', notificationRoutes);
 protectedRouter.use('/search', searchRoutes);
 protectedRouter.use('/upload', uploadRoutes);
+protectedRouter.use('/resources', resourceRoutes);
 
 router.use(protectedRouter);
 

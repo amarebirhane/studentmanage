@@ -42,6 +42,10 @@ export class AuthController {
                 expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
             });
 
+            if (!user) {
+                return ApiResponse.error(res, 'User data missing', 500);
+            }
+
             const { password, ...userWithoutPassword } = user;
             const responseData = { user: userWithoutPassword, token, refreshToken };
             console.log('[AuthController] Sending login response data:', JSON.stringify(responseData, null, 2));

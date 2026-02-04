@@ -76,7 +76,7 @@ export class AuthService {
             data: { refreshToken },
         });
 
-        return { user, token, refreshToken };
+        return { user, token, refreshToken, twoFactorRequired: false };
     }
 
     static async refreshToken(oldToken: string) {

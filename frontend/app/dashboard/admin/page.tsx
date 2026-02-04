@@ -7,9 +7,19 @@ import { Button } from '@/components/ui/button';
 import { dashboardService, SchoolAdminData } from '@/services/dashboard.service';
 import Link from 'next/link';
 
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+
 export default function AdminDashboard() {
     const [data, setData] = useState<SchoolAdminData | null>(null);
     const [loading, setLoading] = useState(true);
+
+    const getFullAvatarUrl = (url: string | null | undefined) => {
+        if (!url) return null;
+        if (url.startsWith('http')) return url;
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || '';
+        const baseUrl = apiUrl.replace('/api/v1', '');
+        return `${baseUrl}${url}`;
+    };
 
     useEffect(() => {
         const fetchStats = async () => {
@@ -36,7 +46,7 @@ export default function AdminDashboard() {
     return (
         <div className="p-6 space-y-8">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
+                <div className="flex items-center gap-4">
                     <h1 className="text-3xl font-bold tracking-tight">Dashboard Overview</h1>
                     <p className="text-muted-foreground mt-1">Welcome to EduSmart management portal.</p>
                 </div>
@@ -84,13 +94,12 @@ export default function AdminDashboard() {
                         <div className="space-y-4">
                             {data?.recentActivity?.enrollments?.length ? data.recentActivity.enrollments.map((enrollment: any) => (
                                 <div key={enrollment.id} className="flex items-center gap-4 p-4 rounded-xl bg-secondary/20 border border-white/5 group hover:bg-secondary/30 transition-all">
-                                    <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0 border border-primary/20 overflow-hidden">
-                                        {enrollment.avatar ? (
-                                            <img src={enrollment.avatar} alt="" className="h-full w-full object-cover" />
-                                        ) : (
-                                            <Users className="h-5 w-5 text-primary" />
-                                        )}
-                                    </div>
+                                    <Avatar className="h-10 w-10 border border-primary/20">
+                                        <AvatarImage src={getFullAvatarUrl(enrollment.avatar) || undefined} className="object-cover" />
+                                        <AvatarFallback className="bg-primary/5 text-primary text-xs">
+                                            {enrollment.name?.[0]}
+                                        </AvatarFallback>
+                                    </Avatar>
                                     <div className="flex-1 min-w-0">
                                         <p className="text-sm font-semibold truncate">{enrollment.name}</p>
                                         <p className="text-xs text-muted-foreground">Enrolled in {enrollment.class} • {new Date(enrollment.date).toLocaleDateString()}</p>

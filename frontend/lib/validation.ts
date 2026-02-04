@@ -42,8 +42,26 @@ export const parentSchema = z.object({
     phone: z.string().optional(),
     studentIds: z.array(z.string()).optional(),
     relationship: z.string().optional(),
+    avatarUrl: z.string().optional().nullable(),
 });
 
 export const updateParentSchema = parentSchema.partial();
+
+export const teacherSchema = z.object({
+    firstName: z.string().min(2, 'First name must be at least 2 characters'),
+    lastName: z.string().min(2, 'Last name must be at least 2 characters'),
+    email: z.string().email('Invalid email address'),
+    password: z.string().min(6, 'Password must be at least 6 characters').optional(),
+    phone: z.string().optional(),
+    employeeId: z.string().min(1, 'Employee ID is required'),
+    specialization: z.string().optional(),
+    qualification: z.string().optional(),
+    experience: z.number().optional().or(z.string().transform(v => Number(v))),
+    joiningDate: z.string().optional(),
+    avatarUrl: z.string().optional().nullable(),
+});
+
+export const updateTeacherSchema = teacherSchema.partial();
+
 // Trigger rebuild
 

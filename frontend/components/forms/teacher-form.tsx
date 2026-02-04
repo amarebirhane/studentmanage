@@ -7,8 +7,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { teacherSchema, updateTeacherSchema } from '@/lib/validation';
 import toast from 'react-hot-toast';
-import { Upload, User, Phone, Mail, Hash, BookOpen, Eye, EyeOff, Lock } from 'lucide-react';
+import { Upload, User, Phone, Mail, Hash, BookOpen, Eye, EyeOff, Lock, Sparkles } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 interface TeacherFormProps {
     teacherId?: string;
@@ -35,6 +37,7 @@ const TeacherForm = ({ teacherId, initialData }: TeacherFormProps) => {
     const [avatarFile, setAvatarFile] = useState<File | null>(null);
     const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
+    const [errors, setErrors] = useState<Record<string, string>>({});
 
     useEffect(() => {
         if (initialData) {
@@ -61,11 +64,16 @@ const TeacherForm = ({ teacherId, initialData }: TeacherFormProps) => {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
+        if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
     };
 
     const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
+            if (file.size > 2 * 1024 * 1024) {
+                toast.error('Image size should be less than 2MB');
+                return;
+            }
             setAvatarFile(file);
             const reader = new FileReader();
             reader.onloadend = () => {
@@ -96,6 +104,7 @@ const TeacherForm = ({ teacherId, initialData }: TeacherFormProps) => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
+        setErrors({});
 
         try {
             const avatarUrl = await uploadAvatar();
@@ -105,6 +114,21 @@ const TeacherForm = ({ teacherId, initialData }: TeacherFormProps) => {
                 experience: experience ? parseInt(experience) : 0,
                 avatarUrl
             };
+
+            const schema = teacherId ? updateTeacherSchema : teacherSchema;
+            const result = schema.safeParse(submitData);
+
+            if (!result.success) {
+                const fieldErrors: Record<string, string> = {};
+                result.error.errors.forEach(err => {
+                    const field = err.path[0] as string;
+                    fieldErrors[field] = err.message;
+                });
+                setErrors(fieldErrors);
+                setLoading(false);
+                toast.error('Please fix the errors in the form');
+                return;
+            }
 
             if (teacherId) {
                 await api.put(`/teachers/${teacherId}`, submitData);
@@ -133,16 +157,19 @@ const TeacherForm = ({ teacherId, initialData }: TeacherFormProps) => {
                         </CardHeader>
                         <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-2">
-                                <Label>First Name</Label>
+                                <Label>First Name <span className="text-destructive">*</span></Label>
                                 <Input name="firstName" value={formData.firstName} onChange={handleChange} />
+                                {errors['firstName'] && <p className="text-xs text-destructive">{errors['firstName']}</p>}
                             </div>
                             <div className="space-y-2">
-                                <Label>Last Name</Label>
+                                <Label>Last Name <span className="text-destructive">*</span></Label>
                                 <Input name="lastName" value={formData.lastName} onChange={handleChange} />
+                                {errors['lastName'] && <p className="text-xs text-destructive">{errors['lastName']}</p>}
                             </div>
                             <div className="space-y-2">
-                                <Label>Email</Label>
+                                <Label>Email <span className="text-destructive">*</span></Label>
                                 <Input name="email" value={formData.email} onChange={handleChange} />
+                                {errors['email'] && <p className="text-xs text-destructive">{errors['email']}</p>}
                             </div>
                             <div className="space-y-2">
                                 <Label>Phone</Label>
@@ -168,6 +195,7 @@ const TeacherForm = ({ teacherId, initialData }: TeacherFormProps) => {
                                             {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                                         </button>
                                     </div>
+                                    {errors['password'] && <p className="text-xs text-destructive">{errors['password']}</p>}
                                 </div>
                             )}
                         </CardContent>
@@ -204,24 +232,23 @@ const TeacherForm = ({ teacherId, initialData }: TeacherFormProps) => {
                     <Card className="glass-card">
                         <CardHeader>
                             <CardTitle className="text-xl flex items-center gap-2">
-                                <Upload className="h-5 w-5 text-primary" /> Photo
+                                <Sparkles className="h-5 w-5 text-primary" /> Photo
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="flex flex-col items-center space-y-4">
                             <div className="relative group">
-                                <div className="h-32 w-32 rounded-2xl bg-secondary flex items-center justify-center overflow-hidden border-2 border-dashed border-muted-foreground/25 group-hover:border-primary/50 transition-colors">
-                                    {avatarPreview ? (
-                                        <img src={avatarPreview} alt="Preview" className="h-full w-full object-cover" />
-                                    ) : (
+                                <Avatar className="h-32 w-32 border-4 border-background shadow-xl rounded-2xl overflow-hidden">
+                                    <AvatarImage src={avatarPreview || undefined} className="object-cover" />
+                                    <AvatarFallback className="bg-secondary">
                                         <User className="h-12 w-12 text-muted-foreground/50" />
-                                    )}
-                                </div>
+                                    </AvatarFallback>
+                                </Avatar>
                                 <Label htmlFor="avatar-upload" className="absolute inset-0 cursor-pointer flex items-center justify-center bg-black/40 text-white opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl">
                                     <Upload className="h-6 w-6" />
                                 </Label>
                                 <input id="avatar-upload" type="file" className="hidden" accept="image/*" onChange={handleAvatarChange} />
                             </div>
-                            <p className="text-[10px] text-muted-foreground text-center uppercase tracking-widest font-bold">Recommended: 400x400 JPG/PNG</p>
+                            <p className="text-[10px] text-muted-foreground text-center uppercase tracking-widest font-bold opacity-60">Recommended: 400x400 JPG/PNG</p>
                         </CardContent>
                     </Card>
 
@@ -231,8 +258,9 @@ const TeacherForm = ({ teacherId, initialData }: TeacherFormProps) => {
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <div className="space-y-2">
-                                <Label>Employee ID</Label>
+                                <Label>Employee ID <span className="text-destructive">*</span></Label>
                                 <Input name="employeeId" value={formData.employeeId} onChange={handleChange} />
+                                {errors['employeeId'] && <p className="text-xs text-destructive">{errors['employeeId']}</p>}
                             </div>
                         </CardContent>
                     </Card>

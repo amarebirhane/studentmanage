@@ -3,7 +3,7 @@ import { AuthResponse, LoginCredentials, RegisterData, User } from '@/types/user
 import { ApiResponse } from '@/types/api';
 
 export const authService = {
-    async login(credentials: LoginCredentials): Promise<AuthResponse> {
+    async login(credentials: LoginCredentials & { code?: string }): Promise<AuthResponse> {
         const { data } = await api.post<ApiResponse<AuthResponse>>('/auth/login', credentials);
         console.log('AuthService.login - Raw API data.data:', data.data);
         return data.data!;

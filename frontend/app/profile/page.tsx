@@ -1,12 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Mail, Shield, User, Building2, Pencil, Loader2, Save, X } from 'lucide-react';
+import { Mail, Shield, User, Building2, Pencil, Loader2, Save, X, Camera, Upload } from 'lucide-react';
 import Sidebar from '@/components/layout/sidebar';
 import Navbar from '@/components/layout/navbar';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose, DialogDescription } from '@/components/ui/dialog';
@@ -14,12 +14,16 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'react-hot-toast';
 import { authService } from '@/services/auth.service';
+import api from '@/lib/api';
 
 export default function ProfilePage() {
-    const { user, isLoading, updateProfile } = useAuth(); // Assuming login or a similar method updates the local user state
+    const { user, isLoading, updateProfile } = useAuth();
     const router = useRouter();
     const [isEditing, setIsEditing] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
+    const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+    const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
     const [formData, setFormData] = useState({
         firstName: '',
         lastName: '',
@@ -59,6 +63,74 @@ export default function ProfilePage() {
         } finally {
             setIsSaving(false);
         }
+    };
+
+    const handleAvatarClick = () => {
+        fileInputRef.current?.click();
+    };
+
+    const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        // Validate file size (2MB)
+        if (file.size > 2 * 1024 * 1024) {
+            toast.error('Image must be less than 2MB');
+            return;
+        }
+
+        // Validate file type
+        if (!file.type.startsWith('image/')) {
+            toast.error('Please select an image file');
+            return;
+        }
+
+        // Show preview
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            if (typeof reader.result === 'string') {
+                setAvatarPreview(reader.result);
+            }
+        };
+        reader.readAsDataURL(file);
+
+        // Upload to server
+        setIsUploadingAvatar(true);
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            const res = await api.post('/upload', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
+
+            const avatarUrl = res.data?.data?.url || res.data?.url;
+            if (!avatarUrl) {
+                toast.error('Upload failed: No URL returned');
+                setAvatarPreview(null);
+                return;
+            }
+
+            // Update profile with new avatar URL
+            await updateProfile({ avatarUrl });
+            toast.success('Profile picture updated successfully');
+        } catch (error: any) {
+            console.error('Avatar upload error:', error);
+            toast.error(error.response?.data?.message || 'Failed to upload image');
+            setAvatarPreview(null);
+        } finally {
+            setIsUploadingAvatar(false);
+        }
+    };
+
+    const getAvatarUrl = () => {
+        if (avatarPreview) return avatarPreview;
+        if (user.avatarUrl) {
+            return user.avatarUrl.startsWith('http')
+                ? user.avatarUrl
+                : `${process.env.NEXT_PUBLIC_API_URL?.replace('/api/v1', '')}${user.avatarUrl}`;
+        }
+        return `https://api.dicebear.com/7.x/initials/svg?seed=${user.email}`;
     };
 
     return (
@@ -137,12 +209,30 @@ export default function ProfilePage() {
                                 <div className="flex flex-col md:flex-row gap-8 items-start">
                                     {/* Avatar Section */}
                                     <div className="flex flex-col items-center space-y-4">
-                                        <Avatar className="h-32 w-32 border-4 border-background shadow-xl">
-                                            <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${user.email}`} />
-                                            <AvatarFallback className="text-4xl font-bold bg-primary/10 text-primary">
-                                                {user.firstName?.[0]}{user.lastName?.[0]}
-                                            </AvatarFallback>
-                                        </Avatar>
+                                        <div className="relative group cursor-pointer" onClick={handleAvatarClick}>
+                                            <Avatar className="h-32 w-32 border-4 border-background shadow-xl">
+                                                <AvatarImage src={getAvatarUrl()} />
+                                                <AvatarFallback className="text-4xl font-bold bg-primary/10 text-primary">
+                                                    {user.firstName?.[0]}{user.lastName?.[0]}
+                                                </AvatarFallback>
+                                            </Avatar>
+                                            {isUploadingAvatar && (
+                                                <div className="absolute inset-0 flex items-center justify-center bg-black/60 rounded-full">
+                                                    <Loader2 className="h-8 w-8 text-white animate-spin" />
+                                                </div>
+                                            )}
+                                            <div className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <Camera className="h-8 w-8 text-white" />
+                                            </div>
+                                        </div>
+                                        <input
+                                            ref={fileInputRef}
+                                            type="file"
+                                            accept="image/*"
+                                            className="hidden"
+                                            onChange={handleAvatarChange}
+                                        />
+                                        <p className="text-xs text-muted-foreground text-center">Click to upload photo</p>
                                         <div className="text-center">
                                             <div className="inline-flex items-center px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-wider border border-primary/20">
                                                 {user.role}

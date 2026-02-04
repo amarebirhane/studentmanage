@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { parentSchema, updateParentSchema } from '@/lib/validation';
 import toast from 'react-hot-toast';
-import { User, Phone, Mail, Shield, Users, Search, X } from 'lucide-react';
+import { User, Phone, Mail, Shield, Users, Search, X, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { parentService } from '@/services/parent.service';
 import { studentService } from '@/services/student.service';

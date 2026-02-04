@@ -137,6 +137,15 @@
         "login": "ግባ",
         "adminOnlyError": "አዲስ ተጠቃሚዎችን መመዝገብ የሚችሉት አስተዳዳሪዎች ብቻ ናቸው",
         "successRegister": "ተጠቃሚው በተሳካ ሁኔታ ተመዝግቧል!",
-        "passwordsDoNotMatch": "የይለፍ ቃላት አይዛመዱም"
+        "passwordsDoNotMatch": "የይለፍ ቃላት አይዛመዱም",
+        "forgotPassword": "የይለፍ ቃል ረስተዋል?",
+        "forgotPasswordDesc": "የኢሜይል አድራሻዎን ያስገቡ እና የይለፍ ቃልዎን እንደገና ለማስጀመር ሊንክ እንልክልዎታለን።",
+        "sendingLink": "ሊንክ በመላክ ላይ...",
+        "sendResetLink": "የእንደገና ማስጀመሪያ ሊንክ ላክ",
+        "backToLogin": "ወደ መግቢያ ተመለስ",
+        "checkEmail": "ኢሜይልዎን ያረጋግጡ",
+        "resetLinkSentDesc": "ወደ {email} የይለፍ ቃል ዳግም ማስጀመሪያ ሊንክ ልከናል።",
+        "successResetLink": "የእንደገና ማስጀመሪያ ሊንክ ወደ ኢሜይልዎ ተልኳል!",
+        "errorResetLink": "የእንደገና ማስጀመሪያ ሊንክ መላክ አልተቻለም።"
     }
 }

@@ -137,6 +137,15 @@
         "login": "እቶ",
         "adminOnlyError": "ኣመሓደርቲ ጥራይ እዮም ሓደሽቲ ተጠቃሚታት ክምዝግቡ ዝኽእሉ",
         "successRegister": "ተጠቃሚ ብዓወት ተመዝጊቡ ኣሎ!",
-        "passwordsDoNotMatch": "መሕለፊ ቃላት ኣይሰማምዑን"
+        "passwordsDoNotMatch": "መሕለፊ ቃላት ኣይሰማምዑን",
+        "forgotPassword": "መሕለፊ ቃል ረሲዕካ?",
+        "forgotPasswordDesc": "ኢመይል ኣድራሻኹም የእትዉ፡ መሕለፊ ቃልኹም ንምቕያር ድማ ሊንክ ክንሰደልኩም ኢና።",
+        "sendingLink": "ሊንክ ይሰድድ ኣሎ...",
+        "sendResetLink": "ናይ መሕለፊ ቃል መቐየሪ ሊንክ ስደድ",
+        "backToLogin": "ናብ መእተዊ ተመለስ",
+        "checkEmail": "ኢመይልኹም ሕሰቡ",
+        "resetLinkSentDesc": "ናብ {email} ናይ መሕለፊ ቃል መቐየሪ ሊንክ ሰዲድና ኣለና።",
+        "successResetLink": "ናይ መሕለፊ ቃል መቐየሪ ሊንክ ናብ ኢመይልኩም ተሰዲዱ ኣሎ!",
+        "errorResetLink": "ሊንክ ክስደድ ኣይተኻእለን።"
     }
 }

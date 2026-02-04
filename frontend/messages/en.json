@@ -137,6 +137,15 @@
         "login": "Login",
         "adminOnlyError": "Only admins can register new users",
         "successRegister": "User registered successfully!",
-        "passwordsDoNotMatch": "Passwords do not match"
+        "passwordsDoNotMatch": "Passwords do not match",
+        "forgotPassword": "Forgot Password",
+        "forgotPasswordDesc": "Enter your email address and we will send you a link to reset your password.",
+        "sendingLink": "Sending Link...",
+        "sendResetLink": "Send Reset Link",
+        "backToLogin": "Back to Login",
+        "checkEmail": "Check your email",
+        "resetLinkSentDesc": "We have sent a password reset link to {email}.",
+        "successResetLink": "Reset link sent to your email!",
+        "errorResetLink": "Failed to send reset link."
     }
 }

@@ -137,6 +137,15 @@
         "login": "Seeni",
         "adminOnlyError": "Bulchitoota qofatu ተጠቃሚዎችን galmeessuu danda'a",
         "successRegister": "ተጠቃሚው milkaa'inaan galmaa'eera!",
-        "passwordsDoNotMatch": "Jechi darbii wal hin fakkaatu"
+        "passwordsDoNotMatch": "Jechi darbii wal hin fakkaatu",
+        "forgotPassword": "Jecha Darbii Irranfattee?",
+        "forgotPasswordDesc": "Iimeeyilii keessan galchaa, nuyis jecha darbii keessan deebistanii saaguf liinkii isiniif ergina.",
+        "sendingLink": "Liinkii ergaa jira...",
+        "sendResetLink": "Liinkii Deebisii Saagi Ergi",
+        "backToLogin": "Gara Seensaatti Deebi'i",
+        "checkEmail": "Iimeeyilii keessan ilaalaa",
+        "resetLinkSentDesc": "Liinkii jecha darbii deebisanii saagan gara {email} ergineerra.",
+        "successResetLink": "Liinkiin deebisii saagi gara iimeeyilii keessanii ergameera!",
+        "errorResetLink": "Liinkii deebisii saagi erguun hin danda'amne."
     }
 }

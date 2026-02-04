@@ -17,14 +17,14 @@ import {
     ClipboardCheck,
     ShieldCheck,
     LogOut,
-    DollarSign,
     BarChart3,
     CreditCard,
     UserPlus,
     Bell,
     MessageSquare,
     Clock,
-    Video
+    Video,
+    DollarSign
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 

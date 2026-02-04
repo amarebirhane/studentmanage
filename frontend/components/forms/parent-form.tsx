@@ -29,12 +29,15 @@ const ParentForm = ({ parentId, initialData }: ParentFormProps) => {
         password: '',
         relationship: 'Parent',
         studentIds: [] as string[],
+        avatarUrl: '',
     });
 
     const [allStudents, setAllStudents] = useState<any[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
+    const [avatarFile, setAvatarFile] = useState<File | null>(null);
+    const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
 
     useEffect(() => {
         fetchStudents();
@@ -59,9 +62,48 @@ const ParentForm = ({ parentId, initialData }: ParentFormProps) => {
                 password: '', // Don't populate password
                 relationship: initialData.parentProfiles?.[0]?.relationship || 'Parent',
                 studentIds: initialData.parentProfiles?.map((p: any) => p.studentId) || [],
+                avatarUrl: initialData.avatarUrl || '',
             });
+
+            if (initialData.avatarUrl) {
+                const fullUrl = initialData.avatarUrl.startsWith('http')
+                    ? initialData.avatarUrl
+                    : `${process.env.NEXT_PUBLIC_API_URL?.replace('/api/v1', '')}${initialData.avatarUrl}`;
+                setAvatarPreview(fullUrl);
+            }
         }
     }, [initialData]);
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            if (file.size > 2 * 1024 * 1024) {
+                toast.error('Image size should be less than 2MB');
+                return;
+            }
+            setAvatarFile(file);
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setAvatarPreview(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const uploadAvatar = async () => {
+        if (!avatarFile) return null;
+        const formData = new FormData();
+        formData.append('file', avatarFile);
+        try {
+            const response = await api.post('/upload', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
+            return response.data.url;
+        } catch (error) {
+            toast.error('Avatar upload failed');
+            return null;
+        }
+    };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -85,8 +127,20 @@ const ParentForm = ({ parentId, initialData }: ParentFormProps) => {
         setLoading(true);
         setErrors({});
 
+        let avatarUrl = formData.avatarUrl;
+        if (avatarFile) {
+            const uploaded = await uploadAvatar();
+            if (!uploaded) {
+                setLoading(false);
+                return;
+            }
+            avatarUrl = uploaded;
+        }
+
+        const submitData = { ...formData, avatarUrl };
+
         const schema = parentId ? updateParentSchema : parentSchema;
-        const result = schema.safeParse(formData);
+        const result = schema.safeParse(submitData);
 
         if (!result.success) {
             const fieldErrors: Record<string, string> = {};
@@ -102,10 +156,10 @@ const ParentForm = ({ parentId, initialData }: ParentFormProps) => {
 
         try {
             if (parentId) {
-                await parentService.updateParent(parentId, formData);
+                await parentService.updateParent(parentId, submitData);
                 toast.success('Parent record updated');
             } else {
-                await parentService.createParent(formData);
+                await parentService.createParent(submitData);
                 toast.success('New parent account created successfully');
             }
             router.push('/dashboard/admin/parents');
@@ -232,6 +286,32 @@ const ParentForm = ({ parentId, initialData }: ParentFormProps) => {
                 </div>
 
                 <div className="space-y-8">
+                    <Card className="glass-card border-none overflow-hidden">
+                        <CardHeader className="bg-primary/5 border-b border-white/5">
+                            <CardTitle className="text-xl flex items-center gap-2 text-primary">
+                                <Sparkles className="h-5 w-5" /> Profile Image
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="pt-6 flex flex-col items-center gap-4">
+                            <div className="relative group">
+                                <div className="h-32 w-32 rounded-2xl bg-secondary flex items-center justify-center border-4 border-background shadow-xl overflow-hidden">
+                                    {avatarPreview ? (
+                                        <img src={avatarPreview} alt="Preview" className="h-full w-full object-cover" />
+                                    ) : (
+                                        <User className="h-12 w-12 text-muted-foreground opacity-20" />
+                                    )}
+                                </div>
+                                <label className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer rounded-2xl">
+                                    <span className="text-white text-xs font-bold uppercase tracking-widest">Change</span>
+                                    <input type="file" className="hidden" accept="image/*" onChange={handleFileChange} />
+                                </label>
+                            </div>
+                            <p className="text-[10px] text-muted-foreground text-center uppercase tracking-widest opacity-60">
+                                Recommended: 400x400 JPG or PNG
+                            </p>
+                        </CardContent>
+                    </Card>
+
                     <Card className="glass-card border-none overflow-hidden">
                         <CardHeader className="bg-primary/5 border-b border-white/5">
                             <CardTitle className="text-xl flex items-center gap-2 text-primary">

@@ -32,7 +32,21 @@ export const checkPermission = (module: string, action: 'view' | 'create' | 'edi
                 return next();
             }
 
-            // 4. Check granular permissions in the database
+            // 4. Special Case: Accountant gets default access to fees and reports
+            if (req.user.role === 'ACCOUNTANT' as any && (module === 'fees' || module === 'reports' || module === 'fee-structures')) {
+                if (action === 'view' || action === 'create' || action === 'edit') {
+                    return next();
+                }
+            }
+
+            // 5. Special Case: Staff gets default access to view essential modules
+            if (req.user.role === 'STAFF' as any && (module === 'students' || module === 'classes' || module === 'attendance')) {
+                if (action === 'view') {
+                    return next();
+                }
+            }
+
+            // 6. Check granular permissions in the database
             const hasPermission = await PermissionService.checkPermission(req.user.id, module, action);
 
             if (!hasPermission) {

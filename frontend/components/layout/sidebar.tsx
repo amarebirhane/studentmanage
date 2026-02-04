@@ -197,9 +197,15 @@ const Sidebar = () => {
             label: 'Administrative',
             items: [
                 {
+                    title: 'User Management',
+                    href: '/dashboard/admin/users',
+                    icon: Users,
+                    show: true,
+                },
+                {
                     title: 'Teachers',
                     href: '/dashboard/admin/teachers',
-                    icon: Users,
+                    icon: GraduationCap,
                     show: true,
                 },
             ]

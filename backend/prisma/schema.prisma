@@ -601,6 +601,7 @@ model GeneratedDocument {
 model School {
   id                   String                @id @default(uuid())
   name                 String
+  slug                 String                @unique
   address              String?
   phone                String?
   email                String?

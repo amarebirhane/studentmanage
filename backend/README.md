@@ -109,7 +109,7 @@ Every request is scoped to a school via middleware:
 
 ## 📖 API Documentation
 
-Access Swagger UI at: `http://localhost:5001/api-docs`
+Access Swagger UI at: `http://localhost:5000/api-docs`
 
 ## 🧪 Testing
 

@@ -52,4 +52,4 @@ Academic Enhancements: Online quiz engine, digital library (LMS), and interactiv
 Communication: Real-time WebSocket notifications for instant alerts and live-class (Zoom/Meet) integration.
 Security: Full 2FA implementation and advanced audit trails.
 Finance: Online payment gateway integration (Chapa, Stripe) and expense tracking.
-Accessibility: Multi-language support (Amharic, Oromo, etc.) and native mobile apps.
+Accessibility: Multi-language support (Amharic, Oromo, English, Tigrigna etc.) and native mobile apps.

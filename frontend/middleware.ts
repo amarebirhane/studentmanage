@@ -9,54 +9,69 @@ const roleRoutes = {
     PARENT: '/dashboard/parent',
 };
 
+import createMiddleware from 'next-intl/middleware';
+
+const roleRoutes = {
+    SUPER_ADMIN: '/dashboard/super-admin',
+    ADMIN: '/dashboard/admin',
+    TEACHER: '/dashboard/teacher',
+    STUDENT: '/dashboard/student',
+    PARENT: '/dashboard/parent',
+};
+
+const intlMiddleware = createMiddleware({
+    locales: ['en', 'am', 'or'],
+    defaultLocale: 'en'
+});
+
 export function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
+
+    // Extract locale and path without locale
+    const localeMatch = pathname.match(/^\/(en|am|or)(\/|$)/);
+    const locale = localeMatch ? localeMatch[1] : 'en';
+    const pathWithoutLocale = pathname.replace(/^\/(en|am|or)/, '') || '/';
+
     const token = request.cookies.get('token')?.value;
     const userRole = request.cookies.get('user_role')?.value as keyof typeof roleRoutes | undefined;
 
-    // Public routes
+    // Public routes (checking pathWithoutLocale)
     const publicRoutes = ['/login', '/register', '/forgot-password', '/reset-password', '/'];
-    const isPublicRoute = publicRoutes.some(route => pathname === route || pathname.startsWith(route + '/'));
+    const isPublicRoute = publicRoutes.some(route => pathWithoutLocale === route || pathWithoutLocale.startsWith(route + '/'));
 
     // 1. Redirect unauthenticated users to login
     if (!token) {
         if (!isPublicRoute) {
-            const loginUrl = new URL('/login', request.url);
-            loginUrl.searchParams.set('redirect', pathname);
+            // Construct login URL with locale
+            const loginUrl = new URL(`/${locale}/login`, request.url);
+            loginUrl.searchParams.set('redirect', pathWithoutLocale);
             return NextResponse.redirect(loginUrl);
         }
-        return NextResponse.next();
     }
 
-    // 2. Redirect authenticated users away from auth pages
-    // if (isPublicRoute && pathname !== '/') {
-    //     const dashboardUrl = userRole ? roleRoutes[userRole] : '/dashboard';
-    //     return NextResponse.redirect(new URL(dashboardUrl || '/dashboard', request.url));
-    // }
-
-    // 3. Role-Based Access Control
-    if (pathname.startsWith('/dashboard')) {
+    // 2. Role-Based Access Control
+    if (pathWithoutLocale.startsWith('/dashboard')) {
         // Enforce role boundaries
         if (userRole) {
-            if (pathname.startsWith('/dashboard/super-admin') && userRole !== 'SUPER_ADMIN') {
-                return NextResponse.redirect(new URL(roleRoutes[userRole], request.url));
+            if (pathWithoutLocale.startsWith('/dashboard/super-admin') && userRole !== 'SUPER_ADMIN') {
+                return NextResponse.redirect(new URL(`/${locale}${roleRoutes[userRole]}`, request.url));
             }
-            if (pathname.startsWith('/dashboard/admin') && userRole !== 'ADMIN') {
-                return NextResponse.redirect(new URL(roleRoutes[userRole], request.url));
+            if (pathWithoutLocale.startsWith('/dashboard/admin') && userRole !== 'ADMIN') {
+                return NextResponse.redirect(new URL(`/${locale}${roleRoutes[userRole]}`, request.url));
             }
-            if (pathname.startsWith('/dashboard/teacher') && userRole !== 'TEACHER') {
-                return NextResponse.redirect(new URL(roleRoutes[userRole], request.url));
+            if (pathWithoutLocale.startsWith('/dashboard/teacher') && userRole !== 'TEACHER') {
+                return NextResponse.redirect(new URL(`/${locale}${roleRoutes[userRole]}`, request.url));
             }
-            if (pathname.startsWith('/dashboard/student') && userRole !== 'STUDENT') {
-                return NextResponse.redirect(new URL(roleRoutes[userRole], request.url));
+            if (pathWithoutLocale.startsWith('/dashboard/student') && userRole !== 'STUDENT') {
+                return NextResponse.redirect(new URL(`/${locale}${roleRoutes[userRole]}`, request.url));
             }
-            if (pathname.startsWith('/dashboard/parent') && userRole !== 'PARENT') {
-                return NextResponse.redirect(new URL(roleRoutes[userRole], request.url));
+            if (pathWithoutLocale.startsWith('/dashboard/parent') && userRole !== 'PARENT') {
+                return NextResponse.redirect(new URL(`/${locale}${roleRoutes[userRole]}`, request.url));
             }
         }
     }
 
-    return NextResponse.next();
+    return intlMiddleware(request);
 }
 
 export const config = {

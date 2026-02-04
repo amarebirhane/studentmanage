@@ -1,0 +1,11 @@
+{
+    "Common": {
+        "welcome": "እንኳን ደህና መጡ",
+        "login": "ግባ",
+        "register": "ተመዝገብ",
+        "email": "ኢሜይል",
+        "password": "የይለፍ ቃል",
+        "dashboard": "ዳሽቦርድ",
+        "home": "መነሻ"
+    }
+}

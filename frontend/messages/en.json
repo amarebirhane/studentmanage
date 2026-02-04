@@ -1,0 +1,11 @@
+{
+    "Common": {
+        "welcome": "Welcome",
+        "login": "Login",
+        "register": "Register",
+        "email": "Email",
+        "password": "Password",
+        "dashboard": "Dashboard",
+        "home": "Home"
+    }
+}

@@ -9,6 +9,8 @@ import { toast } from 'react-hot-toast';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/hooks/useAuth';
+import { paymentService } from '@/services/payment.service';
 
 export default function StudentFeesPage() {
     const [fees, setFees] = useState<any[]>([]);
@@ -47,6 +49,32 @@ export default function StudentFeesPage() {
         }
 
         return { label: 'Pending', color: 'text-orange-500 bg-orange-500/10 border-orange-500/20', icon: FileText };
+    };
+
+    const handlePay = async (fee: any) => {
+        if (!user) return;
+        setProcessingId(fee.id);
+
+        try {
+            const result = await paymentService.initializePayment({
+                amount: fee.amount - (fee.paidAmount || 0),
+                invoiceId: fee.id,
+                email: user.email,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                studentId: user.id
+            });
+
+            if (result && result.checkout_url) {
+                window.location.href = result.checkout_url;
+            } else {
+                toast.error('Could not initialize payment');
+            }
+        } catch (error) {
+            toast.error('Payment initialization failed');
+        } finally {
+            setProcessingId(null);
+        }
     };
 
     return (
@@ -107,8 +135,20 @@ export default function StudentFeesPage() {
                                                 />
                                             </div>
                                             {status.label !== 'Paid' && (
-                                                <Button className="w-full mt-2" variant="outline">
-                                                    View Details
+                                                <Button
+                                                    className="w-full mt-2 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg shadow-green-500/20"
+                                                    onClick={() => handlePay(fee)}
+                                                    disabled={!!processingId}
+                                                >
+                                                    {processingId === fee.id ? (
+                                                        <>
+                                                            <Loader2 className="h-4 w-4 mr-2 animate-spin" /> Processing...
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <DollarSign className="h-4 w-4 mr-2" /> Pay Now
+                                                        </>
+                                                    )}
                                                 </Button>
                                             )}
                                         </div>

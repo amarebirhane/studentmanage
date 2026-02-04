@@ -10,5 +10,6 @@ router.post('/logout', AuthController.logout);
 router.post('/refresh', AuthController.refresh);
 router.get('/profile', protect, AuthController.getProfile);
 router.put('/profile', protect, AuthController.updateProfile);
+router.patch('/change-password', protect, AuthController.changePassword);
 
 export default router;

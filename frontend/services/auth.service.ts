@@ -27,4 +27,8 @@ export const authService = {
         const { data: response } = await api.put<ApiResponse<User>>('/auth/profile', data);
         return response.data!;
     },
+
+    async changePassword(data: any): Promise<void> {
+        await api.patch('/auth/change-password', data);
+    },
 };

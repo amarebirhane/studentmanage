@@ -118,4 +118,13 @@ export class AuthController {
             return ApiResponse.error(res, error.message, 400);
         }
     }
+
+    static async changePassword(req: AuthenticatedRequest, res: Response) {
+        try {
+            await AuthService.changePassword(req.user!.id, req.body);
+            return ApiResponse.success(res, {}, 'Password changed successfully');
+        } catch (error: any) {
+            return ApiResponse.error(res, error.message, 400);
+        }
+    }
 }

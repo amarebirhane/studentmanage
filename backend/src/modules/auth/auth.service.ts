@@ -164,4 +164,30 @@ export class AuthService {
 
         return true;
     }
+
+    static async changePassword(userId: string, data: any) {
+        const { currentPassword, newPassword } = data;
+
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+        });
+
+        if (!user) {
+            throw new ApiError(404, 'User not found');
+        }
+
+        const isMatch = await comparePassword(currentPassword, user.password);
+        if (!isMatch) {
+            throw new ApiError(400, 'Incorrect current password');
+        }
+
+        const hashedPassword = await hashPassword(newPassword);
+
+        await prisma.user.update({
+            where: { id: userId },
+            data: { password: hashedPassword },
+        });
+
+        return true;
+    }
 }

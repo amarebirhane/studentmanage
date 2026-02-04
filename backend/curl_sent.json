@@ -1,1 +1,0 @@
-{"success":false,"message":"Access Denied: You do not have 'view' permission for the 'messages' module.","errors":"Error: Access Denied: You do not have 'view' permission for the 'messages' module.\n    at C:\\Users\\ASHROCK\\Desktop\\projectsms\\backend\\src\\middlewares\\permission.middleware.ts:34:29"}

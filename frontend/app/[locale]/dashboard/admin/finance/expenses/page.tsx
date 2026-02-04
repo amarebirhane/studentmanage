@@ -13,6 +13,7 @@ import { Plus, Trash2, Edit, TrendingUp, TrendingDown, DollarSign } from 'lucide
 import { toast } from 'react-hot-toast';
 import { format } from 'date-fns';
 import { ColumnDef } from '@tanstack/react-table';
+import { DeleteConfirmDialog } from '@/components/DeleteConfirmDialog';
 
 export default function ExpensesPage() {
     const [expenses, setExpenses] = useState<Expense[]>([]);
@@ -20,6 +21,8 @@ export default function ExpensesPage() {
     const [isLoading, setIsLoading] = useState(true);
     const [isCreateOpen, setIsCreateOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [expenseToDelete, setExpenseToDelete] = useState<string | null>(null);
 
     // Form state
     const [formData, setFormData] = useState({
@@ -68,13 +71,20 @@ export default function ExpensesPage() {
     };
 
     const handleDelete = async (id: string) => {
-        if (!confirm('Are you sure you want to delete this expense?')) return;
+        setExpenseToDelete(id);
+        setDeleteDialogOpen(true);
+    };
+
+    const confirmDelete = async () => {
+        if (!expenseToDelete) return;
         try {
-            await expenseService.delete(id);
+            await expenseService.delete(expenseToDelete);
             toast.success('Expense deleted');
             loadData();
         } catch (error) {
             toast.error('Failed to delete expense');
+        } finally {
+            setExpenseToDelete(null);
         }
     };
 
@@ -246,6 +256,14 @@ export default function ExpensesPage() {
                     />
                 </CardContent>
             </Card>
+
+            <DeleteConfirmDialog
+                open={deleteDialogOpen}
+                onOpenChange={setDeleteDialogOpen}
+                onConfirm={confirmDelete}
+                title="Delete Expense"
+                description="Are you sure you want to delete this expense record? This action cannot be undone."
+            />
         </div>
     );
 }

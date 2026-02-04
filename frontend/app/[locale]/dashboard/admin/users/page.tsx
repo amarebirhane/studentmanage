@@ -11,10 +11,13 @@ import Link from 'next/link';
 import toast from 'react-hot-toast';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { DeleteConfirmDialog } from '@/components/DeleteConfirmDialog';
 
 export default function UsersPage() {
     const [users, setUsers] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [userToDelete, setUserToDelete] = useState<string | null>(null);
 
     const fetchUsers = async () => {
         try {
@@ -36,14 +39,20 @@ export default function UsersPage() {
     }, []);
 
     const handleDelete = async (id: string) => {
-        if (confirm('Are you sure you want to delete this user?')) {
-            try {
-                await userService.deleteUser(id);
-                toast.success('User deleted successfully');
-                fetchUsers();
-            } catch (error) {
-                toast.error('Failed to delete user');
-            }
+        setUserToDelete(id);
+        setDeleteDialogOpen(true);
+    };
+
+    const confirmDelete = async () => {
+        if (!userToDelete) return;
+        try {
+            await userService.deleteUser(userToDelete);
+            toast.success('User deleted successfully');
+            fetchUsers();
+        } catch (error) {
+            toast.error('Failed to delete user');
+        } finally {
+            setUserToDelete(null);
         }
     };
 
@@ -166,6 +175,14 @@ export default function UsersPage() {
                     )}
                 </CardContent>
             </Card>
+
+            <DeleteConfirmDialog
+                open={deleteDialogOpen}
+                onOpenChange={setDeleteDialogOpen}
+                onConfirm={confirmDelete}
+                title="Delete User"
+                description="Are you sure you want to delete this user? This will remove their account and all associated data."
+            />
         </div>
     );
 }

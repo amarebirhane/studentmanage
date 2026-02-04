@@ -31,6 +31,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { useRole } from '@/hooks/useRole';
 import { useAuth } from '@/hooks/useAuth';
+import { DeleteConfirmDialog } from '@/components/DeleteConfirmDialog';
 
 export default function AnnouncementsPage() {
     const { user } = useAuth();
@@ -41,6 +42,8 @@ export default function AnnouncementsPage() {
     const [loading, setLoading] = useState(true);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [submitting, setSubmitting] = useState(false);
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [announcementToDelete, setAnnouncementToDelete] = useState<string | null>(null);
 
     const [formData, setFormData] = useState({
         title: '',
@@ -85,13 +88,20 @@ export default function AnnouncementsPage() {
     };
 
     const handleDelete = async (id: string) => {
-        if (!confirm('Are you sure you want to delete this announcement?')) return;
+        setAnnouncementToDelete(id);
+        setDeleteDialogOpen(true);
+    };
+
+    const confirmDelete = async () => {
+        if (!announcementToDelete) return;
         try {
-            await announcementService.deleteAnnouncement(id);
+            await announcementService.deleteAnnouncement(announcementToDelete);
             toast.success('Announcement deleted');
-            setAnnouncements(prev => prev.filter(a => a.id !== id));
+            setAnnouncements(prev => prev.filter(a => a.id !== announcementToDelete));
         } catch (error) {
             toast.error('Failed to delete announcement');
+        } finally {
+            setAnnouncementToDelete(null);
         }
     };
 
@@ -225,6 +235,14 @@ export default function AnnouncementsPage() {
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+
+            <DeleteConfirmDialog
+                open={deleteDialogOpen}
+                onOpenChange={setDeleteDialogOpen}
+                onConfirm={confirmDelete}
+                title="Delete Announcement"
+                description="Are you sure you want to delete this announcement? This action cannot be undone."
+            />
         </div>
     );
 }

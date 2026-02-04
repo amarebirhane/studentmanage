@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { DollarSign, Banknote, ClipboardList, TrendingUp, ArrowUpRight } from 'lucide-react';
+import { DollarSign, Banknote, ClipboardList, TrendingUp, ArrowUpRight, MessageSquare } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { dashboardService, SchoolAdminData } from '@/services/dashboard.service';
 import Link from 'next/link';
@@ -77,31 +77,33 @@ export default function AccountantDashboard() {
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <Card className="glass-card border-none overflow-hidden rounded-2xl">
-                    <CardHeader className="bg-primary/5 border-b border-white/5">
+                    <CardHeader className="bg-primary/5 border-b border-white/5 flex flex-row items-center justify-between p-6">
                         <CardTitle className="flex items-center gap-2">
-                            <Banknote className="h-5 w-5 text-primary" /> Recent Payments
+                            <Banknote className="h-5 w-5 text-primary" /> Today's Collections
                         </CardTitle>
+                        <span className="text-xs font-bold text-primary bg-primary/10 px-3 py-1 rounded-full uppercase tracking-tighter">Live</span>
                     </CardHeader>
                     <CardContent className="p-6">
                         <div className="space-y-4">
-                            {data?.recentActivity?.payments?.length ? data.recentActivity.payments.map((payment: any) => (
-                                <div key={payment.id} className="flex items-center gap-4 p-4 rounded-xl bg-secondary/20 border border-white/5 group hover:bg-secondary/30 transition-all">
-                                    <div className="h-10 w-10 rounded-full bg-emerald-500/10 flex items-center justify-center shrink-0 border border-emerald-500/20">
-                                        <Banknote className="h-5 w-5 text-emerald-600" />
+                            {data?.recentActivity?.payments?.filter((p: any) => new Date(p.date).toDateString() === new Date().toDateString()).length ?
+                                data.recentActivity.payments.filter((p: any) => new Date(p.date).toDateString() === new Date().toDateString()).map((payment: any) => (
+                                    <div key={payment.id} className="flex items-center gap-4 p-4 rounded-xl bg-secondary/20 border border-white/5 group hover:bg-secondary/30 transition-all">
+                                        <div className="h-10 w-10 rounded-full bg-emerald-500/10 flex items-center justify-center shrink-0 border border-emerald-500/20">
+                                            <Banknote className="h-5 w-5 text-emerald-600" />
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-sm font-semibold truncate">{payment.studentName}</p>
+                                            <p className="text-xs text-muted-foreground">${payment.amount} • {payment.method}</p>
+                                        </div>
+                                        <div className="text-right">
+                                            <p className="text-[10px] text-muted-foreground">{new Date(payment.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                                        </div>
                                     </div>
-                                    <div className="flex-1 min-w-0">
-                                        <p className="text-sm font-semibold truncate">{payment.studentName}</p>
-                                        <p className="text-xs text-muted-foreground">${payment.amount} • {payment.method}</p>
+                                )) : (
+                                    <div className="text-center py-10">
+                                        <p className="text-sm text-muted-foreground">No collections recorded today</p>
                                     </div>
-                                    <div className="text-right">
-                                        <p className="text-[10px] text-muted-foreground">{new Date(payment.date).toLocaleDateString()}</p>
-                                    </div>
-                                </div>
-                            )) : (
-                                <div className="text-center py-10">
-                                    <p className="text-sm text-muted-foreground">No recent payments recorded</p>
-                                </div>
-                            )}
+                                )}
                         </div>
                     </CardContent>
                 </Card>
@@ -109,19 +111,53 @@ export default function AccountantDashboard() {
                 <Card className="glass-card border-none overflow-hidden rounded-2xl">
                     <CardHeader className="bg-primary/5 border-b border-white/5">
                         <CardTitle className="flex items-center gap-2">
-                            Quick Actions
+                            Financial Operations
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="p-6">
-                        <div className="grid grid-cols-1 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <Link href="/dashboard/admin/fees">
-                                <Button className="w-full justify-start h-12 rounded-xl" variant="outline">
-                                    <DollarSign className="h-4 w-4 mr-2 text-primary" /> Process New Fee Payment
+                                <Button className="w-full justify-start h-16 rounded-xl border-primary/20 bg-primary/5 hover:bg-primary/10 text-foreground" variant="outline">
+                                    <div className="bg-primary/10 p-2 rounded-lg mr-3">
+                                        <DollarSign className="h-5 w-5 text-primary" />
+                                    </div>
+                                    <div className="text-left">
+                                        <p className="text-sm font-bold">Collect Fees</p>
+                                        <p className="text-[10px] text-muted-foreground">Record new payment</p>
+                                    </div>
                                 </Button>
                             </Link>
                             <Link href="/dashboard/admin/reports">
-                                <Button className="w-full justify-start h-12 rounded-xl" variant="outline">
-                                    <ClipboardList className="h-4 w-4 mr-2 text-primary" /> Generate Financial Report
+                                <Button className="w-full justify-start h-16 rounded-xl border-blue-500/20 bg-blue-500/5 hover:bg-blue-500/10 text-foreground" variant="outline">
+                                    <div className="bg-blue-500/10 p-2 rounded-lg mr-3">
+                                        <ClipboardList className="h-5 w-5 text-blue-600" />
+                                    </div>
+                                    <div className="text-left">
+                                        <p className="text-sm font-bold">Financial Reports</p>
+                                        <p className="text-[10px] text-muted-foreground">Analyze revenue</p>
+                                    </div>
+                                </Button>
+                            </Link>
+                            <Link href="/dashboard/admin/fees/structures">
+                                <Button className="w-full justify-start h-16 rounded-xl border-orange-500/20 bg-orange-500/5 hover:bg-orange-500/10 text-foreground" variant="outline">
+                                    <div className="bg-orange-500/10 p-2 rounded-lg mr-3">
+                                        <TrendingUp className="h-5 w-5 text-orange-600" />
+                                    </div>
+                                    <div className="text-left">
+                                        <p className="text-sm font-bold">Fee Structures</p>
+                                        <p className="text-[10px] text-muted-foreground">Manage pricing</p>
+                                    </div>
+                                </Button>
+                            </Link>
+                            <Link href="/dashboard/messages">
+                                <Button className="w-full justify-start h-16 rounded-xl border-purple-500/20 bg-purple-500/5 hover:bg-purple-500/10 text-foreground" variant="outline">
+                                    <div className="bg-purple-500/10 p-2 rounded-lg mr-3">
+                                        <MessageSquare className="h-5 w-5 text-purple-600" />
+                                    </div>
+                                    <div className="text-left">
+                                        <p className="text-sm font-bold">Send Reminders</p>
+                                        <p className="text-[10px] text-muted-foreground">Dunning messages</p>
+                                    </div>
                                 </Button>
                             </Link>
                         </div>

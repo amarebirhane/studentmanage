@@ -151,6 +151,12 @@ const Sidebar = () => {
                     icon: ClipboardList,
                     show: (isTeacher || isStudent || isParent) && !isSuperAdmin,
                 },
+                {
+                    title: 'Digital Library',
+                    href: '/dashboard/resources',
+                    icon: BookOpen,
+                    show: !isSuperAdmin,
+                },
             ]
         },
         {

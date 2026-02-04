@@ -4,7 +4,12 @@ import { protect, authorize } from '../../middlewares/auth.middleware';
 
 const router = Router();
 
-router.use(protect, authorize('ADMIN'));
+router.use(protect);
+
+// Search is available to all authenticated users
+router.get('/search', UserController.searchUsers);
+
+router.use(authorize('ADMIN'));
 
 router.route('/')
     .get(UserController.getUsers);

@@ -12,6 +12,16 @@ export class UserController {
         }
     }
 
+    static async searchUsers(req: any, res: Response) {
+        try {
+            const { q } = req.query;
+            const users = await UserService.searchUsers(q as string, req.schoolId);
+            return ApiResponse.success(res, users, 'Users found');
+        } catch (error: any) {
+            return ApiResponse.error(res, error.message);
+        }
+    }
+
     static async getUserById(req: any, res: Response) {
         try {
             const user = await UserService.getUserById(req.params.id as string, req.schoolId);

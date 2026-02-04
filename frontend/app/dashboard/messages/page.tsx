@@ -16,7 +16,8 @@ import {
     User,
     Clock,
     CheckCircle2,
-    Trash2
+    Trash2,
+    Reply
 } from 'lucide-react';
 import { messageService } from '@/services/message.service';
 import { toast } from 'react-hot-toast';
@@ -32,6 +33,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 export default function MessagesPage() {
     const { user } = useAuth();
@@ -42,6 +44,11 @@ export default function MessagesPage() {
     const [submitting, setSubmitting] = useState(false);
     const [activeTab, setActiveTab] = useState('inbox');
     const [selectedMessage, setSelectedMessage] = useState<any>(null);
+
+    const [userSearchQuery, setUserSearchQuery] = useState('');
+    const [userSearchResults, setUserSearchResults] = useState<any[]>([]);
+    const [searchingUsers, setSearchingUsers] = useState(false);
+    const [selectedRecipient, setSelectedRecipient] = useState<any>(null);
 
     const [composeData, setComposeData] = useState({
         recipientId: '',
@@ -69,9 +76,52 @@ export default function MessagesPage() {
         }
     };
 
+    const handleSearch = async (query: string) => {
+        setUserSearchQuery(query);
+        if (query.length < 2) {
+            setUserSearchResults([]);
+            return;
+        }
+
+        try {
+            setSearchingUsers(true);
+            const results = await messageService.searchUsers(query);
+            setUserSearchResults(results || []);
+        } catch (error) {
+            console.error('Search failed');
+        } finally {
+            setSearchingUsers(false);
+        }
+    };
+
+    const selectRecipient = (u: any) => {
+        setSelectedRecipient(u);
+        setComposeData(prev => ({ ...prev, recipientId: u.id }));
+        setUserSearchQuery('');
+        setUserSearchResults([]);
+    };
+
+    const handleReply = () => {
+        if (!selectedMessage) return;
+        const recipient = activeTab === 'inbox' ? selectedMessage.sender : selectedMessage.recipient;
+        setSelectedRecipient(recipient);
+        setComposeData({
+            recipientId: recipient.id,
+            subject: `Re: ${selectedMessage.subject}`,
+            content: `\n\n-------------------\nOn ${format(new Date(selectedMessage.createdAt), 'PPpp')}, ${recipient.firstName} wrote:\n${selectedMessage.content}`
+        });
+        setIsComposeOpen(true);
+    };
+
+    const getFullAvatarUrl = (url: string | null) => {
+        if (!url) return null;
+        if (url.startsWith('http')) return url;
+        return `${process.env.NEXT_PUBLIC_API_URL?.replace('/api/v1', '')}${url}`;
+    };
+
     const handleSend = async () => {
         if (!composeData.recipientId || !composeData.subject || !composeData.content) {
-            toast.error('Please fill in all fields (Recipient ID required for now)');
+            toast.error('Please select a recipient and fill in all fields');
             return;
         }
 
@@ -81,6 +131,7 @@ export default function MessagesPage() {
             toast.success('Message sent successfully');
             setIsComposeOpen(false);
             setComposeData({ recipientId: '', subject: '', content: '' });
+            setSelectedRecipient(null);
             fetchMessages();
         } catch (error) {
             toast.error('Failed to send message');
@@ -152,31 +203,41 @@ export default function MessagesPage() {
                                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
                             </div>
                         ) : displayedMessages.length > 0 ? (
-                            displayedMessages.map((msg) => (
-                                <div
-                                    key={msg.id}
-                                    onClick={() => handleRead(msg)}
-                                    className={cn(
-                                        "p-4 rounded-xl cursor-pointer transition-all hover:bg-white/5 border border-transparent",
-                                        selectedMessage?.id === msg.id ? "bg-primary/10 border-primary/20" : "",
-                                        activeTab === 'inbox' && !msg.readAt ? "bg-secondary/20 font-medium" : "opacity-80"
-                                    )}
-                                >
-                                    <div className="flex justify-between items-start mb-1">
-                                        <span className="text-sm font-bold truncate pr-2">
-                                            {activeTab === 'inbox'
-                                                ? `${msg.sender?.firstName} ${msg.sender?.lastName}`
-                                                : `${msg.recipient?.firstName} ${msg.recipient?.lastName}`
-                                            }
-                                        </span>
-                                        <span className="text-[10px] text-muted-foreground whitespace-nowrap">
-                                            {format(new Date(msg.createdAt), 'MMM d, h:mm a')}
-                                        </span>
+                            displayedMessages.map((msg) => {
+                                const participant = activeTab === 'inbox' ? msg.sender : msg.recipient;
+                                return (
+                                    <div
+                                        key={msg.id}
+                                        onClick={() => handleRead(msg)}
+                                        className={cn(
+                                            "p-4 rounded-xl cursor-pointer transition-all hover:bg-white/5 border border-transparent",
+                                            selectedMessage?.id === msg.id ? "bg-primary/10 border-primary/20" : "",
+                                            activeTab === 'inbox' && !msg.readAt ? "bg-secondary/20 font-medium" : "opacity-80"
+                                        )}
+                                    >
+                                        <div className="flex gap-3">
+                                            <Avatar className="h-10 w-10 border border-white/10 shrink-0">
+                                                <AvatarImage src={getFullAvatarUrl(participant?.avatarUrl) || undefined} />
+                                                <AvatarFallback className="bg-primary/5 text-primary text-xs uppercase">
+                                                    {participant?.firstName?.[0]}{participant?.lastName?.[0]}
+                                                </AvatarFallback>
+                                            </Avatar>
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex justify-between items-start mb-1">
+                                                    <span className="text-sm font-bold truncate pr-2">
+                                                        {participant?.firstName} {participant?.lastName}
+                                                    </span>
+                                                    <span className="text-[10px] text-muted-foreground whitespace-nowrap">
+                                                        {format(new Date(msg.createdAt), 'MMM d')}
+                                                    </span>
+                                                </div>
+                                                <p className="text-sm truncate text-foreground/90">{msg.subject}</p>
+                                                <p className="text-xs text-muted-foreground truncate line-clamp-1">{msg.content}</p>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <p className="text-sm truncate text-foreground/90">{msg.subject}</p>
-                                    <p className="text-xs text-muted-foreground truncate line-clamp-1">{msg.content}</p>
-                                </div>
-                            ))
+                                );
+                            })
                         ) : (
                             <div className="text-center py-12 text-muted-foreground">
                                 <MessageSquare className="h-10 w-10 mx-auto mb-3 opacity-20" />
@@ -192,43 +253,59 @@ export default function MessagesPage() {
                         <div className="flex flex-col h-full">
                             <CardHeader className="border-b border-white/5 pb-4">
                                 <div className="flex justify-between items-start">
-                                    <div>
-                                        <CardTitle className="text-xl mb-2">{selectedMessage.subject}</CardTitle>
-                                        <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                                            <div className="flex items-center gap-2">
-                                                <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-                                                    <User className="h-4 w-4" />
-                                                </div>
+                                    <div className="flex-1 min-w-0">
+                                        <CardTitle className="text-xl mb-4 truncate">{selectedMessage.subject}</CardTitle>
+                                        <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+                                            <div className="flex items-center gap-3">
+                                                <Avatar className="h-10 w-10 border border-white/10">
+                                                    <AvatarImage src={getFullAvatarUrl(activeTab === 'inbox' ? selectedMessage.sender?.avatarUrl : selectedMessage.recipient?.avatarUrl) || undefined} />
+                                                    <AvatarFallback className="bg-primary/5 text-primary text-xs">
+                                                        {(activeTab === 'inbox' ? selectedMessage.sender?.firstName : selectedMessage.recipient?.firstName)?.[0]}
+                                                    </AvatarFallback>
+                                                </Avatar>
                                                 <div>
-                                                    <p className="font-semibold text-foreground">
+                                                    <p className="font-bold text-foreground">
                                                         {activeTab === 'inbox'
                                                             ? `${selectedMessage.sender?.firstName} ${selectedMessage.sender?.lastName}`
                                                             : `${selectedMessage.recipient?.firstName} ${selectedMessage.recipient?.lastName}`
                                                         }
                                                     </p>
-                                                    <p className="text-xs">{activeTab === 'inbox' ? 'Sender' : 'Recipient'}</p>
+                                                    <p className="text-[10px] uppercase tracking-wider opacity-60">
+                                                        {activeTab === 'inbox' ? 'From' : 'To'} • {activeTab === 'inbox' ? selectedMessage.sender?.role : selectedMessage.recipient?.role}
+                                                    </p>
                                                 </div>
                                             </div>
-                                            <span className="text-xs flex items-center gap-1 ml-auto">
-                                                <Clock className="h-3 w-3" />
-                                                {format(new Date(selectedMessage.createdAt), 'PPpp')}
-                                            </span>
+                                            <div className="flex items-center gap-4 ml-auto">
+                                                <span className="text-xs flex items-center gap-1">
+                                                    <Clock className="h-3.3 w-3.5 mr-1" />
+                                                    {format(new Date(selectedMessage.createdAt), 'PPpp')}
+                                                </span>
+                                                <div className="flex items-center gap-2">
+                                                    {activeTab === 'inbox' && (
+                                                        <Button variant="secondary" size="sm" onClick={handleReply} className="h-8 gap-2">
+                                                            <Reply className="h-3.5 w-3.5" /> Reply
+                                                        </Button>
+                                                    )}
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="h-8 w-8 text-destructive hover:bg-destructive/10"
+                                                        onClick={() => handleDelete(selectedMessage.id)}
+                                                    >
+                                                        <Trash2 className="h-4 w-4" />
+                                                    </Button>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                    <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        className="text-destructive hover:bg-destructive/10"
-                                        onClick={() => handleDelete(selectedMessage.id)}
-                                    >
-                                        <Trash2 className="h-4 w-4" />
-                                    </Button>
                                 </div>
                             </CardHeader>
-                            <CardContent className="flex-1 overflow-y-auto p-6">
-                                <p className="whitespace-pre-wrap leading-relaxed text-sm">
-                                    {selectedMessage.content}
-                                </p>
+                            <CardContent className="flex-1 overflow-y-auto p-8">
+                                <div className="max-w-none prose prose-invert">
+                                    <p className="whitespace-pre-wrap leading-relaxed text-base text-foreground/90">
+                                        {selectedMessage.content}
+                                    </p>
+                                </div>
                             </CardContent>
                         </div>
                     ) : (
@@ -243,46 +320,114 @@ export default function MessagesPage() {
                 </Card>
             </div>
 
-            <Dialog open={isComposeOpen} onOpenChange={setIsComposeOpen}>
+            <Dialog open={isComposeOpen} onOpenChange={(open) => {
+                setIsComposeOpen(open);
+                if (!open) {
+                    setUserSearchQuery('');
+                    setUserSearchResults([]);
+                    if (!composeData.content.includes('---')) { // Only reset if not a reply
+                        setSelectedRecipient(null);
+                        setComposeData({ recipientId: '', subject: '', content: '' });
+                    }
+                }
+            }}>
                 <DialogContent className="glass-card border-none sm:max-w-[500px]">
                     <DialogHeader>
                         <DialogTitle>New Message</DialogTitle>
-                        <DialogDescription>Send a private message.</DialogDescription>
+                        <DialogDescription>Direct and private communication.</DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4 py-4">
                         <div className="space-y-2">
-                            <Label>Recipient ID</Label>
-                            <Input
-                                placeholder="Enter User ID"
-                                className="glass border-white/10"
-                                value={composeData.recipientId}
-                                onChange={(e) => setComposeData(prev => ({ ...prev, recipientId: e.target.value }))}
-                            />
-                            <p className="text-[10px] text-muted-foreground">Enter the unique ID of the user you want to message.</p>
+                            <Label className="text-xs font-bold uppercase tracking-wider opacity-60">Recipient</Label>
+                            {selectedRecipient ? (
+                                <div className="flex items-center justify-between p-3 rounded-xl bg-primary/10 border border-primary/20 animate-in zoom-in duration-200">
+                                    <div className="flex items-center gap-3">
+                                        <Avatar className="h-8 w-8">
+                                            <AvatarImage src={getFullAvatarUrl(selectedRecipient.avatarUrl) || undefined} />
+                                            <AvatarFallback className="bg-primary/20 text-primary text-xs">
+                                                {selectedRecipient.firstName?.[0]}
+                                            </AvatarFallback>
+                                        </Avatar>
+                                        <div>
+                                            <p className="text-sm font-bold">{selectedRecipient.firstName} {selectedRecipient.lastName}</p>
+                                            <p className="text-[10px] opacity-60">{selectedRecipient.role}</p>
+                                        </div>
+                                    </div>
+                                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setSelectedRecipient(null)}>
+                                        <X className="h-4 w-4" />
+                                    </Button>
+                                </div>
+                            ) : (
+                                <div className="relative">
+                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                    <Input
+                                        placeholder="Search by name or email..."
+                                        className="glass border-white/10 pl-9"
+                                        value={userSearchQuery}
+                                        onChange={(e) => handleSearch(e.target.value)}
+                                    />
+                                    {searchingUsers && (
+                                        <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                                            <Loader2 className="h-4 w-4 animate-spin opacity-50" />
+                                        </div>
+                                    )}
+
+                                    {userSearchResults.length > 0 && (
+                                        <div className="absolute top-full left-0 right-0 mt-2 bg-[#1a1c1e] border border-white/10 rounded-xl shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2">
+                                            {userSearchResults.map((u) => (
+                                                <div
+                                                    key={u.id}
+                                                    className="p-3 flex items-center gap-3 hover:bg-white/5 cursor-pointer transition-colors"
+                                                    onClick={() => selectRecipient(u)}
+                                                >
+                                                    <Avatar className="h-8 w-8">
+                                                        <AvatarImage src={getFullAvatarUrl(u.avatarUrl) || undefined} />
+                                                        <AvatarFallback className="bg-primary/10 text-primary text-xs">
+                                                            {u.firstName?.[0]}
+                                                        </AvatarFallback>
+                                                    </Avatar>
+                                                    <div>
+                                                        <p className="text-sm font-bold">{u.firstName} {u.lastName}</p>
+                                                        <p className="text-[10px] opacity-60">{u.role} • {u.email}</p>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
                         </div>
                         <div className="space-y-2">
-                            <Label>Subject</Label>
+                            <Label className="text-xs font-bold uppercase tracking-wider opacity-60">Subject</Label>
                             <Input
-                                placeholder="Message Subject"
+                                placeholder="What is this about?"
                                 className="glass border-white/10"
                                 value={composeData.subject}
                                 onChange={(e) => setComposeData(prev => ({ ...prev, subject: e.target.value }))}
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label>Content</Label>
+                            <Label className="text-xs font-bold uppercase tracking-wider opacity-60">Message</Label>
                             <Textarea
-                                placeholder="Type your message..."
-                                className="glass border-white/10 min-h-[150px]"
+                                placeholder="Write your message here..."
+                                className="glass border-white/10 min-h-[150px] resize-none"
                                 value={composeData.content}
                                 onChange={(e) => setComposeData(prev => ({ ...prev, content: e.target.value }))}
                             />
                         </div>
                     </div>
-                    <DialogFooter>
-                        <Button variant="ghost" onClick={() => setIsComposeOpen(false)}>Cancel</Button>
-                        <Button onClick={handleSend} disabled={submitting}>
-                            {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Send Message'}
+                    <DialogFooter className="gap-2">
+                        <Button variant="ghost" className="h-11 px-6 rounded-xl" onClick={() => setIsComposeOpen(false)}>Cancel</Button>
+                        <Button
+                            onClick={handleSend}
+                            disabled={submitting}
+                            className="h-11 px-8 rounded-xl shadow-lg shadow-primary/20 min-w-[140px]"
+                        >
+                            {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : (
+                                <span className="flex items-center gap-2">
+                                    <Send className="h-4 w-4" /> Send Message
+                                </span>
+                            )}
                         </Button>
                     </DialogFooter>
                 </DialogContent>

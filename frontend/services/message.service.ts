@@ -24,5 +24,10 @@ export const messageService = {
     deleteMessage: async (id: string) => {
         const response = await api.delete(`/messages/${id}`);
         return response.data;
+    },
+
+    searchUsers: async (query: string) => {
+        const response = await api.get(`/users/search?q=${query}`);
+        return response.data.data;
     }
 };

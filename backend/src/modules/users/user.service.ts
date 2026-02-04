@@ -21,6 +21,31 @@ export class UserService {
         });
     }
 
+    static async searchUsers(query: string, schoolId?: string) {
+        const where: any = {
+            deletedAt: null,
+            OR: [
+                { firstName: { contains: query, mode: 'insensitive' } },
+                { lastName: { contains: query, mode: 'insensitive' } },
+                { email: { contains: query, mode: 'insensitive' } },
+            ],
+        };
+        if (schoolId) where.schoolId = schoolId;
+
+        return prisma.user.findMany({
+            where,
+            select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                email: true,
+                role: true,
+                avatarUrl: true,
+            },
+            take: 10,
+        });
+    }
+
     static async getUserById(id: string, schoolId?: string) {
         const where: any = { id, deletedAt: null };
         if (schoolId) where.schoolId = schoolId;

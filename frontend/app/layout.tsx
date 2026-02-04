@@ -3,6 +3,7 @@ import { Toaster } from 'react-hot-toast';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { ThemeProvider } from '@/components/theme-provider';
+import { SocketClient } from '@/components/socket-client';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -25,6 +26,7 @@ export default function RootLayout({
                     enableSystem
                     disableTransitionOnChange
                 >
+                    <SocketClient />
                     {children}
                     <Toaster position="top-right" />
                 </ThemeProvider>

@@ -19,6 +19,8 @@ import permissionRoutes from './modules/permissions/permission.routes';
 import reportRoutes from './modules/reports/report.routes';
 import timetableRoutes from './modules/timetables/timetable.routes';
 import dashboardRoutes from './modules/dashboard/dashboard.routes';
+import notificationRoutes from './modules/notifications/notification.routes';
+import searchRoutes from './modules/search/search.routes';
 import uploadRoutes from './routes/upload.routes';
 
 import { protect } from './middlewares/auth.middleware';
@@ -53,6 +55,8 @@ protectedRouter.use('/permissions', permissionRoutes);
 protectedRouter.use('/reports', reportRoutes);
 protectedRouter.use('/timetables', timetableRoutes);
 protectedRouter.use('/dashboard', dashboardRoutes);
+protectedRouter.use('/notifications', notificationRoutes);
+protectedRouter.use('/search', searchRoutes);
 protectedRouter.use('/upload', uploadRoutes);
 
 router.use(protectedRouter);

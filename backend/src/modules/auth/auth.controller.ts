@@ -92,24 +92,30 @@ export class AuthController {
     }
 
     static async logout(req: AuthenticatedRequest, res: Response) {
-        // Clear refresh token in DB if user is found
-        if (req.user) {
-            await prisma.user.update({
-                where: { id: req.user.id },
-                data: { refreshToken: null },
-            });
-        }
+        try {
+            // Clear refresh token in DB if user is found
+            if (req.user) {
+                await prisma.user.update({
+                    where: { id: req.user.id },
+                    data: { refreshToken: null },
+                });
+                console.log(`[AuthController] User ${req.user.email} logged out. Token cleared in DB.`);
+            }
 
-        const cookieOptions = {
-            httpOnly: true,
-            expires: new Date(0),
-            secure: config.env === 'production',
-            sameSite: 'strict' as const,
-            path: '/'
-        };
-        res.cookie('token', '', cookieOptions);
-        res.cookie('refreshToken', '', cookieOptions);
-        return ApiResponse.success(res, {}, 'Logged out successfully');
+            const cookieOptions = {
+                httpOnly: true,
+                expires: new Date(0),
+                secure: config.env === 'production',
+                sameSite: 'lax' as const, // Match login attribute
+                path: '/'
+            };
+            res.cookie('token', '', cookieOptions);
+            res.cookie('refreshToken', '', cookieOptions);
+            return ApiResponse.success(res, {}, 'Logged out successfully');
+        } catch (error) {
+            console.error('[AuthController] Logout error:', error);
+            return ApiResponse.error(res, 'Logout failed', 500);
+        }
     }
 
     static async getProfile(req: AuthenticatedRequest, res: Response) {

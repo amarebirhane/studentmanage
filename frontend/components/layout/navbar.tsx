@@ -16,6 +16,7 @@ import { notificationService } from '@/services/notification.service';
 import { searchService } from '@/services/search.service';
 import { formatDistanceToNow } from 'date-fns';
 import { useRouter } from 'next/navigation';
+import LanguageSwitcher from '@/components/language-switcher';
 
 export default function Navbar() {
     const { user, logout } = useAuth();
@@ -181,7 +182,9 @@ export default function Navbar() {
                 </div>
             </div>
 
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-4">
+                <LanguageSwitcher />
+
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <button className="relative p-2 text-muted-foreground hover:text-primary transition-colors group">

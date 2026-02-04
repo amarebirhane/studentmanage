@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Video, Calendar, Clock, Plus, Trash2, ExternalLink, Users } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { format } from 'date-fns';
+import { DeleteConfirmDialog } from '@/components/DeleteConfirmDialog';
 
 export default function LiveClassesPage() {
     const { user } = useAuth();
@@ -18,6 +19,8 @@ export default function LiveClassesPage() {
     const [isLoading, setIsLoading] = useState(true);
     const [isCreateOpen, setIsCreateOpen] = useState(false);
     const [creating, setCreating] = useState(false);
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [classToDelete, setClassToDelete] = useState<string | null>(null);
 
     // Form state
     const [formData, setFormData] = useState({
@@ -69,13 +72,20 @@ export default function LiveClassesPage() {
     };
 
     const handleDelete = async (id: string) => {
-        if (!confirm('Cancel this class?')) return;
+        setClassToDelete(id);
+        setDeleteDialogOpen(true);
+    };
+
+    const confirmDelete = async () => {
+        if (!classToDelete) return;
         try {
-            await resourceService.delete(id);
+            await resourceService.delete(classToDelete);
             toast.success('Class cancelled');
             fetchClasses();
         } catch (error) {
             toast.error('Failed to cancel class');
+        } finally {
+            setClassToDelete(null);
         }
     };
 
@@ -200,6 +210,14 @@ export default function LiveClassesPage() {
                     ))}
                 </div>
             )}
+
+            <DeleteConfirmDialog
+                open={deleteDialogOpen}
+                onOpenChange={setDeleteDialogOpen}
+                onConfirm={confirmDelete}
+                title="Cancel Live Class"
+                description="Are you sure you want to cancel this live class? Students will no longer be able to join."
+            />
         </div>
     );
 }

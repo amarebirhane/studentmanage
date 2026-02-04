@@ -24,6 +24,7 @@ import { ActivityLogDialog } from '@/components/settings/activity-log-dialog';
 import { TwoFactorModal } from '@/components/auth/TwoFactorModal';
 import { ShieldCheck, AlertTriangle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { DeleteConfirmDialog } from '@/components/DeleteConfirmDialog';
 
 export default function ProfilePage() {
     const { user, isLoading, updateProfile } = useAuth();
@@ -44,6 +45,7 @@ export default function ProfilePage() {
     });
     const [is2FAModalOpen, setIs2FAModalOpen] = useState(false);
     const [is2FAEnabled, setIs2FAEnabled] = useState(false);
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
     useEffect(() => {
         if (user) {
@@ -60,10 +62,13 @@ export default function ProfilePage() {
         } catch (e) { }
     };
 
-    const handleDisable2FA = async () => {
-        if (!confirm('Are you sure you want to disable 2FA? Your account will be less secure.')) return;
+    const handleDisable2FA = () => {
+        setDeleteDialogOpen(true);
+    };
+
+    const confirmDisable2FA = async () => {
         try {
-            await api.post('/auth/2fa/disable');
+            await api.post('/auth/2fa/ disable');
             setIs2FAEnabled(false);
             toast.success('2FA disabled successfully');
         } catch (error) {
@@ -489,6 +494,14 @@ export default function ProfilePage() {
                     setIs2FAEnabled(true);
                     check2FAStatus();
                 }}
+            />
+            <DeleteConfirmDialog
+                open={deleteDialogOpen}
+                onOpenChange={setDeleteDialogOpen}
+                onConfirm={confirmDisable2FA}
+                title="Disable Two-Factor Authentication"
+                description="Are you sure you want to disable 2FA? Your account will be less secure without this extra layer of protection."
+                confirmText="Disable 2FA"
             />
         </div>
     );

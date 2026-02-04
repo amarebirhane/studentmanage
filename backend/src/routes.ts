@@ -25,6 +25,7 @@ import uploadRoutes from './routes/upload.routes';
 
 import { protect } from './middlewares/auth.middleware';
 import { tenantMiddleware } from './middlewares/tenant.middleware';
+import { auditLog } from './middlewares/auditLog.middleware';
 
 const router = Router();
 console.log('🛣️  Routes initializing...');
@@ -36,7 +37,7 @@ router.use('/platform', platformRoutes);
 
 // 2. Protected & Isolated Routes
 const protectedRouter = Router();
-protectedRouter.use(protect, tenantMiddleware);
+protectedRouter.use(protect, tenantMiddleware, auditLog);
 
 protectedRouter.use('/students', studentRoutes);
 protectedRouter.use('/classes', classRoutes);

@@ -17,7 +17,7 @@ export const messageService = {
     },
 
     markAsRead: async (id: string) => {
-        const response = await api.put(`/messages/${id}/read`);
+        const response = await api.patch(`/messages/${id}/read`);
         return response.data.data;
     },
 

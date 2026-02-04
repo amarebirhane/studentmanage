@@ -1,5 +1,5 @@
 import { Bell, LogOut, Search, User, Check, X } from 'lucide-react';
-import Link from 'next/link';
+import { Link, useRouter } from '@/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
@@ -15,12 +15,13 @@ import { useEffect, useState, useRef } from 'react';
 import { notificationService } from '@/services/notification.service';
 import { searchService } from '@/services/search.service';
 import { formatDistanceToNow } from 'date-fns';
-import { useRouter } from 'next/navigation';
 import LanguageSwitcher from '@/components/language-switcher';
+import { useTranslations } from 'next-intl';
 
 export default function Navbar() {
     const { user, logout } = useAuth();
     const router = useRouter();
+    const t = useTranslations('Common');
     const [notifications, setNotifications] = useState<any[]>([]);
     const [unreadCount, setUnreadCount] = useState(0);
     const [searchQuery, setSearchQuery] = useState('');
@@ -113,7 +114,7 @@ export default function Navbar() {
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <input
                         type="text"
-                        placeholder="Search students, teachers, classes..."
+                        placeholder={t('searchPlaceholder')}
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         onFocus={() => searchQuery.length >= 2 && setShowSearch(true)}
@@ -123,14 +124,14 @@ export default function Navbar() {
                     {showSearch && searchResults && (
                         <div className="absolute top-full left-0 right-0 mt-2 glass-card border rounded-xl shadow-2xl overflow-hidden max-h-[400px] overflow-y-auto z-50 animate-in fade-in slide-in-from-top-2 duration-200">
                             <div className="p-2 border-b bg-muted/30 flex items-center justify-between">
-                                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground px-2">Search Results</span>
+                                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground px-2">{t('searchResults')}</span>
                                 <button onClick={() => setShowSearch(false)}><X className="h-3 w-3 text-muted-foreground hover:text-foreground" /></button>
                             </div>
 
                             {/* Students */}
                             {searchResults.students?.length > 0 && (
                                 <div className="p-1">
-                                    <div className="px-3 py-1 text-[10px] font-bold text-muted-foreground uppercase opacity-50">Students</div>
+                                    <div className="px-3 py-1 text-[10px] font-bold text-muted-foreground uppercase opacity-50">{t('students')}</div>
                                     {searchResults.students.map((res: any) => (
                                         <button
                                             key={res.id}
@@ -153,7 +154,7 @@ export default function Navbar() {
                             {/* Teachers */}
                             {searchResults.teachers?.length > 0 && (
                                 <div className="p-1 border-t">
-                                    <div className="px-3 py-1 text-[10px] font-bold text-muted-foreground uppercase opacity-50">Teachers</div>
+                                    <div className="px-3 py-1 text-[10px] font-bold text-muted-foreground uppercase opacity-50">{t('teachers')}</div>
                                     {searchResults.teachers.map((res: any) => (
                                         <button
                                             key={res.id}
@@ -175,7 +176,7 @@ export default function Navbar() {
 
                             {/* No results */}
                             {(!searchResults.students?.length && !searchResults.teachers?.length && !searchResults.classes?.length) && (
-                                <div className="p-8 text-center text-sm text-muted-foreground italic">No matches found for "{searchQuery}"</div>
+                                <div className="p-8 text-center text-sm text-muted-foreground italic">{t('noMatches')} "{searchQuery}"</div>
                             )}
                         </div>
                     )}
@@ -198,10 +199,10 @@ export default function Navbar() {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-80 glass-card border-none mt-2 p-0 overflow-hidden">
                         <div className="p-4 border-b bg-primary/5 flex items-center justify-between">
-                            <h3 className="font-bold">Notifications</h3>
+                            <h3 className="font-bold">{t('notifications')}</h3>
                             {unreadCount > 0 && (
                                 <Button variant="ghost" size="sm" onClick={handleMarkAllAsRead} className="h-7 text-[10px] font-bold text-primary hover:text-primary/80 hover:bg-primary/10">
-                                    Mark all as read
+                                    {t('markAllRead')}
                                 </Button>
                             )}
                         </div>
@@ -232,7 +233,7 @@ export default function Navbar() {
                             ) : (
                                 <div className="p-8 text-center text-muted-foreground space-y-2">
                                     <Bell className="h-8 w-8 mx-auto opacity-20" />
-                                    <p className="text-sm italic">You're all caught up!</p>
+                                    <p className="text-sm italic">{t('caughtUp')}</p>
                                 </div>
                             )}
                         </div>
@@ -258,19 +259,19 @@ export default function Navbar() {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-56 glass-card border-none mt-2">
                         <DropdownMenuLabel className="flex flex-col gap-1 p-4 bg-muted/30">
-                            <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Logged in as</span>
+                            <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">{t('loggedInAs')}</span>
                             <span className="text-sm font-bold">{user?.email}</span>
                         </DropdownMenuLabel>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem asChild>
                             <Link href="/profile" className="flex items-center cursor-pointer p-3 font-medium">
                                 <User className="mr-3 h-4 w-4 text-primary" />
-                                <span>Profile Settings</span>
+                                <span>{t('profileSettings')}</span>
                             </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem className="cursor-pointer p-3 font-medium text-destructive focus:text-destructive focus:bg-destructive/5" onClick={() => logout()}>
                             <LogOut className="mr-3 h-4 w-4" />
-                            <span>Sign out</span>
+                            <span>{t('signOut')}</span>
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>

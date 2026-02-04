@@ -105,7 +105,7 @@ const Sidebar = () => {
             items: [
                 {
                     title: 'Students',
-                    href: isAdmin ? '/dashboard/admin/students' : '/dashboard/teacher/students',
+                    href: (isAdmin || isStaff) ? '/dashboard/admin/students' : '/dashboard/teacher/students',
                     icon: Users,
                     show: (isTeacher || isAdmin || isStaff) && !isSuperAdmin,
                 },
@@ -117,9 +117,9 @@ const Sidebar = () => {
                 },
                 {
                     title: 'Parents',
-                    href: isAdmin ? '/dashboard/admin/parents' : '/dashboard/teacher/parents',
+                    href: (isAdmin || isStaff) ? '/dashboard/admin/parents' : '/dashboard/teacher/parents',
                     icon: Users,
-                    show: (isTeacher || isAdmin) && !isSuperAdmin,
+                    show: (isTeacher || isAdmin || isStaff) && !isSuperAdmin,
                 },
                 {
                     title: 'Classes',
@@ -129,13 +129,13 @@ const Sidebar = () => {
                 },
                 {
                     title: 'Attendance',
-                    href: isStudent ? '/dashboard/student/attendance' : '/dashboard/attendance',
+                    href: isStudent ? '/dashboard/student/attendance' : (isAdmin || isStaff || isTeacher) ? '/dashboard/attendance' : '/dashboard/attendance',
                     icon: ClipboardCheck,
                     show: (isTeacher || isAdmin || isStudent || isStaff) && !isSuperAdmin,
                 },
                 {
                     title: 'Timetable',
-                    href: isTeacher ? '/dashboard/teacher/timetable' : '/dashboard/timetable',
+                    href: isTeacher ? '/dashboard/teacher/timetable' : (isStudent || isStaff) ? '/dashboard/timetable' : '/dashboard/timetable',
                     icon: Clock,
                     show: (isTeacher || isStudent || isStaff) && !isSuperAdmin,
                 },

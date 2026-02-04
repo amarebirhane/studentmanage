@@ -18,9 +18,9 @@ export function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
 
     // Extract locale and path without locale
-    const localeMatch = pathname.match(/^\/(en|am|or)(\/|$)/);
+    const localeMatch = pathname.match(/^\/(en|am|or|ti)(\/|$)/);
     const locale = localeMatch ? localeMatch[1] : 'en';
-    const pathWithoutLocale = pathname.replace(/^\/(en|am|or)/, '') || '/';
+    const pathWithoutLocale = pathname.replace(/^\/(en|am|or|ti)/, '') || '/';
 
     const token = request.cookies.get('token')?.value;
     const userRole = request.cookies.get('user_role')?.value as keyof typeof roleRoutes | undefined;

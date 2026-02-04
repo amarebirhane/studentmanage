@@ -28,7 +28,8 @@ export default function LanguageSwitcher() {
     const languages = {
         en: 'English',
         am: 'Amharic',
-        or: 'Oromo'
+        or: 'Oromo',
+        ti: 'Tigrigna'
     };
 
     return (

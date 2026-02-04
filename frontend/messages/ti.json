@@ -1,0 +1,13 @@
+{
+    "common": {
+        "dashboard": "ዳሽቦርድ",
+        "students": "ተምሃሮ",
+        "teachers": "መምህራን",
+        "classes": "ክፍልታት",
+        "attendance": "ሳዕሬ",
+        "exams": "ፈተናታት",
+        "settings": "ቅጥታት",
+        "logout": "ውጻእ",
+        "language": "ቋንቋ"
+    }
+}

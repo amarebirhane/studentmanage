@@ -133,9 +133,16 @@ const StudentForm = ({ studentId, initialData }: StudentFormProps) => {
       const res = await api.post('/upload', data, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
-      return res.data.url;
-    } catch (error) {
-      toast.error('Avatar upload failed');
+      // Backend returns { success: true, data: { url: '/uploads/...' }, message: '...' }
+      const avatarUrl = res.data?.data?.url || res.data?.url;
+      if (!avatarUrl) {
+        toast.error('Avatar upload failed: No URL returned');
+        return null;
+      }
+      return avatarUrl;
+    } catch (error: any) {
+      console.error('Avatar upload error:', error);
+      toast.error(error.response?.data?.message || 'Avatar upload failed');
       return null;
     }
   };

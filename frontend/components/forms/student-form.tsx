@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { studentSchema, updateStudentSchema } from '@/lib/validation';
 import toast from 'react-hot-toast';
-import { Upload, User, Phone, Mail, Hash, MapPin, Shield, BookOpen, Layers } from 'lucide-react';
+import { Upload, User, Phone, Mail, Hash, MapPin, Shield, BookOpen, Layers, Lock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   Select,
@@ -42,6 +42,7 @@ const StudentForm = ({ studentId, initialData }: StudentFormProps) => {
     classId: '',
     sectionId: '',
     avatarUrl: null,
+    password: '',
   });
 
   const [classes, setClasses] = useState<any[]>([]);
@@ -87,6 +88,7 @@ const StudentForm = ({ studentId, initialData }: StudentFormProps) => {
         classId: profile.classId || '',
         sectionId: profile.sectionId || '',
         avatarUrl: profile.avatarUrl || null,
+        password: '',
       });
       if (profile.avatarUrl) {
         setAvatarPreview(profile.avatarUrl.startsWith('http') ? profile.avatarUrl : `${process.env.NEXT_PUBLIC_API_URL?.replace('/api/v1', '')}${profile.avatarUrl}`);
@@ -231,6 +233,22 @@ const StudentForm = ({ studentId, initialData }: StudentFormProps) => {
                   <Input name="phone" value={formData.phone} onChange={handleChange} className="pl-9" placeholder="+1 234 567 890" />
                 </div>
               </div>
+              {!studentId && (
+                <div className="space-y-2">
+                  <Label>Password</Label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      name="password"
+                      type="password"
+                      value={formData.password}
+                      onChange={handleChange}
+                      className="pl-9"
+                      placeholder="Default: Student@123"
+                    />
+                  </div>
+                </div>
+              )}
               <div className="space-y-2">
                 <Label>Gender</Label>
                 <Select value={formData.gender} onValueChange={(v) => handleSelectChange('gender', v)}>

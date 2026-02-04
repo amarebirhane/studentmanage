@@ -3,9 +3,12 @@ import { ApiError } from '../../middlewares/error.middleware';
 
 export class ResourceService {
     static async createResource(data: any, userId: string, schoolId: string) {
+        const { subjectId, classId, ...rest } = data;
         return prisma.resource.create({
             data: {
-                ...data,
+                ...rest,
+                subjectId: subjectId || null,
+                classId: classId || null,
                 uploadedById: userId,
                 schoolId
             },

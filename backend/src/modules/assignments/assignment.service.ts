@@ -19,10 +19,10 @@ export class AssignmentService {
             data: {
                 title: data.title,
                 description: data.description,
-                subjectId: data.subjectId,
+                subjectId: data.subjectId || null,
                 dueDate: data.dueDate,
-                classId: data.classId,
-                sectionId: data.sectionId,
+                classId: data.classId || null,
+                sectionId: data.sectionId || null,
                 attachmentUrl: data.attachmentUrl,
                 resourcesUrl: data.resourcesUrl,
                 teacherId: data.teacherId,

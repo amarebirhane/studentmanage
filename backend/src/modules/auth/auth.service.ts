@@ -50,11 +50,11 @@ export class AuthService {
             throw new Error('Invalid email or password');
         }
 
-        if (user.twoFactorEnabled) {
+        if ((user as any).twoFactorEnabled) {
             if (code) {
                 // Verify 2FA code
                 const verified = speakeasy.totp.verify({
-                    secret: user.twoFactorSecret!,
+                    secret: (user as any).twoFactorSecret!,
                     encoding: 'base32',
                     token: code
                 });
@@ -249,10 +249,10 @@ export class AuthService {
 
     static async verifyTwoFactor(userId: string, token: string) {
         const user = await prisma.user.findUnique({ where: { id: userId } });
-        if (!user || !user.twoFactorSecret) throw new ApiError(400, '2FA not enabled');
+        if (!user || !(user as any).twoFactorSecret) throw new ApiError(400, '2FA not enabled');
 
         const verified = speakeasy.totp.verify({
-            secret: user.twoFactorSecret,
+            secret: (user as any).twoFactorSecret,
             encoding: 'base32',
             token
         });

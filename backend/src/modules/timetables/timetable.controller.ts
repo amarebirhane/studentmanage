@@ -28,6 +28,18 @@ export const getTimetable = async (req: Request, res: Response, next: NextFuncti
     }
 };
 
+export const getMyTimetable = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const userId = (req as any).user.id;
+        const schoolId = (req as any).schoolId;
+        const role = (req as any).user.role;
+        const timetable = await TimetableService.getMyTimetable(userId, schoolId, role);
+        new ApiResponse(res, 200, 'Your timetable retrieved', timetable).send();
+    } catch (error) {
+        next(error);
+    }
+};
+
 export const updateEntry = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const schoolId = (req as any).schoolId;

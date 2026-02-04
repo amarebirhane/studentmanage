@@ -70,6 +70,37 @@ export class TimetableService {
         return entry;
     }
 
+    static async getMyTimetable(userId: string, schoolId: string, role: string) {
+        if (role === 'STUDENT') {
+            const student = await prisma.studentProfile.findUnique({
+                where: { userId },
+                select: { classId: true, sectionId: true }
+            });
+
+            if (!student) throw new Error('Student profile not found');
+
+            return this.getTimetable({
+                classId: student.classId as string,
+                sectionId: student.sectionId as string,
+                schoolId
+            });
+        } else if (role === 'TEACHER') {
+            const teacher = await prisma.teacherProfile.findUnique({
+                where: { userId },
+                select: { id: true }
+            });
+
+            if (!teacher) throw new Error('Teacher profile not found');
+
+            return this.getTimetable({
+                teacherId: teacher.id,
+                schoolId
+            });
+        }
+
+        throw new Error('User role not supported for my-timetable');
+    }
+
     static async getTimetable(filters: {
         classId?: string;
         sectionId?: string;

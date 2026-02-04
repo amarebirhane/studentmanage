@@ -85,6 +85,7 @@ model User {
   resetToken       String?
   resetTokenExpiry DateTime?
   uploadedResources Resource[] @relation("ResourceUploader")
+  recordedExpenses Expense[]
 }
 
 model StudentProfile {

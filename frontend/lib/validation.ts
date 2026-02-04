@@ -10,8 +10,17 @@ export const registerSchema = z.object({
     lastName: z.string().min(2, 'Last name must be at least 2 characters'),
     email: z.string().email('Invalid email address'),
     password: z.string().min(6, 'Password must be at least 6 characters'),
-    role: z.enum(['ADMIN', 'TEACHER', 'STUDENT', 'PARENT']).optional(),
+    role: z.enum(['ADMIN', 'TEACHER', 'STUDENT', 'PARENT', 'ACCOUNTANT', 'STAFF']).optional(),
     phone: z.string().optional(),
+});
+
+export const userManagementSchema = z.object({
+    firstName: z.string().min(2, 'First name must be at least 2 characters'),
+    lastName: z.string().min(2, 'Last name must be at least 2 characters'),
+    email: z.string().email('Invalid email address'),
+    role: z.enum(['TEACHER', 'ACCOUNTANT', 'STAFF']),
+    phone: z.string().optional(),
+    avatarUrl: z.string().optional().nullable(),
 });
 
 export const studentSchema = z.object({

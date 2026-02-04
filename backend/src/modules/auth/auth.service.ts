@@ -4,6 +4,8 @@ import { signToken, signRefreshToken, verifyRefreshToken } from '../../utils/jwt
 import { UserRole } from './auth.types';
 import { ApiError } from '../../utils/apiResponse';
 import crypto from 'crypto';
+import speakeasy from 'speakeasy';
+import qrcode from 'qrcode';
 
 export class AuthService {
     static async register(data: any) {
@@ -189,5 +191,68 @@ export class AuthService {
         });
 
         return true;
+    }
+
+    // 2FA Methods
+    static async generateTwoFactorSecret(userId: string) {
+        const user = await prisma.user.findUnique({ where: { id: userId } });
+        if (!user) throw new ApiError(404, 'User not found');
+
+        const secret = speakeasy.generateSecret({
+            name: `EduSmart (${user.email})`
+        });
+
+        const qrCodeUrl = await qrcode.toDataURL(secret.otpauth_url!);
+
+        return {
+            secret: secret.base32,
+            qrCodeUrl
+        };
+    }
+
+    static async enableTwoFactor(userId: string, token: string, secret: string) {
+        const verified = speakeasy.totp.verify({
+            secret,
+            encoding: 'base32',
+            token
+        });
+
+        if (!verified) throw new ApiError(400, 'Invalid OTP');
+
+        await prisma.user.update({
+            where: { id: userId },
+            data: {
+                twoFactorSecret: secret,
+                twoFactorEnabled: true
+            }
+        });
+
+        return { message: '2FA enabled successfully' };
+    }
+
+    static async verifyTwoFactor(userId: string, token: string) {
+        const user = await prisma.user.findUnique({ where: { id: userId } });
+        if (!user || !user.twoFactorSecret) throw new ApiError(400, '2FA not enabled');
+
+        const verified = speakeasy.totp.verify({
+            secret: user.twoFactorSecret,
+            encoding: 'base32',
+            token
+        });
+
+        if (!verified) throw new ApiError(400, 'Invalid OTP');
+
+        return true;
+    }
+
+    static async disableTwoFactor(userId: string) {
+        await prisma.user.update({
+            where: { id: userId },
+            data: {
+                twoFactorSecret: null,
+                twoFactorEnabled: false
+            }
+        });
+        return { message: '2FA disabled successfully' };
     }
 }

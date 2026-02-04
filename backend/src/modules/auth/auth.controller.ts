@@ -127,4 +127,42 @@ export class AuthController {
             return ApiResponse.error(res, error.message, 400);
         }
     }
+
+    // 2FA Endpoints
+    static async generateTwoFactor(req: AuthenticatedRequest, res: Response) {
+        try {
+            const data = await AuthService.generateTwoFactorSecret(req.user!.id);
+            return ApiResponse.success(res, data, '2FA secret generated');
+        } catch (error: any) {
+            return ApiResponse.error(res, error.message, 500);
+        }
+    }
+
+    static async enableTwoFactor(req: AuthenticatedRequest, res: Response) {
+        try {
+            const { token, secret } = req.body;
+            const result = await AuthService.enableTwoFactor(req.user!.id, token, secret);
+            return ApiResponse.success(res, result, '2FA enabled successfully');
+        } catch (error: any) {
+            return ApiResponse.error(res, error.message, 400);
+        }
+    }
+
+    static async verifyTwoFactor(req: AuthenticatedRequest, res: Response) {
+        try {
+            const result = await AuthService.verifyTwoFactor(req.user!.id, req.body.token);
+            return ApiResponse.success(res, { valid: result }, 'Token verified');
+        } catch (error: any) {
+            return ApiResponse.error(res, error.message, 400);
+        }
+    }
+
+    static async disableTwoFactor(req: AuthenticatedRequest, res: Response) {
+        try {
+            const result = await AuthService.disableTwoFactor(req.user!.id);
+            return ApiResponse.success(res, result, '2FA disabled successfully');
+        } catch (error: any) {
+            return ApiResponse.error(res, error.message, 500);
+        }
+    }
 }

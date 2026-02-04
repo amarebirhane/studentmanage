@@ -5,6 +5,7 @@ import { Users, GraduationCap, School, Activity, ArrowUpRight, ClipboardCheck } 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { dashboardService, SchoolAdminData } from '@/services/dashboard.service';
 import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 export default function StaffDashboard() {

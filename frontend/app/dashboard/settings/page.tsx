@@ -98,7 +98,7 @@ export default function SettingsPage() {
                             </div>
                             <Button variant="ghost" size="sm" className="text-xs font-bold text-primary">Enable</Button>
                         </div>
-                    </div>
+                    </CardContent>
                 </Card>
 
                 <Card className="glass-card border-none bg-primary/[0.02]">

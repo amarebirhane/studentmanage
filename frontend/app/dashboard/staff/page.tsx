@@ -77,32 +77,43 @@ export default function StaffDashboard() {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <Card className="lg:col-span-2 glass-card border-none overflow-hidden rounded-2xl">
-                    <CardHeader className="bg-primary/5 border-b border-white/5">
+                    <CardHeader className="bg-primary/5 border-b border-white/5 flex flex-row items-center justify-between p-6">
                         <CardTitle className="flex items-center gap-2">
-                            <Users className="h-5 w-5 text-primary" /> Recent Student Enrollments
+                            <Users className="h-5 w-5 text-primary" /> Today's Attendance Overview
                         </CardTitle>
+                        <Link href="/dashboard/attendance" className="text-xs font-bold text-primary hover:underline">Full Report</Link>
                     </CardHeader>
                     <CardContent className="p-6">
-                        <div className="space-y-4">
-                            {data?.recentActivity?.enrollments?.length ? data.recentActivity.enrollments.map((enrollment: any) => (
-                                <div key={enrollment.id} className="flex items-center gap-4 p-4 rounded-xl bg-secondary/20 border border-white/5 group hover:bg-secondary/30 transition-all">
-                                    <Avatar className="h-10 w-10 border border-primary/20">
-                                        <AvatarImage src={getFullAvatarUrl(enrollment.avatar) || undefined} className="object-cover" />
-                                        <AvatarFallback className="bg-primary/5 text-primary text-xs font-bold">
-                                            {enrollment.name?.[0]}
-                                        </AvatarFallback>
-                                    </Avatar>
-                                    <div className="flex-1 min-w-0">
-                                        <p className="text-sm font-semibold truncate">{enrollment.name}</p>
-                                        <p className="text-xs text-muted-foreground">Enrolled in {enrollment.class} • {new Date(enrollment.date).toLocaleDateString()}</p>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-4">
+                                <div className="p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/10">
+                                    <p className="text-xs font-bold text-emerald-600 uppercase tracking-widest mb-1">Present Students</p>
+                                    <p className="text-2xl font-bold">{data?.stats?.todayAttendance || 0}</p>
+                                </div>
+                                <div className="p-4 rounded-xl bg-orange-500/5 border border-orange-500/10">
+                                    <p className="text-xs font-bold text-orange-600 uppercase tracking-widest mb-1">Recent Enrollments</p>
+                                    <div className="space-y-2 mt-2">
+                                        {data?.recentActivity?.enrollments?.slice(0, 3).map((s: any) => (
+                                            <div key={s.id} className="flex items-center justify-between">
+                                                <span className="text-sm font-medium truncate mr-2">{s.name}</span>
+                                                <span className="text-[10px] text-muted-foreground whitespace-nowrap">{s.class}</span>
+                                            </div>
+                                        )) || <p className="text-xs text-muted-foreground">No recent enrollments</p>}
                                     </div>
-                                    <ArrowUpRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
                                 </div>
-                            )) : (
-                                <div className="text-center py-10">
-                                    <p className="text-sm text-muted-foreground">No recent enrollments to show</p>
-                                </div>
-                            )}
+                            </div>
+                            <div className="space-y-4">
+                                <Card className="bg-secondary/20 border-white/5 rounded-xl">
+                                    <CardContent className="p-4">
+                                        <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-3">Quick Student Search</p>
+                                        <div className="relative">
+                                            <Link href="/dashboard/admin/students">
+                                                <Button size="sm" variant="outline" className="w-full text-xs h-9 rounded-lg">Go to Student Directory</Button>
+                                            </Link>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            </div>
                         </div>
                     </CardContent>
                 </Card>
@@ -110,19 +121,53 @@ export default function StaffDashboard() {
                 <Card className="glass-card border-none overflow-hidden rounded-2xl">
                     <CardHeader className="bg-primary/5 border-b border-white/5">
                         <CardTitle className="flex items-center gap-2">
-                            Quick Tasks
+                            Administrative Ops
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="p-6">
                         <div className="grid grid-cols-1 gap-4">
+                            <Link href="/dashboard/admin/students">
+                                <Button className="w-full justify-start h-16 rounded-xl border-blue-500/20 bg-blue-500/5 hover:bg-blue-500/10 text-foreground" variant="outline">
+                                    <div className="bg-blue-500/10 p-2 rounded-lg mr-3">
+                                        <Users className="h-5 w-5 text-blue-600" />
+                                    </div>
+                                    <div className="text-left">
+                                        <p className="text-sm font-bold">Manage Students</p>
+                                        <p className="text-[10px] text-muted-foreground">Enroll & update profiles</p>
+                                    </div>
+                                </Button>
+                            </Link>
                             <Link href="/dashboard/attendance">
-                                <Button className="w-full justify-start h-12 rounded-xl" variant="outline">
-                                    <ClipboardCheck className="h-4 w-4 mr-2 text-primary" /> Mark Daily Attendance
+                                <Button className="w-full justify-start h-16 rounded-xl border-emerald-500/20 bg-emerald-500/5 hover:bg-emerald-500/10 text-foreground" variant="outline">
+                                    <div className="bg-emerald-500/10 p-2 rounded-lg mr-3">
+                                        <ClipboardCheck className="h-5 w-5 text-emerald-600" />
+                                    </div>
+                                    <div className="text-left">
+                                        <p className="text-sm font-bold">Mark Attendance</p>
+                                        <p className="text-[10px] text-muted-foreground">Review daily records</p>
+                                    </div>
+                                </Button>
+                            </Link>
+                            <Link href="/dashboard/admin/classes">
+                                <Button className="w-full justify-start h-16 rounded-xl border-orange-500/20 bg-orange-500/5 hover:bg-orange-500/10 text-foreground" variant="outline">
+                                    <div className="bg-orange-500/10 p-2 rounded-lg mr-3">
+                                        <School className="h-5 w-5 text-orange-600" />
+                                    </div>
+                                    <div className="text-left">
+                                        <p className="text-sm font-bold">Classes & Sections</p>
+                                        <p className="text-[10px] text-muted-foreground">Manage classrooms</p>
+                                    </div>
                                 </Button>
                             </Link>
                             <Link href="/dashboard/announcements">
-                                <Button className="w-full justify-start h-12 rounded-xl" variant="outline">
-                                    <Activity className="h-4 w-4 mr-2 text-primary" /> Post School Announcement
+                                <Button className="w-full justify-start h-16 rounded-xl border-purple-500/20 bg-purple-500/5 hover:bg-purple-500/10 text-foreground" variant="outline">
+                                    <div className="bg-purple-500/10 p-2 rounded-lg mr-3">
+                                        <Activity className="h-5 w-5 text-purple-600" />
+                                    </div>
+                                    <div className="text-left">
+                                        <p className="text-sm font-bold">Post Notice</p>
+                                        <p className="text-[10px] text-muted-foreground">Broadcast updates</p>
+                                    </div>
                                 </Button>
                             </Link>
                         </div>

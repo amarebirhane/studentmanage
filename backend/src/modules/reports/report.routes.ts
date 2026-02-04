@@ -10,7 +10,7 @@ router.use(protect);
 // Attendance Report (Admin, Teacher, Staff)
 router.get(
     '/attendance',
-    authorize('ADMIN', 'TEACHER', 'STAFF'),
+    authorize('ADMIN', 'TEACHER', 'STAFF', 'ACCOUNTANT'),
     reportController.getAttendanceReport
 );
 

@@ -53,5 +53,50 @@
         "teachers": "Teachers",
         "settings": "Settings",
         "signOut": "Sign Out"
+    },
+    "Landing": {
+        "heroBadge": "The #1 Rated School Management System",
+        "heroTitle": "Empowering Education with Innovation",
+        "heroDesc": "A complete, all-in-one solution for modern educational institutions. Streamline administration, enhance learning, and build a stronger school community.",
+        "startFreeTrial": "Start Free Trial",
+        "liveDemo": "Live Demo",
+        "noCreditCard": "No credit card required",
+        "setupInMinutes": "Setup in minutes",
+        "moduleSubtitle": "Modules",
+        "moduleTitle": "Everything You Need To Grow",
+        "moduleDesc": "Powerful tools designed to simplify complex school operations and drive academic success.",
+        "ctaTitle": "Ready to modernise your school?",
+        "ctaDesc": "Join over 500+ schools worldwide and experience the future of education management.",
+        "getStarted": "Get Started Now",
+        "contactSales": "Contact Sales",
+        "footerRights": "© 2026 EduSmart SMS. All rights reserved.",
+        "privacy": "Privacy",
+        "terms": "Terms",
+        "features": {
+            "admin": {
+                "title": "Smart Admin Panel",
+                "desc": "Full control over staff, students, and curriculum with advanced analytics."
+            },
+            "student": {
+                "title": "Student Management",
+                "desc": "Track academic progress, attendance, and student performance with ease."
+            },
+            "parent": {
+                "title": "Parent Portal",
+                "desc": "Keep parents informed with real-time updates on their child's activities."
+            },
+            "curriculum": {
+                "title": "Curriculum Builder",
+                "desc": "Design and manage course content, exams, and results digitally."
+            },
+            "attendance": {
+                "title": "Attendance Tracking",
+                "desc": "Automated attendance marking with instant alerts for parents."
+            },
+            "financial": {
+                "title": "Secure Financials",
+                "desc": "Manage fees, payroll, and school expenses in one secure location."
+            }
+        }
     }
 }

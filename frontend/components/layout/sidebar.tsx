@@ -1,6 +1,6 @@
 'use client';
 
-import Link from 'next/link';
+import { Link } from '@/navigation';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { useRole } from '@/hooks/useRole';
@@ -27,11 +27,13 @@ import {
     DollarSign
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useTranslations } from 'next-intl';
 
 const Sidebar = () => {
     const pathname = usePathname();
     const { user, logout } = useAuth();
     const { isSuperAdmin, isAdmin, isTeacher, isStudent, isAccountant, isStaff, isParent } = useRole({ userRole: user?.role as any });
+    const t = useTranslations('Sidebar');
 
     const getAvatarUrl = () => {
         if (user?.avatarUrl) {
@@ -44,16 +46,16 @@ const Sidebar = () => {
 
     const menuGroups = [
         {
-            label: 'System Dashboard',
+            label: t('systemDashboard'),
             items: [
                 {
-                    title: 'System Overview',
+                    title: t('systemOverview'),
                     href: '/dashboard/super-admin',
                     icon: ShieldCheck,
                     show: isSuperAdmin,
                 },
                 {
-                    title: 'My Dashboard',
+                    title: t('myDashboard'),
                     href: user?.role ? `/dashboard/${user.role.toLowerCase()}` : '/dashboard/admin',
                     icon: LayoutDashboard,
                     show: !isSuperAdmin,
@@ -61,40 +63,40 @@ const Sidebar = () => {
             ]
         },
         {
-            label: 'Platform Management',
+            label: t('platformManagement'),
             items: [
                 {
-                    title: 'Schools',
+                    title: t('schools'),
                     href: '/dashboard/super-admin/schools',
                     icon: GraduationCap,
                     show: isSuperAdmin,
                 },
                 {
-                    title: 'School Admins',
+                    title: t('schoolAdmins'),
                     href: '/dashboard/super-admin/admins',
                     icon: UserPlus,
                     show: isSuperAdmin,
                 },
                 {
-                    title: 'Revenue Tracking',
+                    title: t('revenueTracking'),
                     href: '/dashboard/super-admin/revenue',
                     icon: DollarSign,
                     show: isSuperAdmin,
                 },
                 {
-                    title: 'Global Analytics',
+                    title: t('globalAnalytics'),
                     href: '/dashboard/super-admin/analytics',
                     icon: BarChart3,
                     show: isSuperAdmin,
                 },
                 {
-                    title: 'Subscriptions',
+                    title: t('subscriptions'),
                     href: '/dashboard/super-admin/subscriptions',
                     icon: CreditCard,
                     show: isSuperAdmin,
                 },
                 {
-                    title: 'Audit Logs',
+                    title: t('auditLogs'),
                     href: '/dashboard/super-admin/logs',
                     icon: ClipboardList,
                     show: isSuperAdmin,
@@ -102,58 +104,58 @@ const Sidebar = () => {
             ]
         },
         {
-            label: 'Academic Management',
+            label: t('academicManagement'),
             items: [
                 {
-                    title: 'Students',
+                    title: t('students'),
                     href: (isAdmin || isStaff) ? '/dashboard/admin/students' : '/dashboard/teacher/students',
                     icon: Users,
                     show: (isTeacher || isAdmin || isStaff) && !isSuperAdmin,
                 },
                 {
-                    title: 'My Classes',
+                    title: t('myClasses'),
                     href: '/dashboard/teacher/classes',
                     icon: GraduationCap,
                     show: isTeacher && !isSuperAdmin,
                 },
                 {
-                    title: 'Parents',
+                    title: t('parents'),
                     href: (isAdmin || isStaff) ? '/dashboard/admin/parents' : '/dashboard/teacher/parents',
                     icon: Users,
                     show: (isTeacher || isAdmin || isStaff) && !isSuperAdmin,
                 },
                 {
-                    title: 'Classes',
+                    title: t('classes'),
                     href: '/dashboard/admin/classes',
                     icon: GraduationCap,
                     show: (isAdmin || isStaff) && !isSuperAdmin,
                 },
                 {
-                    title: 'Attendance',
+                    title: t('attendance'),
                     href: isStudent ? '/dashboard/student/attendance' : (isAdmin || isStaff || isTeacher) ? '/dashboard/attendance' : isParent ? '/dashboard/attendance' : '/dashboard/attendance',
                     icon: ClipboardCheck,
                     show: (isTeacher || isAdmin || isStudent || isStaff || isParent) && !isSuperAdmin,
                 },
                 {
-                    title: 'Timetable',
+                    title: t('timetable'),
                     href: isTeacher ? '/dashboard/teacher/timetable' : (isStudent || isStaff || isParent) ? '/dashboard/timetable' : '/dashboard/timetable',
                     icon: Clock,
                     show: (isTeacher || isStudent || isStaff || isParent) && !isSuperAdmin,
                 },
                 {
-                    title: 'Assignments',
+                    title: t('assignments'),
                     href: isTeacher ? '/dashboard/teacher/assignments' : '/dashboard/assignments',
                     icon: BookOpen,
                     show: (isTeacher || isStudent || isParent) && !isSuperAdmin,
                 },
                 {
-                    title: 'Exams & Results',
+                    title: t('examsResults'),
                     href: isTeacher ? '/dashboard/teacher/exams' : '/dashboard/exams',
                     icon: ClipboardList,
                     show: (isTeacher || isStudent || isParent) && !isSuperAdmin,
                 },
                 {
-                    title: 'Digital Library',
+                    title: t('digitalLibrary'),
                     href: '/dashboard/resources',
                     icon: BookOpen,
                     show: !isSuperAdmin,
@@ -161,22 +163,22 @@ const Sidebar = () => {
             ]
         },
         {
-            label: 'Communication',
+            label: t('communication'),
             items: [
                 {
-                    title: 'Announcements',
+                    title: t('announcements'),
                     href: '/dashboard/announcements',
                     icon: Bell,
                     show: !isSuperAdmin,
                 },
                 {
-                    title: 'Messages',
+                    title: t('messages'),
                     href: '/dashboard/messages',
                     icon: MessageSquare,
                     show: !isSuperAdmin,
                 },
                 {
-                    title: 'Live Classes',
+                    title: t('liveClasses'),
                     href: '/dashboard/live-classes',
                     icon: Video,
                     show: !isSuperAdmin,
@@ -184,22 +186,22 @@ const Sidebar = () => {
             ]
         },
         {
-            label: 'Financial Management',
+            label: t('financialManagement'),
             items: [
                 {
-                    title: 'Fee Management',
+                    title: t('feeManagement'),
                     href: '/dashboard/admin/fees',
                     icon: DollarSign,
                     show: (isAdmin || isAccountant) && !isSuperAdmin,
                 },
                 {
-                    title: 'My Fees',
+                    title: t('myFees'),
                     href: '/dashboard/student/fees',
                     icon: DollarSign,
                     show: (isStudent || isParent) && !isSuperAdmin,
                 },
                 {
-                    title: 'Reports',
+                    title: t('reports'),
                     href: '/dashboard/admin/reports',
                     icon: BookOpen,
                     show: (isAdmin || isAccountant) && !isSuperAdmin,
@@ -207,16 +209,16 @@ const Sidebar = () => {
             ]
         },
         ...((isAdmin || isStaff) && !isSuperAdmin ? [{
-            label: 'Administrative',
+            label: t('administrative'),
             items: [
                 {
-                    title: 'User Management',
+                    title: t('userManagement'),
                     href: '/dashboard/admin/users',
                     icon: Users,
                     show: isAdmin,
                 },
                 {
-                    title: 'Teachers',
+                    title: t('teachers'),
                     href: '/dashboard/admin/teachers',
                     icon: GraduationCap,
                     show: true,
@@ -224,10 +226,10 @@ const Sidebar = () => {
             ]
         }] : []),
         {
-            label: 'System',
+            label: t('system'),
             items: [
                 {
-                    title: 'Settings',
+                    title: t('settings'),
                     href: '/dashboard/settings',
                     icon: Settings,
                     show: true,
@@ -262,7 +264,8 @@ const Sidebar = () => {
                             <div className="space-y-1">
                                 {visibleItems.map((item) => {
                                     const Icon = item.icon;
-                                    const isActive = pathname === item.href;
+                                    // Check if pathname starts with the item href to handle nested routes and locale prefixes
+                                    const isActive = pathname.startsWith(item.href);
                                     return (
                                         <Link
                                             key={item.href}
@@ -312,7 +315,7 @@ const Sidebar = () => {
                         onClick={() => logout()}
                     >
                         <LogOut className="h-4 w-4 mr-2 group-hover:rotate-12 transition-transform" />
-                        Sign Out
+                        {t('signOut')}
                     </Button>
                 </div>
             </div>

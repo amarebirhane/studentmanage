@@ -8,6 +8,7 @@ export interface User {
     role: UserRole;
     phone?: string;
     avatarUrl?: string;
+    schoolId?: string;
     createdAt: string;
     updatedAt: string;
 }

@@ -31,6 +31,11 @@ export class DashboardController {
                 case 'PARENT':
                     data = await DashboardService.getParentDashboard(userId, schoolId);
                     break;
+                case 'ACCOUNTANT':
+                case 'STAFF':
+                    // These roles use the school admin dashboard view restricted to their school
+                    data = await DashboardService.getSchoolAdminDashboard(schoolId);
+                    break;
                 default:
                     throw new Error('Invalid role for dashboard');
             }

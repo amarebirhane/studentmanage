@@ -314,6 +314,14 @@ export default function DigitalLibraryPage() {
                     ))}
                 </div>
             )}
+
+            <DeleteConfirmDialog
+                open={deleteDialogOpen}
+                onOpenChange={setDeleteDialogOpen}
+                onConfirm={confirmDelete}
+                title="Delete Resource"
+                description="Are you sure you want to delete this resource? This action cannot be undone."
+            />
         </div>
     );
 }

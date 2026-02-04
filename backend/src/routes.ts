@@ -24,6 +24,7 @@ import searchRoutes from './modules/search/search.routes';
 import uploadRoutes from './routes/upload.routes';
 import resourceRoutes from './modules/resources/resource.routes';
 import paymentRoutes from './modules/finance/payment.routes';
+import expenseRoutes from './modules/finance/expense.routes';
 
 import { protect } from './middlewares/auth.middleware';
 import { tenantMiddleware } from './middlewares/tenant.middleware';

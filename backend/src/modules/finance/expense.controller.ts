@@ -28,7 +28,7 @@ export class ExpenseController {
 
     static async update(req: AuthenticatedRequest, res: Response) {
         try {
-            const expense = await ExpenseService.updateExpense(req.params.id, req.body);
+            const expense = await ExpenseService.updateExpense(req.params.id as string, req.body);
             return ApiResponse.success(res, expense, 'Expense updated successfully');
         } catch (error: any) {
             return ApiResponse.error(res, error.message, 500);
@@ -37,7 +37,7 @@ export class ExpenseController {
 
     static async delete(req: AuthenticatedRequest, res: Response) {
         try {
-            await ExpenseService.deleteExpense(req.params.id);
+            await ExpenseService.deleteExpense(req.params.id as string);
             return ApiResponse.success(res, null, 'Expense deleted successfully');
         } catch (error: any) {
             return ApiResponse.error(res, error.message, 500);

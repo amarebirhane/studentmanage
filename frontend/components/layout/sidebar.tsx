@@ -30,7 +30,7 @@ import { Button } from '@/components/ui/button';
 const Sidebar = () => {
     const pathname = usePathname();
     const { user, logout } = useAuth();
-    const { isSuperAdmin, isAdmin, isTeacher, isStudent, isAccountant, isParent } = useRole({ userRole: user?.role as any });
+    const { isSuperAdmin, isAdmin, isTeacher, isStudent, isAccountant, isStaff, isParent } = useRole({ userRole: user?.role as any });
 
     const getAvatarUrl = () => {
         if (user?.avatarUrl) {
@@ -107,7 +107,7 @@ const Sidebar = () => {
                     title: 'Students',
                     href: isAdmin ? '/dashboard/admin/students' : '/dashboard/teacher/students',
                     icon: Users,
-                    show: (isTeacher || isAdmin) && !isSuperAdmin,
+                    show: (isTeacher || isAdmin || isStaff) && !isSuperAdmin,
                 },
                 {
                     title: 'My Classes',
@@ -125,19 +125,19 @@ const Sidebar = () => {
                     title: 'Classes',
                     href: '/dashboard/admin/classes',
                     icon: GraduationCap,
-                    show: isAdmin && !isSuperAdmin,
+                    show: (isAdmin || isStaff) && !isSuperAdmin,
                 },
                 {
                     title: 'Attendance',
                     href: isStudent ? '/dashboard/student/attendance' : '/dashboard/attendance',
                     icon: ClipboardCheck,
-                    show: (isTeacher || isAdmin || isStudent) && !isSuperAdmin,
+                    show: (isTeacher || isAdmin || isStudent || isStaff) && !isSuperAdmin,
                 },
                 {
                     title: 'Timetable',
                     href: isTeacher ? '/dashboard/teacher/timetable' : '/dashboard/timetable',
                     icon: Clock,
-                    show: (isTeacher || isStudent) && !isSuperAdmin,
+                    show: (isTeacher || isStudent || isStaff) && !isSuperAdmin,
                 },
                 {
                     title: 'Assignments',
@@ -193,14 +193,14 @@ const Sidebar = () => {
                 },
             ]
         },
-        ...(isAdmin && !isSuperAdmin ? [{
+        ...((isAdmin || isStaff) && !isSuperAdmin ? [{
             label: 'Administrative',
             items: [
                 {
                     title: 'User Management',
                     href: '/dashboard/admin/users',
                     icon: Users,
-                    show: true,
+                    show: isAdmin,
                 },
                 {
                     title: 'Teachers',

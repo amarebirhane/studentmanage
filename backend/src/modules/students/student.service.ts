@@ -107,6 +107,42 @@ export class StudentService {
             }
         }
 
+        // Normalize empty strings to null for foreign key fields
+        const normalizedClassId = profileData.classId && typeof profileData.classId === 'string' && profileData.classId.trim() !== ''
+            ? profileData.classId.trim()
+            : null;
+        const normalizedSectionId = profileData.sectionId && typeof profileData.sectionId === 'string' && profileData.sectionId.trim() !== ''
+            ? profileData.sectionId.trim()
+            : null;
+
+        // Validate classId if provided
+        if (normalizedClassId) {
+            const classExists = await prisma.class.findFirst({
+                where: {
+                    id: normalizedClassId,
+                    deletedAt: null,
+                    ...(schoolId && { schoolId })
+                }
+            });
+            if (!classExists) {
+                throw new Error('Selected class does not exist');
+            }
+        }
+
+        // Validate sectionId if provided
+        if (normalizedSectionId) {
+            const sectionExists = await prisma.section.findFirst({
+                where: {
+                    id: normalizedSectionId,
+                    deletedAt: null,
+                    ...(normalizedClassId && { classId: normalizedClassId })
+                }
+            });
+            if (!sectionExists) {
+                throw new Error('Selected section does not exist');
+            }
+        }
+
         const hashedPassword = await hashPassword(password || 'Student@123');
 
         return await prisma.$transaction(async (tx) => {
@@ -122,13 +158,18 @@ export class StudentService {
                 },
             });
 
+            // Prepare profile data, excluding classId and sectionId from spread
+            const { classId, sectionId, dateOfBirth, ...restProfileData } = profileData;
+
             const profile = await tx.studentProfile.create({
                 data: {
-                    ...profileData,
+                    ...restProfileData,
                     userId: user.id,
                     enrollmentNo,
                     schoolId,
-                    dateOfBirth: profileData.dateOfBirth ? new Date(profileData.dateOfBirth) : null,
+                    dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : null,
+                    ...(normalizedClassId && { classId: normalizedClassId }),
+                    ...(normalizedSectionId && { sectionId: normalizedSectionId }),
                 },
                 include: { user: true },
             });

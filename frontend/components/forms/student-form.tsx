@@ -157,6 +157,8 @@ const StudentForm = ({ studentId, initialData }: StudentFormProps) => {
     const submitData = {
       ...rest,
       age: age ? parseInt(age) : undefined,
+      classId: rest.classId && rest.classId.trim() !== '' ? rest.classId : undefined,
+      sectionId: rest.sectionId && rest.sectionId.trim() !== '' ? rest.sectionId : undefined,
       avatarUrl
     };
 

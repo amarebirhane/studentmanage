@@ -6,6 +6,16 @@
         "email": "Email",
         "password": "Password",
         "dashboard": "Dashboard",
-        "home": "Home"
+        "home": "Home",
+        "language": "Language",
+        "searchPlaceholder": "Search students, teachers, classes...",
+        "searchResults": "Search Results",
+        "noMatches": "No matches found for",
+        "notifications": "Notifications",
+        "markAllRead": "Mark all as read",
+        "caughtUp": "You're all caught up!",
+        "loggedInAs": "Logged in as",
+        "profileSettings": "Profile Settings",
+        "signOut": "Sign out"
     }
 }

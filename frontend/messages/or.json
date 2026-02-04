@@ -6,6 +6,16 @@
         "email": "Imeelii",
         "password": "Jecha Darbii",
         "dashboard": "Daashboordii",
-        "home": "Man'ee"
+        "home": "Man'ee",
+        "language": "Afaan",
+        "searchPlaceholder": "Barattoota, barsiisota, kutaa barbaadi...",
+        "searchResults": "Bu'aa Barbaachaa",
+        "noMatches": "Wanti argame hin jiru kan",
+        "notifications": "Beeksisa",
+        "markAllRead": "Hunda akka dubbifametti mallatteessi",
+        "caughtUp": "Hundi dubbifameera!",
+        "loggedInAs": "Akka seenteetti",
+        "profileSettings": "Sajata dhuunfaa",
+        "signOut": "Bahi"
     }
 }

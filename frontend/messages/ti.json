@@ -1,13 +1,21 @@
 {
-    "common": {
+    "Common": {
+        "welcome": "እንቋዕ ብደሓን መጻእኩም",
+        "login": "እቶ",
+        "register": "ተመዝገብ",
+        "email": "ኢሜይል",
+        "password": "መሕለፊ ቃል",
         "dashboard": "ዳሽቦርድ",
-        "students": "ተምሃሮ",
-        "teachers": "መምህራን",
-        "classes": "ክፍልታት",
-        "attendance": "ሳዕሬ",
-        "exams": "ፈተናታት",
-        "settings": "ቅጥታት",
-        "logout": "ውጻእ",
-        "language": "ቋንቋ"
+        "home": "መበገሲ",
+        "language": "ቋንቋ",
+        "searchPlaceholder": "ተምሃሮ፣ መምህራን፣ ክፍልታት ድለ...",
+        "searchResults": "ውጽኢት ፍለጋ",
+        "noMatches": "ዝተረኽበ የለን ን",
+        "notifications": "መፍለጥያታት",
+        "markAllRead": "ኩሉ ከምዝተነበበ ምልክት ግበር",
+        "caughtUp": "ኩሉ ተነቢቡ እዩ!",
+        "loggedInAs": "ከም ተመዝጊቡ ዘሎ",
+        "profileSettings": "ቅጥታት ፕሮፋይል",
+        "signOut": "ውጻእ"
     }
 }

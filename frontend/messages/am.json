@@ -6,6 +6,16 @@
         "email": "ኢሜይል",
         "password": "የይለፍ ቃል",
         "dashboard": "ዳሽቦርድ",
-        "home": "መነሻ"
+        "home": "መነሻ",
+        "language": "ቋንቋ",
+        "searchPlaceholder": "ተማሪዎችን፣ መምህራንን፣ ክፍሎችን ይፈልጉ...",
+        "searchResults": "የፍለጋ ውጤቶች",
+        "noMatches": "ምንም አልተገኘም በ",
+        "notifications": "ማሳወቂያዎች",
+        "markAllRead": "ሁሉንም እንደተነበበ ምልክት አድርግ",
+        "caughtUp": "ሁሉም ተነቧል!",
+        "loggedInAs": "እንደ ተመዝግቧል",
+        "profileSettings": "የመገለጫ ቅንብሮች",
+        "signOut": "ውጣ"
     }
 }

@@ -6,7 +6,6 @@ import { ApiResponse } from '../../utils/apiResponse';
 export class ResourceController {
     static async createResource(req: AuthenticatedRequest, res: Response) {
         try {
-            console.log('[ResourceController] Creating resource. Body:', JSON.stringify(req.body, null, 2));
             const resource = await ResourceService.createResource(
                 req.body,
                 req.user!.id,
@@ -14,7 +13,6 @@ export class ResourceController {
             );
             return ApiResponse.success(res, resource, 'Resource uploaded successfully');
         } catch (error: any) {
-            console.error('[ResourceController] Error creating resource:', error);
             return ApiResponse.error(res, error.message, error.statusCode || 500);
         }
     }

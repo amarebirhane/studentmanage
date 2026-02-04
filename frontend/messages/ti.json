@@ -16,7 +16,9 @@
         "caughtUp": "ኩሉ ተነቢቡ እዩ!",
         "loggedInAs": "ከም ተመዝጊቡ ዘሎ",
         "profileSettings": "ቅጥታት ፕሮፋይል",
-        "signOut": "ውጻእ"
+        "signOut": "ውጻእ",
+        "students": "ተምሃሮ",
+        "teachers": "መምህራን"
     },
     "Sidebar": {
         "systemDashboard": "ዳሽቦርድ ስርዓት",

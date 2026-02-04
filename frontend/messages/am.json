@@ -16,7 +16,9 @@
         "caughtUp": "ሁሉም ተነቧል!",
         "loggedInAs": "እንደ ተመዝግቧል",
         "profileSettings": "የመገለጫ ቅንብሮች",
-        "signOut": "ውጣ"
+        "signOut": "ውጣ",
+        "students": "ተማሪዎች",
+        "teachers": "መምህራን"
     },
     "Sidebar": {
         "systemDashboard": "የስርዓት ዳሽቦርድ",

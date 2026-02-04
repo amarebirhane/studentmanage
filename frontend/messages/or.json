@@ -16,7 +16,9 @@
         "caughtUp": "Hundi dubbifameera!",
         "loggedInAs": "Akka seenteetti",
         "profileSettings": "Sajata dhuunfaa",
-        "signOut": "Bahi"
+        "signOut": "Bahi",
+        "students": "Barattoota",
+        "teachers": "Barsiisota"
     },
     "Sidebar": {
         "systemDashboard": "Daashboordii Sirnaa",

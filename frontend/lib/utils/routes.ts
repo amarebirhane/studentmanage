@@ -12,6 +12,8 @@ export function getDashboardRoute(role: UserRole): string {
         TEACHER: '/dashboard/teacher',
         STUDENT: '/dashboard/student',
         PARENT: '/dashboard/parent',
+        ACCOUNTANT: '/dashboard/accountant',
+        STAFF: '/dashboard/staff',
     };
 
     return routes[role] || '/dashboard/admin';

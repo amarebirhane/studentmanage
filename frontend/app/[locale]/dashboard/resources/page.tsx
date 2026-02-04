@@ -12,6 +12,7 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { BookOpen, FileText, Video, Link as LinkIcon, Image as ImageIcon, Plus, Trash2, Search, Filter, Download, ExternalLink, GraduationCap } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import { DeleteConfirmDialog } from '@/components/DeleteConfirmDialog';
 import { format } from 'date-fns';
 
 export default function DigitalLibraryPage() {
@@ -22,6 +23,8 @@ export default function DigitalLibraryPage() {
     const [selectedType, setSelectedType] = useState<string>('ALL');
     const [isUploadOpen, setIsUploadOpen] = useState(false);
     const [uploading, setUploading] = useState(false);
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [resourceToDelete, setResourceToDelete] = useState<string | null>(null);
 
     // Form state
     const [formData, setFormData] = useState({
@@ -86,13 +89,20 @@ export default function DigitalLibraryPage() {
     };
 
     const handleDelete = async (id: string) => {
-        if (!confirm('Are you sure you want to delete this resource?')) return;
+        setResourceToDelete(id);
+        setDeleteDialogOpen(true);
+    };
+
+    const confirmDelete = async () => {
+        if (!resourceToDelete) return;
         try {
-            await resourceService.delete(id);
+            await resourceService.delete(resourceToDelete);
             toast.success('Resource deleted');
             fetchResources();
         } catch (error) {
             toast.error('Failed to delete resource');
+        } finally {
+            setResourceToDelete(null);
         }
     };
 

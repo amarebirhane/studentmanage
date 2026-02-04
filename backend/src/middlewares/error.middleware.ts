@@ -18,5 +18,7 @@ export const errorMiddleware = (err: any, req: Request, res: Response, next: Nex
     const message = err.message || 'Internal Server Error';
     const errors = config.env === 'development' ? err.stack : null;
 
+    console.error('❌ [ErrorMiddleware]:', err);
+
     return ApiResponse.error(res, message, statusCode, errors);
 };

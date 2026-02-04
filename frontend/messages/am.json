@@ -122,6 +122,21 @@
         "enterValidCode": "እባክዎ ትክክለኛ ባለ 6 አሃዝ ኮድ ያስገቡ",
         "twoFactorRequired": "ባለ ሁለት ደረጃ ማረጋገጫ ያስፈልጋል",
         "invalid2faCode": "የተሳሳተ የ 2FA ኮድ",
-        "invalidCredentials": "የተሳሳተ መረጃ"
+        "invalidCredentials": "የተሳሳተ መረጃ",
+        "register": "ይመዝገቡ",
+        "createAccountAdmin": "አዲስ መለያ ይፍጠሩ (ለአስተዳዳሪ ብቻ)",
+        "name": "ስም",
+        "email": "ኢሜይል",
+        "password": "የይለፍ ቃል",
+        "confirmPassword": "የይለፍ ቃል ያረጋግጡ",
+        "role": "ሚና",
+        "teacher": "መምህር",
+        "admin": "አስተዳዳሪ",
+        "registering": "በመመዝገብ ላይ...",
+        "alreadyHaveAccountQuestion": "ቀደም ብሎ መለያ አለዎት?",
+        "login": "ግባ",
+        "adminOnlyError": "አዲስ ተጠቃሚዎችን መመዝገብ የሚችሉት አስተዳዳሪዎች ብቻ ናቸው",
+        "successRegister": "ተጠቃሚው በተሳካ ሁኔታ ተመዝግቧል!",
+        "passwordsDoNotMatch": "የይለፍ ቃላት አይዛመዱም"
     }
 }

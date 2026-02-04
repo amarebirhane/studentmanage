@@ -122,6 +122,21 @@
         "enterValidCode": "በጃኹም ትኽክለኛ ናይ 6 ኣሃዝ ኮድ የእትዉ",
         "twoFactorRequired": "ክልተ-ደረጃ ምርግጋጽ የድሊ",
         "invalid2faCode": "ጌጋ ናይ 2FA ኮድ",
-        "invalidCredentials": "ጌጋ ሓበሬታ"
+        "invalidCredentials": "ጌጋ ሓበሬታ",
+        "register": "ተመዝገብ",
+        "createAccountAdmin": "ሓድሽ ሕሳብ ፍጠር (ንኣማሓዳሪ ጥራይ)",
+        "name": "ስም",
+        "email": "ኢመይል",
+        "password": "መሕለፊ ቃል",
+        "confirmPassword": "መሕለፊ ቃል ኣረጋግጽ",
+        "role": "ተራ",
+        "teacher": "መምህር",
+        "admin": "ኣማሓዳሪ",
+        "registering": "ኣብ ምምዝጋብ ይርከብ...",
+        "alreadyHaveAccountQuestion": "ቅድሚ ሕጂ ሕሳብ ኣለኩም ዶ?",
+        "login": "እቶ",
+        "adminOnlyError": "ኣመሓደርቲ ጥራይ እዮም ሓደሽቲ ተጠቃሚታት ክምዝግቡ ዝኽእሉ",
+        "successRegister": "ተጠቃሚ ብዓወት ተመዝጊቡ ኣሎ!",
+        "passwordsDoNotMatch": "መሕለፊ ቃላት ኣይሰማምዑን"
     }
 }

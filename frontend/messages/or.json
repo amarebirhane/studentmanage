@@ -122,6 +122,21 @@
         "enterValidCode": "Maaloo koodii amansiisaa nambarii 6 galchaa",
         "twoFactorRequired": "Mirkaneessi dachaa barbaachisaadha",
         "invalid2faCode": "Koodii 2FA dogoggora",
-        "invalidCredentials": "Odeeffannoo dogoggora"
+        "invalidCredentials": "Odeeffannoo dogoggora",
+        "register": "Galmaa'u",
+        "createAccountAdmin": "Hanga haaraa uumi (Admin qofa)",
+        "name": "Maqaa",
+        "email": "Iimeeyilii",
+        "password": "Jecha Darbii",
+        "confirmPassword": "Jecha Darbii Mirkaneessi",
+        "role": "Gahee",
+        "teacher": "Barsiisaa",
+        "admin": "Bulchaa",
+        "registering": "Galmeessaa jira...",
+        "alreadyHaveAccountQuestion": "Duraan herrega qabduu?",
+        "login": "Seeni",
+        "adminOnlyError": "Bulchitoota qofatu ተጠቃሚዎችን galmeessuu danda'a",
+        "successRegister": "ተጠቃሚው milkaa'inaan galmaa'eera!",
+        "passwordsDoNotMatch": "Jechi darbii wal hin fakkaatu"
     }
 }

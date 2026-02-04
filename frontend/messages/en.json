@@ -122,6 +122,21 @@
         "enterValidCode": "Please enter a valid 6-digit code",
         "twoFactorRequired": "Two-factor authentication required",
         "invalid2faCode": "Invalid 2FA Code",
-        "invalidCredentials": "Invalid credentials"
+        "invalidCredentials": "Invalid credentials",
+        "register": "Register",
+        "createAccountAdmin": "Create a new account (Admin only)",
+        "name": "Name",
+        "email": "Email",
+        "password": "Password",
+        "confirmPassword": "Confirm Password",
+        "role": "Role",
+        "teacher": "Teacher",
+        "admin": "Admin",
+        "registering": "Registering...",
+        "alreadyHaveAccountQuestion": "Already have an account?",
+        "login": "Login",
+        "adminOnlyError": "Only admins can register new users",
+        "successRegister": "User registered successfully!",
+        "passwordsDoNotMatch": "Passwords do not match"
     }
 }

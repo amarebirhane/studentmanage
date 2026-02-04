@@ -51,6 +51,6 @@ export const resourceService = {
                 'Content-Type': 'multipart/form-data',
             },
         });
-        return response.data.url; // Assuming the upload endpoint returns { url: '...' }
+        return response.data.data.url; // API returns { data: { url: '...' } }
     }
 };

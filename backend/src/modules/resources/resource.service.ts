@@ -3,10 +3,20 @@ import { ApiError } from '../../middlewares/error.middleware';
 
 export class ResourceService {
     static async createResource(data: any, userId: string, schoolId: string) {
-        const { subjectId, classId, ...rest } = data;
+        console.log('[ResourceService] createResource data:', data);
+        const { title, description, type, url, subjectId, classId } = data;
+
+        // Validate required URL field
+        if (!url || typeof url !== 'string' || url.trim() === '') {
+            throw new ApiError(400, 'Resource URL is required');
+        }
+
         return prisma.resource.create({
             data: {
-                ...rest,
+                title,
+                description: description || null,
+                type,
+                url: url.trim(),
                 subjectId: subjectId || null,
                 classId: classId || null,
                 uploadedById: userId,

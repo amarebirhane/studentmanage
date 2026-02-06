@@ -56,7 +56,19 @@ export const checkPermission = (module: string, action: 'view' | 'create' | 'edi
                 }
             }
 
-            // 6. Special Case: Parents get default access to view essential modules for their children
+            // 6. Special Case: Student/Teacher get default access to view essential modules
+            if ((req.user.role === 'STUDENT' as any || req.user.role === 'TEACHER' as any) && (
+                module === 'announcements' ||
+                module === 'timetable' ||
+                module === 'assignments' ||
+                module === 'exams'
+            )) {
+                if (action === 'view') {
+                    return next();
+                }
+            }
+
+            // 7. Special Case: Parents get default access to view essential modules for their children
             if (req.user.role === 'PARENT' as any && (
                 module === 'students' ||
                 module === 'attendance' ||

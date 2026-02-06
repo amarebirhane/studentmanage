@@ -28,7 +28,8 @@ export const checkPermission = (module: string, action: 'view' | 'create' | 'edi
             }
 
             // 3. Special Case: Core features like 'messages' are allowed by default for all roles
-            if (module === 'messages' && (action === 'view' || action === 'create')) {
+            // Ownership is checked at the service level
+            if (module === 'messages') {
                 return next();
             }
 

@@ -42,6 +42,13 @@ router.get(
     attendanceController.getDailyReport
 );
 
+// Alias for frontend compatibility
+router.get(
+    '/report/daily',
+    authorize('ADMIN', 'TEACHER'),
+    attendanceController.getDailyReport
+);
+
 // Legacy routes for compatibility
 router.post('/', authorize('ADMIN', 'TEACHER'), attendanceController.createAttendance);
 router.get('/:id', authorize('ADMIN', 'TEACHER', 'PARENT'), attendanceController.getAttendance);

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import {X} from 'lucide-react';
+import { X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -145,10 +145,14 @@ export default function MessagesPage() {
         setSelectedMessage(msg);
         if (activeTab === 'inbox' && !msg.readAt) {
             try {
+                const now = new Date().toISOString();
+                // Optimistic update
+                setMessages(prev => prev.map(m => m.id === msg.id ? { ...m, readAt: now } : m));
                 await messageService.markAsRead(msg.id);
-                setMessages(prev => prev.map(m => m.id === msg.id ? { ...m, readAt: new Date().toISOString() } : m));
             } catch (error) {
                 console.error('Failed to mark as read');
+                // Revert if failed
+                setMessages(prev => prev.map(m => m.id === msg.id ? { ...m, readAt: null } : m));
             }
         }
     };
@@ -278,12 +282,12 @@ export default function MessagesPage() {
                                             </div>
                                             <div className="flex items-center gap-4 ml-auto">
                                                 <span className="text-xs flex items-center gap-1">
-                                                    <Clock className="h-3.3 w-3.5 mr-1" />
+                                                    <Clock className="h-3.5 w-3.5 mr-1" />
                                                     {format(new Date(selectedMessage.createdAt), 'PPpp')}
                                                 </span>
                                                 <div className="flex items-center gap-2">
                                                     {activeTab === 'inbox' && (
-                                                        <Button variant="secondary" size="sm" onClick={handleReply} className="h-8 gap-2">
+                                                        <Button variant="outline" size="sm" onClick={handleReply} className="h-8 gap-2 border-white/10 hover:bg-white/5">
                                                             <Reply className="h-3.5 w-3.5" /> Reply
                                                         </Button>
                                                     )}
@@ -374,11 +378,11 @@ export default function MessagesPage() {
                                     )}
 
                                     {userSearchResults.length > 0 && (
-                                        <div className="absolute top-full left-0 right-0 mt-2 bg-[#1a1c1e] border border-white/10 rounded-xl shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2">
+                                        <div className="absolute top-full left-0 right-0 mt-2 bg-[#1a1c1e] border border-white/10 rounded-xl shadow-2xl z-[100] overflow-hidden animate-in fade-in slide-in-from-top-2 max-h-[250px] overflow-y-auto">
                                             {userSearchResults.map((u) => (
                                                 <div
                                                     key={u.id}
-                                                    className="p-3 flex items-center gap-3 hover:bg-white/5 cursor-pointer transition-colors"
+                                                    className="p-3 flex items-center gap-3 hover:bg-white/5 cursor-pointer transition-colors border-b border-white/5 last:border-0"
                                                     onClick={() => selectRecipient(u)}
                                                 >
                                                     <Avatar className="h-8 w-8">
@@ -387,9 +391,9 @@ export default function MessagesPage() {
                                                             {u.firstName?.[0]}
                                                         </AvatarFallback>
                                                     </Avatar>
-                                                    <div>
-                                                        <p className="text-sm font-bold">{u.firstName} {u.lastName}</p>
-                                                        <p className="text-[10px] opacity-60">{u.role} • {u.email}</p>
+                                                    <div className="min-w-0 flex-1">
+                                                        <p className="text-sm font-bold truncate">{u.firstName} {u.lastName}</p>
+                                                        <p className="text-[10px] opacity-60 truncate">{u.role} • {u.email}</p>
                                                     </div>
                                                 </div>
                                             ))}

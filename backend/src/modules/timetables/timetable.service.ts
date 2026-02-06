@@ -119,6 +119,7 @@ export class TimetableService {
             include: {
                 class: true,
                 section: true,
+                subject: true,
                 teacher: {
                     include: {
                         user: {

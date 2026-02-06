@@ -2,19 +2,31 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { GraduationCap, Search, Plus, Loader2, Users, Layout, MoreVertical, Edit, Trash2 } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { GraduationCap, Search, Plus, Loader2, Users, Layout, Edit, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { classService } from "@/services/class.service";
 import { toast } from "react-hot-toast";
-import { Badge } from "@/components/ui/badge";
+import ClassModal from "@/components/ClassModal";
+import SectionModal from "@/components/SectionModal";
+import { DeleteConfirmDialog } from "@/components/DeleteConfirmDialog";
 
 export default function ClassesPage() {
     const router = useRouter();
     const [classes, setClasses] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState("");
+
+    // Modal States
+    const [classModalOpen, setClassModalOpen] = useState(false);
+    const [sectionModalOpen, setSectionModalOpen] = useState(false);
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
+    // Selected Item States
+    const [selectedClass, setSelectedClass] = useState<any>(null);
+    const [selectedSection, setSelectedSection] = useState<any>(null);
+    const [itemToDelete, setItemToDelete] = useState<{ id: string; type: 'class' | 'section' } | null>(null);
 
     useEffect(() => {
         fetchClasses();
@@ -33,41 +45,65 @@ export default function ClassesPage() {
         }
     };
 
-    const handleDelete = async (id: string, type: 'class' | 'section') => {
-        if (!confirm(`Are you sure you want to delete this ${type}?`)) return;
+    const confirmDelete = async () => {
+        if (!itemToDelete) return;
 
         try {
-            if (type === 'class') {
-                await classService.deleteClass(id);
+            setLoading(true);
+            if (itemToDelete.type === 'class') {
+                await classService.deleteClass(itemToDelete.id);
             } else {
-                await classService.deleteSection(id);
+                await classService.deleteSection(itemToDelete.id);
             }
-            toast.success(`${type.charAt(0).toUpperCase() + type.slice(1)} deleted successfully`);
+            toast.success(`${itemToDelete.type.charAt(0).toUpperCase() + itemToDelete.type.slice(1)} deleted successfully`);
             fetchClasses();
         } catch (error) {
-            toast.error(`Failed to delete ${type}`);
+            toast.error(`Failed to delete ${itemToDelete.type}`);
+        } finally {
+            setLoading(false);
+            setItemToDelete(null);
         }
+    };
+
+    const openDeleteDialog = (id: string, type: 'class' | 'section') => {
+        setItemToDelete({ id, type });
+        setDeleteDialogOpen(true);
+    };
+
+    const openAddSection = (cls: any) => {
+        setSelectedClass(cls);
+        setSectionModalOpen(true);
+    };
+
+    const openEditClass = (cls: any) => {
+        setSelectedClass(cls);
+        setClassModalOpen(true);
+    };
+
+    const openAddClass = () => {
+        setSelectedClass(null);
+        setClassModalOpen(true);
     };
 
     const filteredClasses = classes.filter(cls =>
         cls.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        cls.grade?.toLowerCase().includes(searchQuery.toLowerCase())
+        cls.grade?.toString().toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500 p-6">
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight">Academic Management</h1>
+                    <h1 className="text-3xl font-bold tracking-tight text-white">Academic Management</h1>
                     <p className="text-muted-foreground">Define grade levels, sections, and curriculum tracks.</p>
                 </div>
                 <div className="flex gap-3">
-                    <Button variant="outline" className="glass border-white/10">
-                        <Layout className="h-4 w-4 mr-2" />
+                    <Button variant="outline" className="glass border-white/10 text-white">
+                        <Layout className="h-4 w-4 mr-2 text-primary" />
                         Manage Sections
                     </Button>
                     <Button
-                        onClick={() => router.push('/dashboard/admin/classes/new')}
+                        onClick={openAddClass}
                         className="glass bg-primary/20 hover:bg-primary/30 text-primary border-primary/20"
                     >
                         <Plus className="h-4 w-4 mr-2" />
@@ -81,15 +117,15 @@ export default function ClassesPage() {
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
                         placeholder="Search by class name or grade..."
-                        className="pl-10 glass border-white/10"
+                        className="pl-10 glass border-white/10 text-white"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
                 </div>
             </div>
 
-            {loading ? (
-                <div className="flex flex-col items-center justify-center py-20 space-y-4">
+            {loading && classes.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-20 space-y-4 text-white">
                     <Loader2 className="h-8 w-8 text-primary animate-spin" />
                     <p className="text-muted-foreground font-medium">Loading classes...</p>
                 </div>
@@ -105,7 +141,7 @@ export default function ClassesPage() {
                                                 <GraduationCap className="h-6 w-6 text-primary" />
                                             </div>
                                             <div>
-                                                <h3 className="text-lg font-bold">{cls.name}</h3>
+                                                <h3 className="text-lg font-bold text-white">{cls.name}</h3>
                                                 <div className="flex items-center text-xs text-muted-foreground">
                                                     <span className="font-medium mr-2">Grade: {cls.grade}</span>
                                                     <span>•</span>
@@ -114,11 +150,11 @@ export default function ClassesPage() {
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-2">
-                                            <Button variant="ghost" size="sm" onClick={() => handleDelete(cls.id, 'class')}>
-                                                <Trash2 className="h-4 w-4 text-destructive" />
+                                            <Button variant="ghost" size="sm" className="hover:bg-white/5" onClick={() => openEditClass(cls)}>
+                                                <Edit className="h-4 w-4 text-primary/70" />
                                             </Button>
-                                            <Button variant="ghost" size="sm">
-                                                <Edit className="h-4 w-4" />
+                                            <Button variant="ghost" size="sm" className="hover:bg-destructive/10" onClick={() => openDeleteDialog(cls.id, 'class')}>
+                                                <Trash2 className="h-4 w-4 text-destructive" />
                                             </Button>
                                         </div>
                                     </div>
@@ -131,23 +167,27 @@ export default function ClassesPage() {
                                                         {section.name}
                                                     </div>
                                                     <div>
-                                                        <p className="text-sm font-semibold">Section {section.name}</p>
+                                                        <p className="text-sm font-semibold text-white">Section {section.name}</p>
                                                         <div className="flex items-center text-[10px] text-muted-foreground">
-                                                            <Users className="h-3 w-3 mr-1" />
+                                                            <Users className="h-3 w-3 mr-1 text-primary/60" />
                                                             {section._count?.students || 0} Students
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0 opacity-0 group-section/hover:opacity-100" onClick={() => handleDelete(section.id, 'section')}>
+                                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0 opacity-0 group-section/hover:opacity-100 hover:bg-destructive/10" onClick={() => openDeleteDialog(section.id, 'section')}>
                                                     <Trash2 className="h-3.5 w-3.5 text-destructive" />
                                                 </Button>
                                             </div>
                                         )) : (
-                                            <div className="p-4 rounded-xl bg-dashed border border-white/10 flex items-center justify-center text-xs text-muted-foreground italic">
+                                            <div className="p-4 rounded-xl bg-white/[0.02] border border-dashed border-white/10 flex items-center justify-center text-xs text-muted-foreground italic">
                                                 No sections defined
                                             </div>
                                         )}
-                                        <Button variant="outline" className="h-full border-dashed border-white/10 hover:bg-white/5 text-xs text-muted-foreground py-4">
+                                        <Button
+                                            variant="outline"
+                                            onClick={() => openAddSection(cls)}
+                                            className="h-full border-dashed border-white/10 hover:bg-white/5 text-xs text-muted-foreground py-4 flex items-center justify-center bg-transparent"
+                                        >
                                             <Plus className="h-3 w-3 mr-1" /> Add Section
                                         </Button>
                                     </div>
@@ -156,12 +196,37 @@ export default function ClassesPage() {
                         </Card>
                     )) : (
                         <div className="text-center py-20 border-2 border-dashed border-white/5 rounded-3xl">
-                            <p className="text-muted-foreground font-medium">No classes found.</p>
+                            <p className="text-muted-foreground font-medium text-white">No classes found.</p>
                             <p className="text-xs text-muted-foreground mt-1">Try refining your search or add a new academic class.</p>
                         </div>
                     )}
                 </div>
             )}
+
+            {/* Modals */}
+            <ClassModal
+                open={classModalOpen}
+                onOpenChange={setClassModalOpen}
+                onSuccess={fetchClasses}
+                editData={selectedClass}
+            />
+
+            <SectionModal
+                open={sectionModalOpen}
+                onOpenChange={setSectionModalOpen}
+                onSuccess={fetchClasses}
+                classId={selectedClass?.id}
+                className={selectedClass?.name}
+            />
+
+            <DeleteConfirmDialog
+                open={deleteDialogOpen}
+                onOpenChange={setDeleteDialogOpen}
+                onConfirm={confirmDelete}
+                title={`Delete ${itemToDelete?.type}`}
+                description={`Are you sure you want to delete this ${itemToDelete?.type}? This action cannot be undone.`}
+                isLoading={loading}
+            />
         </div>
     );
 }

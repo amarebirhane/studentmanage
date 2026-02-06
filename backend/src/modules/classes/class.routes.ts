@@ -18,6 +18,9 @@ router.post('/', checkPermission('classes', 'create'), ClassController.createCla
 router.post('/sections', checkPermission('classes', 'create'), ClassController.createSection);
 router.post('/subjects', checkPermission('classes', 'create'), ClassController.createSubject);
 
+router.put('/:id', checkPermission('classes', 'edit'), ClassController.updateClass);
+router.put('/sections/:id', checkPermission('classes', 'edit'), ClassController.updateSection);
+
 router.delete('/:id', checkPermission('classes', 'delete'), ClassController.deleteClass);
 router.delete('/sections/:id', checkPermission('classes', 'delete'), ClassController.deleteSection);
 router.delete('/subjects/:id', checkPermission('classes', 'delete'), ClassController.deleteSubject);

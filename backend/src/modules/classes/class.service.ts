@@ -64,6 +64,36 @@ export class ClassService {
         });
     }
 
+    static async updateClass(id: string, name?: string, grade?: string, schoolId?: string) {
+        const where: any = { id, deletedAt: null };
+        if (schoolId) where.schoolId = schoolId;
+
+        const cls = await prisma.class.findFirst({ where });
+        if (!cls) throw new Error('Class not found');
+
+        return prisma.class.update({
+            where: { id },
+            data: { name, grade }
+        });
+    }
+
+    static async updateSection(id: string, name: string, schoolId?: string) {
+        const section = await prisma.section.findFirst({
+            where: {
+                id,
+                deletedAt: null,
+                class: schoolId ? { schoolId } : undefined
+            }
+        });
+
+        if (!section) throw new Error('Section not found');
+
+        return prisma.section.update({
+            where: { id },
+            data: { name }
+        });
+    }
+
     static async deleteClass(id: string, schoolId?: string) {
         const where: any = { id, deletedAt: null };
         if (schoolId) where.schoolId = schoolId;

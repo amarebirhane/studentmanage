@@ -42,6 +42,26 @@ export class ClassController {
         }
     }
 
+    static async updateClass(req: AuthenticatedRequest, res: Response) {
+        try {
+            const { name, grade } = req.body;
+            const cls = await ClassService.updateClass(req.params.id as string, name, grade, req.schoolId);
+            return ApiResponse.success(res, cls, 'Class updated successfully');
+        } catch (error: any) {
+            return ApiResponse.error(res, error.message, 400);
+        }
+    }
+
+    static async updateSection(req: AuthenticatedRequest, res: Response) {
+        try {
+            const { name } = req.body;
+            const section = await ClassService.updateSection(req.params.id as string, name, req.schoolId);
+            return ApiResponse.success(res, section, 'Section updated successfully');
+        } catch (error: any) {
+            return ApiResponse.error(res, error.message, 400);
+        }
+    }
+
     static async deleteClass(req: AuthenticatedRequest, res: Response) {
         try {
             await ClassService.deleteClass(req.params.id as string, req.schoolId);

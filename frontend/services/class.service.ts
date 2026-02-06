@@ -33,6 +33,11 @@ export const classService = {
         return data.data!;
     },
 
+    async updateSection(id: string, sectionData: { name: string }): Promise<Section> {
+        const { data } = await api.put<ApiResponse<Section>>(`/classes/sections/${id}`, sectionData);
+        return data.data!;
+    },
+
     async deleteClass(id: string): Promise<void> {
         await api.delete(`/classes/${id}`);
     },

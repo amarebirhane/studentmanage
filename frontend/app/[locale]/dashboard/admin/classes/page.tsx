@@ -72,6 +72,13 @@ export default function ClassesPage() {
 
     const openAddSection = (cls: any) => {
         setSelectedClass(cls);
+        setSelectedSection(null);
+        setSectionModalOpen(true);
+    };
+
+    const openEditSection = (cls: any, section: any) => {
+        setSelectedClass(cls);
+        setSelectedSection(section);
         setSectionModalOpen(true);
     };
 
@@ -174,9 +181,14 @@ export default function ClassesPage() {
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0 opacity-0 group-section/hover:opacity-100 hover:bg-destructive/10" onClick={() => openDeleteDialog(section.id, 'section')}>
-                                                    <Trash2 className="h-3.5 w-3.5 text-destructive" />
-                                                </Button>
+                                                <div className="flex items-center gap-1 opacity-0 group-section/hover:opacity-100 transition-opacity">
+                                                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0 hover:bg-white/5" onClick={() => openEditSection(cls, section)}>
+                                                        <Edit className="h-3.5 w-3.5 text-primary/70" />
+                                                    </Button>
+                                                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0 hover:bg-destructive/10" onClick={() => openDeleteDialog(section.id, 'section')}>
+                                                        <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                                                    </Button>
+                                                </div>
                                             </div>
                                         )) : (
                                             <div className="p-4 rounded-xl bg-white/[0.02] border border-dashed border-white/10 flex items-center justify-center text-xs text-muted-foreground italic">
@@ -201,7 +213,8 @@ export default function ClassesPage() {
                         </div>
                     )}
                 </div>
-            )}
+            )
+            }
 
             {/* Modals */}
             <ClassModal
@@ -217,6 +230,7 @@ export default function ClassesPage() {
                 onSuccess={fetchClasses}
                 classId={selectedClass?.id}
                 className={selectedClass?.name}
+                editData={selectedSection}
             />
 
             <DeleteConfirmDialog
@@ -227,6 +241,6 @@ export default function ClassesPage() {
                 description={`Are you sure you want to delete this ${itemToDelete?.type}? This action cannot be undone.`}
                 isLoading={loading}
             />
-        </div>
+        </div >
     );
 }

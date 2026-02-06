@@ -55,9 +55,8 @@ export default function SectionModal({
 
         try {
             if (editData?.id) {
-                // Assuming there's an updateSection if needed, but for now we focus on Add Section
-                // If updateSection doesn't exist in service, we might need to add it or skip edit for sections
-                toast.error('Section update not implemented in service');
+                await classService.updateSection(editData.id, { name: formData.name });
+                toast.success('Section updated successfully');
             } else {
                 await classService.createSection({
                     name: formData.name,

@@ -45,6 +45,7 @@ protectedRouter.use(protect, tenantMiddleware, auditLog);
 protectedRouter.use('/students', studentRoutes);
 protectedRouter.use('/classes', classRoutes);
 protectedRouter.use('/admin', userRoutes);
+protectedRouter.use('/users', userRoutes);
 protectedRouter.use('/teachers', teacherRoutes);
 protectedRouter.use('/parents', parentRoutes);
 protectedRouter.use('/attendance', attendanceRoutes);
